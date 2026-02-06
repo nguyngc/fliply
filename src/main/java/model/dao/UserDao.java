@@ -13,83 +13,115 @@ public class UserDao {
      * Persist a new User entity into the database.
      */
     public void persist(User user) {
-        EntityManager em = MariaDbJPAConnection.getInstance();
-        em.getTransaction().begin();
-        em.persist(user);
-        em.getTransaction().commit();
+        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+            em.getTransaction().begin();
+            try {
+                em.persist(user);
+                em.getTransaction().commit();
+            } catch (Exception e) {
+                em.getTransaction().rollback();
+                throw e;
+            }
+        }
     }
 
     /**
      * Find a User by its primary key (userId).
      */
     public User find(int userId) {
-        EntityManager em = MariaDbJPAConnection.getInstance();
-        return em.find(User.class, userId);
+        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+            return em.find(User.class, Integer.valueOf(userId));
+        }
     }
 
     /**
      * Retrieve all User entities.
      */
     public List<User> findAll() {
-        EntityManager em = MariaDbJPAConnection.getInstance();
-        TypedQuery<User> query = em.createQuery(
-                "SELECT u FROM User u", User.class
-        );
-        return query.getResultList();
+        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+            TypedQuery<User> query = em.createQuery("SELECT u FROM User u", User.class);
+            return query.getResultList();
+        }
     }
 
     /**
      * Update an existing User entity.
      */
     public void update(User user) {
-        EntityManager em = MariaDbJPAConnection.getInstance();
-        em.getTransaction().begin();
-        em.merge(user);
-        em.getTransaction().commit();
+        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+            em.getTransaction().begin();
+            try {
+                em.merge(user);
+                em.getTransaction().commit();
+            } catch (Exception e) {
+                em.getTransaction().rollback();
+                throw e;
+            }
+        }
     }
 
     /**
      * Delete a User entity.
      */
     public void delete(User user) {
-        EntityManager em = MariaDbJPAConnection.getInstance();
-        em.getTransaction().begin();
+        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+            em.getTransaction().begin();
+            try {
+                // Ensure the entity is managed before removal
+                User managed = em.contains(user) ? user : em.merge(user);
+                em.remove(managed);
 
-        // Ensure the entity is managed before removal
-        if (!em.contains(user)) {
-            user = em.merge(user);
+                em.getTransaction().commit();
+            } catch (Exception e) {
+                em.getTransaction().rollback();
+                throw e;
+            }
         }
-
-        em.remove(user);
-        em.getTransaction().commit();
     }
 
     /**
-     * Find a user by email (common lookup).
+     * Find a user by email.
      */
     public User findByEmail(String email) {
-        EntityManager em = MariaDbJPAConnection.getInstance();
-        TypedQuery<User> query = em.createQuery(
-                "SELECT u FROM User u WHERE u.email = :email",
-                User.class
-        );
-        query.setParameter("email", email);
+        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+            TypedQuery<User> query = em.createQuery(
+                    "SELECT u FROM User u WHERE u.email = :email",
+                    User.class
+            );
+            query.setParameter("email", email);
 
-        List<User> results = query.getResultList();
-        return results.isEmpty() ? null : results.get(0);
+            List<User> results = query.getResultList();
+            return results.isEmpty() ? null : results.get(0);
+        }
     }
 
     /**
      * Check if a user exists by Google ID.
      */
     public boolean existsByGoogleId(String googleId) {
-        EntityManager em = MariaDbJPAConnection.getInstance();
-        TypedQuery<Long> query = em.createQuery(
-                "SELECT COUNT(u) FROM User u WHERE u.googleId = :gid",
-                Long.class
-        );
-        query.setParameter("gid", googleId);
+        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+            TypedQuery<Long> query = em.createQuery(
+                    "SELECT COUNT(u) FROM User u WHERE u.googleId = :gid",
+                    Long.class
+            );
+            query.setParameter("gid", googleId);
 
-        return query.getSingleResult() > 0;
+            Long count = query.getSingleResult();
+            return count != null && count > 0;
+        }
+    }
+    /**
+     * fiund user by Google ID.
+     */
+
+    public User findByGoogleId(String googleId) {
+        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+            List<User> results = em.createQuery(
+                    "SELECT u FROM User u WHERE u.googleId = :gid",
+                    User.class
+            ).setParameter("gid", googleId).getResultList();
+
+            return results.isEmpty() ? null : results.get(0);
+        }
     }
 }

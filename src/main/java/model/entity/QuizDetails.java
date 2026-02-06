@@ -4,17 +4,19 @@ import jakarta.persistence.*;
 
 @Entity
 @Table(name = "QUIZ_DETAILS")
-@IdClass(QuizDetailsId.class)
 public class QuizDetails {
 
     @Id
-    @ManyToOne
-    @JoinColumn(name = "quizId")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "QuizDetailsId")
+    private Integer quizDetailsId;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "QuizId", referencedColumnName = "QuizId", nullable = false)
     private Quiz quiz;
 
-    @Id
-    @ManyToOne
-    @JoinColumn(name = "flashcardId")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "FlashcardId", referencedColumnName = "FlashcardId", nullable = false)
     private Flashcard flashcard;
 
     public QuizDetails() {}
@@ -24,28 +26,19 @@ public class QuizDetails {
         this.flashcard = flashcard;
     }
 
-    public Quiz getQuiz() {
-        return quiz;
-    }
+    public Integer getQuizDetailsId() { return quizDetailsId; }
+    public Quiz getQuiz() { return quiz; }
+    public Flashcard getFlashcard() { return flashcard; }
 
-    public Flashcard getFlashcard() {
-        return flashcard;
-    }
-
-    public void setQuiz(Quiz quiz) {
-        this.quiz = quiz;
-    }
-
-    public void setFlashcard(Flashcard flashcard) {
-        this.flashcard = flashcard;
-    }
+    public void setQuiz(Quiz quiz) { this.quiz = quiz; }
+    public void setFlashcard(Flashcard flashcard) { this.flashcard = flashcard; }
 
     @Override
     public String toString() {
         return "QuizDetails{" +
-                "quizId=" + (quiz != null ? quiz.getQuizId() : null) +
+                "quizDetailsId=" + quizDetailsId +
+                ", quizId=" + (quiz != null ? quiz.getQuizId() : null) +
                 ", flashcardId=" + (flashcard != null ? flashcard.getFlashcardId() : null) +
                 '}';
     }
 }
-

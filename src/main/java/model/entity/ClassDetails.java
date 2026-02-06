@@ -8,14 +8,15 @@ public class ClassDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    @Column(name = "ClassDetailsId")
+    private Integer classDetailsId;
 
-    @ManyToOne
-    @JoinColumn(name = "userId")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "UserId", referencedColumnName = "UserId", nullable = false)
     private User user;
 
-    @ManyToOne
-    @JoinColumn(name = "classId")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "ClassId", referencedColumnName = "ClassId", nullable = false)
     private ClassModel classModel;
 
     public ClassDetails() {}
@@ -25,7 +26,7 @@ public class ClassDetails {
         this.classModel = classModel;
     }
 
-    public int getId() { return id; }
+    public Integer getClassDetailsId() { return classDetailsId; }
     public User getUser() { return user; }
     public ClassModel getClassModel() { return classModel; }
 
@@ -35,10 +36,9 @@ public class ClassDetails {
     @Override
     public String toString() {
         return "ClassDetails{" +
-                "id=" + id +
+                "classDetailsId=" + classDetailsId +
                 ", userId=" + (user != null ? user.getUserId() : null) +
                 ", classId=" + (classModel != null ? classModel.getClassId() : null) +
                 '}';
     }
 }
-

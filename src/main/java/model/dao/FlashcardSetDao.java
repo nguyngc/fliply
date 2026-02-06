@@ -9,87 +9,85 @@ import java.util.List;
 
 public class FlashcardSetDao {
 
-    /**
-     * Persist a new FlashcardSet entity into the database.
-     */
     public void persist(FlashcardSet flashcardSet) {
-        EntityManager em = MariaDbJPAConnection.getInstance();
-        em.getTransaction().begin();
-        em.persist(flashcardSet);
-        em.getTransaction().commit();
-    }
-
-    /**
-     * Find a FlashcardSet by its primary key (flashcardSetId).
-     */
-    public FlashcardSet find(int flashcardSetId) {
-        EntityManager em = MariaDbJPAConnection.getInstance();
-        return em.find(FlashcardSet.class, flashcardSetId);
-    }
-
-    /**
-     * Retrieve all FlashcardSet records.
-     */
-    public List<FlashcardSet> findAll() {
-        EntityManager em = MariaDbJPAConnection.getInstance();
-        TypedQuery<FlashcardSet> query = em.createQuery(
-                "SELECT fs FROM FlashcardSet fs", FlashcardSet.class
-        );
-        return query.getResultList();
-    }
-
-    /**
-     * Update an existing FlashcardSet entity.
-     */
-    public void update(FlashcardSet flashcardSet) {
-        EntityManager em = MariaDbJPAConnection.getInstance();
-        em.getTransaction().begin();
-        em.merge(flashcardSet);
-        em.getTransaction().commit();
-    }
-
-    /**
-     * Delete a FlashcardSet entity.
-     */
-    public void delete(FlashcardSet flashcardSet) {
-        EntityManager em = MariaDbJPAConnection.getInstance();
-        em.getTransaction().begin();
-
-        // Ensure entity is managed before removal
-        if (!em.contains(flashcardSet)) {
-            flashcardSet = em.merge(flashcardSet);
+        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+            em.getTransaction().begin();
+            try {
+                em.persist(flashcardSet);
+                em.getTransaction().commit();
+            } catch (Exception e) {
+                em.getTransaction().rollback();
+                throw e;
+            }
         }
-
-        em.remove(flashcardSet);
-        em.getTransaction().commit();
     }
 
-    /**
-     * Find all flashcard sets belonging to a specific class.
-     */
+    public FlashcardSet find(int flashcardSetId) {
+        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+            return em.find(FlashcardSet.class, Integer.valueOf(flashcardSetId));
+        }
+    }
+
+    public List<FlashcardSet> findAll() {
+        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+            TypedQuery<FlashcardSet> query = em.createQuery(
+                    "SELECT fs FROM FlashcardSet fs", FlashcardSet.class
+            );
+            return query.getResultList();
+        }
+    }
+
+    public void update(FlashcardSet flashcardSet) {
+        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+            em.getTransaction().begin();
+            try {
+                em.merge(flashcardSet);
+                em.getTransaction().commit();
+            } catch (Exception e) {
+                em.getTransaction().rollback();
+                throw e;
+            }
+        }
+    }
+
+    public void delete(FlashcardSet flashcardSet) {
+        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+            em.getTransaction().begin();
+            try {
+                if (!em.contains(flashcardSet)) {
+                    flashcardSet = em.merge(flashcardSet);
+                }
+                em.remove(flashcardSet);
+                em.getTransaction().commit();
+            } catch (Exception e) {
+                em.getTransaction().rollback();
+                throw e;
+            }
+        }
+    }
+
     public List<FlashcardSet> findByClassId(int classId) {
-        EntityManager em = MariaDbJPAConnection.getInstance();
-        TypedQuery<FlashcardSet> query = em.createQuery(
-                "SELECT fs FROM FlashcardSet fs WHERE fs.classModel.classId = :cid",
-                FlashcardSet.class
-        );
-        query.setParameter("cid", classId);
-        return query.getResultList();
+        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+            TypedQuery<FlashcardSet> query = em.createQuery(
+                    "SELECT fs FROM FlashcardSet fs WHERE fs.classModel.classId = :cid",
+                    FlashcardSet.class
+            );
+            query.setParameter("cid", classId);
+            return query.getResultList();
+        }
     }
 
-    /**
-     * Check if a flashcard set with the same subject already exists in a class.
-     */
     public boolean existsBySubjectInClass(String subject, int classId) {
-        EntityManager em = MariaDbJPAConnection.getInstance();
-        TypedQuery<Long> query = em.createQuery(
-                "SELECT COUNT(fs) FROM FlashcardSet fs " +
-                        "WHERE fs.subject = :subject AND fs.classModel.classId = :cid",
-                Long.class
-        );
-        query.setParameter("subject", subject);
-        query.setParameter("cid", classId);
+        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+            TypedQuery<Long> query = em.createQuery(
+                    "SELECT COUNT(fs) FROM FlashcardSet fs " +
+                            "WHERE fs.subject = :subject AND fs.classModel.classId = :cid",
+                    Long.class
+            );
+            query.setParameter("subject", subject);
+            query.setParameter("cid", classId);
 
-        return query.getSingleResult() > 0;
+            return query.getSingleResult() > 0;
+        }
     }
 }

@@ -3,21 +3,26 @@ package model.entity;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "FLASHCARD")
 public class Flashcard {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int flashcardId;
+    @Column(name = "FlashcardId")
+    private Integer flashcardId;
 
+    @Column(name = "Term")
     private String term;
+
+    @Column(name = "Definition")
     private String definition;
 
-    @ManyToOne
-    @JoinColumn(name = "flashcardSetId")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "FlashcardSetId", referencedColumnName = "FlashcardSetId", nullable = false)
     private FlashcardSet flashcardSet;
 
-    @ManyToOne
-    @JoinColumn(name = "userId")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "UserId", referencedColumnName = "UserId", nullable = false)
     private User user;
 
     public Flashcard() {}
@@ -29,7 +34,7 @@ public class Flashcard {
         this.user = user;
     }
 
-    public int getFlashcardId() { return flashcardId; }
+    public Integer getFlashcardId() { return flashcardId; }
     public String getTerm() { return term; }
     public String getDefinition() { return definition; }
     public FlashcardSet getFlashcardSet() { return flashcardSet; }
@@ -51,4 +56,3 @@ public class Flashcard {
                 '}';
     }
 }
-

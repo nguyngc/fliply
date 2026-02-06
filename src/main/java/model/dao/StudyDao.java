@@ -9,99 +9,94 @@ import java.util.List;
 
 public class StudyDao {
 
-    /**
-     * Persist a new Study entity into the database.
-     */
     public void persist(Study study) {
-        EntityManager em = MariaDbJPAConnection.getInstance();
-        em.getTransaction().begin();
-        em.persist(study);
-        em.getTransaction().commit();
-    }
-
-    /**
-     * Find a Study by its primary key (id).
-     */
-    public Study find(int id) {
-        EntityManager em = MariaDbJPAConnection.getInstance();
-        return em.find(Study.class, id);
-    }
-
-    /**
-     * Retrieve all Study records.
-     */
-    public List<Study> findAll() {
-        EntityManager em = MariaDbJPAConnection.getInstance();
-        TypedQuery<Study> query = em.createQuery(
-                "SELECT s FROM Study s", Study.class
-        );
-        return query.getResultList();
-    }
-
-    /**
-     * Update an existing Study entity.
-     */
-    public void update(Study study) {
-        EntityManager em = MariaDbJPAConnection.getInstance();
-        em.getTransaction().begin();
-        em.merge(study);
-        em.getTransaction().commit();
-    }
-
-    /**
-     * Delete a Study entity.
-     */
-    public void delete(Study study) {
-        EntityManager em = MariaDbJPAConnection.getInstance();
-        em.getTransaction().begin();
-
-        // Ensure entity is managed before removal
-        if (!em.contains(study)) {
-            study = em.merge(study);
+        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+            em.getTransaction().begin();
+            try {
+                em.persist(study);
+                em.getTransaction().commit();
+            } catch (Exception e) {
+                em.getTransaction().rollback();
+                throw e;
+            }
         }
-
-        em.remove(study);
-        em.getTransaction().commit();
     }
 
-    /**
-     * Find all Study records for a specific user.
-     */
+    public Study find(int id) {
+        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+            return em.find(Study.class, Integer.valueOf(id));
+        }
+    }
+
+    public List<Study> findAll() {
+        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+            TypedQuery<Study> query = em.createQuery("SELECT s FROM Study s", Study.class);
+            return query.getResultList();
+        }
+    }
+
+    public void update(Study study) {
+        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+            em.getTransaction().begin();
+            try {
+                em.merge(study);
+                em.getTransaction().commit();
+            } catch (Exception e) {
+                em.getTransaction().rollback();
+                throw e;
+            }
+        }
+    }
+
+    public void delete(Study study) {
+        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+            em.getTransaction().begin();
+            try {
+                if (!em.contains(study)) {
+                    study = em.merge(study);
+                }
+                em.remove(study);
+                em.getTransaction().commit();
+            } catch (Exception e) {
+                em.getTransaction().rollback();
+                throw e;
+            }
+        }
+    }
+
     public List<Study> findByUserId(int userId) {
-        EntityManager em = MariaDbJPAConnection.getInstance();
-        TypedQuery<Study> query = em.createQuery(
-                "SELECT s FROM Study s WHERE s.user.userId = :uid",
-                Study.class
-        );
-        query.setParameter("uid", userId);
-        return query.getResultList();
+        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+            TypedQuery<Study> query = em.createQuery(
+                    "SELECT s FROM Study s WHERE s.user.userId = :uid",
+                    Study.class
+            );
+            query.setParameter("uid", userId);
+            return query.getResultList();
+        }
     }
 
-    /**
-     * Find all Study records for a specific flashcard set.
-     */
     public List<Study> findByFlashcardSetId(int setId) {
-        EntityManager em = MariaDbJPAConnection.getInstance();
-        TypedQuery<Study> query = em.createQuery(
-                "SELECT s FROM Study s WHERE s.flashcardSet.flashcardSetId = :sid",
-                Study.class
-        );
-        query.setParameter("sid", setId);
-        return query.getResultList();
+        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+            TypedQuery<Study> query = em.createQuery(
+                    "SELECT s FROM Study s WHERE s.flashcardSet.flashcardSetId = :sid",
+                    Study.class
+            );
+            query.setParameter("sid", setId);
+            return query.getResultList();
+        }
     }
 
-    /**
-     * Check if a user has studied a specific flashcard set.
-     */
     public boolean existsByUserAndSet(int userId, int setId) {
-        EntityManager em = MariaDbJPAConnection.getInstance();
-        TypedQuery<Long> query = em.createQuery(
-                "SELECT COUNT(s) FROM Study s WHERE s.user.userId = :uid AND s.flashcardSet.flashcardSetId = :sid",
-                Long.class
-        );
-        query.setParameter("uid", userId);
-        query.setParameter("sid", setId);
+        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+            TypedQuery<Long> query = em.createQuery(
+                    "SELECT COUNT(s) FROM Study s " +
+                            "WHERE s.user.userId = :uid AND s.flashcardSet.flashcardSetId = :sid",
+                    Long.class
+            );
+            query.setParameter("uid", userId);
+            query.setParameter("sid", setId);
 
-        return query.getSingleResult() > 0;
+            return query.getSingleResult() > 0;
+        }
     }
 }

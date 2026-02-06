@@ -1,24 +1,22 @@
 package model.entity;
 
 import jakarta.persistence.*;
-import java.util.List;
 
 @Entity
-@Table(name = "ClassModel")
+@Table(name = "CLASS")
 public class ClassModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int classId;
+    @Column(name = "ClassId")
+    private Integer classId;
 
+    @Column(name = "ClassName")
     private String className;
 
-    @ManyToOne
-    @JoinColumn(name = "teacherId")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "TeacherId", referencedColumnName = "UserId", nullable = false)
     private User teacher;
-
-    @OneToMany(mappedBy = "classModel")
-    private List<FlashcardSet> flashcardSets;
 
     public ClassModel() {}
 
@@ -27,7 +25,7 @@ public class ClassModel {
         this.teacher = teacher;
     }
 
-    public int getClassId() { return classId; }
+    public Integer getClassId() { return classId; }
     public String getClassName() { return className; }
     public User getTeacher() { return teacher; }
 
@@ -39,8 +37,7 @@ public class ClassModel {
         return "ClassModel{" +
                 "classId=" + classId +
                 ", className='" + className + '\'' +
-                ", teacher=" + (teacher != null ? teacher.getUserId() : null) +
+                ", teacherId=" + (teacher != null ? teacher.getUserId() : null) +
                 '}';
     }
 }
-

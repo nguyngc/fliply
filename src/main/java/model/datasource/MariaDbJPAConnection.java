@@ -1,30 +1,24 @@
 package model.datasource;
 
-import jakarta.persistence.*;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 
-/**
- * Singleton class to manage JPA EntityManager for MariaDB.
- */
 public class MariaDbJPAConnection {
-    // Holds the EntityManagerFactory instance
-    private static EntityManagerFactory emf = null;
-    // Holds the EntityManager instance
-    private static EntityManager em = null;
-    /**
-     * Returns a singleton EntityManager instance.
-     * Initializes EntityManagerFactory and EntityManager if not already created.
-     * Note: Not thread-safe, synchronization needed for multi-threaded use.
-     * @return EntityManager instance
-     */
+
+    private static final EntityManagerFactory emf =
+            Persistence.createEntityManagerFactory("FliplyDbUnit");
+
+    public static EntityManager createEntityManager() {
+        return emf.createEntityManager();
+    }
+
+    @Deprecated
     public static EntityManager getInstance() {
-        // Create EntityManager if it doesn't exist
-        if (em==null) {
-            // Create EntityManagerFactory if it doesn't exist
-            if (emf==null) {
-                emf = Persistence.createEntityManagerFactory("FliplyDbUnit");
-            }
-            em = emf.createEntityManager();
-        }
-        return em;
+        return createEntityManager();
+    }
+
+    public static void shutdown() {
+        if (emf.isOpen()) emf.close();
     }
 }

@@ -1,44 +1,36 @@
 package model.entity;
 
 import jakarta.persistence.*;
-import java.util.List;
 
 @Entity
+@Table(name = "QUIZ")
 public class Quiz {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int quizId;
+    @Column(name = "QuizId")
+    private Integer quizId;
 
-    private int noOfQuestions;
+    @Column(name = "NoOfQuestions")
+    private Integer noOfQuestions;
 
-    @ManyToOne
-    @JoinColumn(name = "userId")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "UserId", referencedColumnName = "UserId", nullable = false)
     private User user;
-
-    @ManyToMany
-    @JoinTable(
-            name = "QUIZ_DETAILS",
-            joinColumns = @JoinColumn(name = "quizId"),
-            inverseJoinColumns = @JoinColumn(name = "flashcardId")
-    )
-    private List<Flashcard> flashcards;
 
     public Quiz() {}
 
-    public Quiz(int noOfQuestions, User user) {
+    public Quiz(Integer noOfQuestions, User user) {
         this.noOfQuestions = noOfQuestions;
         this.user = user;
     }
 
-    public int getQuizId() { return quizId; }
-    public int getNoOfQuestions() { return noOfQuestions; }
+    public Integer getQuizId() { return quizId; }
+    public Integer getNoOfQuestions() { return noOfQuestions; }
     public User getUser() { return user; }
-    public List<Flashcard> getFlashcards() { return flashcards; }
 
-    public void setNoOfQuestions(int noOfQuestions) { this.noOfQuestions = noOfQuestions; }
+    public void setNoOfQuestions(Integer noOfQuestions) { this.noOfQuestions = noOfQuestions; }
     public void setUser(User user) { this.user = user; }
-    public void setFlashcards(List<Flashcard> flashcards) { this.flashcards = flashcards; }
 
     @Override
     public String toString() {
@@ -49,4 +41,3 @@ public class Quiz {
                 '}';
     }
 }
-
