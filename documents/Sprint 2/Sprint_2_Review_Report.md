@@ -38,7 +38,7 @@ The goal of Sprint 2 is to begin implementing the Online Flashcard System for St
 - Solid grasp of Agile methodologies
 
 ## What Could Be Improved
-- Improved time estimation
+- Improved time estimation 
 - Increased frequency of internal team check-ins
 
 ## Next Sprint Focus
