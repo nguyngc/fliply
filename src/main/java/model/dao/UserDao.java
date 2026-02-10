@@ -67,10 +67,8 @@ public class UserDao {
         try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
             em.getTransaction().begin();
             try {
-                // Ensure the entity is managed before removal
                 User managed = em.contains(user) ? user : em.merge(user);
                 em.remove(managed);
-
                 em.getTransaction().commit();
             } catch (Exception e) {
                 em.getTransaction().rollback();
@@ -84,42 +82,40 @@ public class UserDao {
      */
     public User findByEmail(String email) {
         try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
-            TypedQuery<User> query = em.createQuery(
+            List<User> results = em.createQuery(
                     "SELECT u FROM User u WHERE u.email = :email",
                     User.class
-            );
-            query.setParameter("email", email);
+            ).setParameter("email", email).getResultList();
 
-            List<User> results = query.getResultList();
             return results.isEmpty() ? null : results.get(0);
         }
     }
 
     /**
-     * Check if a user exists by Google ID.
+     * Check if a user exists by email.
      */
-    public boolean existsByGoogleId(String googleId) {
+    public boolean existsByEmail(String email) {
         try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
-            TypedQuery<Long> query = em.createQuery(
-                    "SELECT COUNT(u) FROM User u WHERE u.googleId = :gid",
+            Long count = em.createQuery(
+                    "SELECT COUNT(u) FROM User u WHERE u.email = :email",
                     Long.class
-            );
-            query.setParameter("gid", googleId);
+            ).setParameter("email", email).getSingleResult();
 
-            Long count = query.getSingleResult();
             return count != null && count > 0;
         }
     }
-    /**
-     * fiund user by Google ID.
-     */
 
-    public User findByGoogleId(String googleId) {
+    /**
+     * Login: find user by email + password
+     */
+    public User findByEmailAndPassword(String email, String password) {
         try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
             List<User> results = em.createQuery(
-                    "SELECT u FROM User u WHERE u.googleId = :gid",
-                    User.class
-            ).setParameter("gid", googleId).getResultList();
+                            "SELECT u FROM User u WHERE u.email = :email AND u.password = :pw",
+                            User.class
+                    ).setParameter("email", email)
+                    .setParameter("pw", password)
+                    .getResultList();
 
             return results.isEmpty() ? null : results.get(0);
         }

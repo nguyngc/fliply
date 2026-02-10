@@ -12,7 +12,7 @@ public class Main {
         u.setFirstName("Nhut");
         u.setLastName("Vo");
         u.setEmail("nhut@test.com");
-        u.setGoogleId("google-sub-123");
+        u.setPassword("12345");
         u.setRole(1);
         userDao.persist(u);
 

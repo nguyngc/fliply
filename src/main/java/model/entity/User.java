@@ -11,19 +11,19 @@ public class User {
     @Column(name = "UserId")
     private Integer userId;
 
-    @Column(name = "FirstName")
+    @Column(name = "FirstName", nullable = false)
     private String firstName;
 
-    @Column(name = "LastName")
+    @Column(name = "LastName", nullable = false)
     private String lastName;
 
-    @Column(name = "Email")
+    @Column(name = "Email", nullable = false, unique = true)
     private String email;
 
-    @Column(name = "GoogleId")
-    private String googleId;
+    @Column(name = "Password", nullable = false)
+    private String password;
 
-    @Column(name = "Role")
+    @Column(name = "Role", nullable = false)
     private Integer role;
 
     public User() {}
@@ -32,13 +32,13 @@ public class User {
     public String getFirstName() { return firstName; }
     public String getLastName() { return lastName; }
     public String getEmail() { return email; }
-    public String getGoogleId() { return googleId; }
+    public String getPassword() { return password; }
     public Integer getRole() { return role; }
 
     public void setFirstName(String firstName) { this.firstName = firstName; }
     public void setLastName(String lastName) { this.lastName = lastName; }
     public void setEmail(String email) { this.email = email; }
-    public void setGoogleId(String googleId) { this.googleId = googleId; }
+    public void setPassword(String password) { this.password = password; }
     public void setRole(Integer role) { this.role = role; }
 
     @Override
@@ -48,7 +48,7 @@ public class User {
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", email='" + email + '\'' +
-                ", googleId='" + googleId + '\'' +
+                ", password='" + password + '\'' +
                 ", role=" + role +
                 '}';
     }
