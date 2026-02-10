@@ -1,0 +1,40 @@
+.nav-bar {
+    -fx-padding: 0;
+}
+
+.nav-container {
+    -fx-background-color: white;
+    -fx-background-radius: 28 28 0 0;
+
+    /* smaller padding so items have more width */
+    -fx-padding: 10 14 10 14;
+
+    /* subtle shadow */
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.08), 16, 0.25, 0, 6);
+}
+
+.nav-item {
+    -fx-background-color: transparent;
+
+    /* IMPORTANT: remove big left/right padding so labels don't truncate */
+    -fx-padding: 6 0 6 0;
+
+    -fx-cursor: hand;
+
+    /* make each ToggleButton center its graphic */
+    -fx-alignment: center;
+}
+
+.nav-text {
+    -fx-text-fill: #8E8E8E;
+    -fx-font-size: 10px;
+    -fx-font-weight: 600;
+
+    /* better for narrow widths */
+    -fx-text-alignment: center;
+    -fx-alignment: center;
+}
+
+.nav-item:selected .nav-text {
+    -fx-text-fill: #2F6FED;
+}

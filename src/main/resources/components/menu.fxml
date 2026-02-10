@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<StackPane xmlns:fx="http://javafx.com/fxml/1"
+           styleClass="nav-bar"
+           stylesheets="@../styles/menu.css" prefHeight="95.0" minHeight="95.0"
+           maxHeight="95.0"
+           xmlns="http://javafx.com/javafx/24.0.1"
+           fx:controller="controller.components.NavController">
+
+    <!-- spacing MUST be 0, items will stretch evenly -->
+    <HBox alignment="CENTER" spacing="0" styleClass="nav-container">
+
+        <ToggleButton fx:id="homeBtn"
+                      onAction="#goHome"
+                      styleClass="nav-item"
+                      HBox.hgrow="ALWAYS"
+                      maxWidth="Infinity">
+            <graphic>
+                <VBox alignment="CENTER" spacing="6">
+                    <ImageView fx:id="homeIcon"
+                               fitWidth="24"
+                               fitHeight="24"
+                               preserveRatio="true"/>
+                    <Label fx:id="homeLabel"
+                           text="Home"
+                           style="-fx-font-size: 11px;
+              -fx-font-weight: 500;
+              -fx-text-fill: #8C8C8C;"/>
+                </VBox>
+            </graphic>
+        </ToggleButton>
+
+        <ToggleButton fx:id="classBtn"
+                      onAction="#goClass"
+                      styleClass="nav-item"
+                      HBox.hgrow="ALWAYS"
+                      maxWidth="Infinity">
+            <graphic>
+                <VBox alignment="CENTER" spacing="6">
+                    <ImageView fx:id="classIcon"
+                               fitWidth="24"
+                               fitHeight="24"
+                               preserveRatio="true"/>
+                    <Label fx:id="classLabel"
+                           text="Classes"
+                           style="-fx-font-size: 11px;
+              -fx-font-weight: 500;
+              -fx-text-fill: #8C8C8C;"/>
+                </VBox>
+            </graphic>
+        </ToggleButton>
+
+        <ToggleButton fx:id="flashBtn"
+                      onAction="#goFlash"
+                      styleClass="nav-item"
+                      HBox.hgrow="ALWAYS"
+                      maxWidth="Infinity">
+            <graphic>
+                <VBox alignment="CENTER" spacing="6">
+                    <ImageView fx:id="flashcardIcon"
+                               fitWidth="24"
+                               fitHeight="24"
+                               preserveRatio="true"/>
+                    <Label fx:id="flashLabel"
+                           text="Flashcards"
+                           style="-fx-font-size: 11px;
+              -fx-font-weight: 500;
+              -fx-text-fill: #8C8C8C;"/>
+                </VBox>
+            </graphic>
+        </ToggleButton>
+
+        <ToggleButton fx:id="quizBtn"
+                      onAction="#goQuiz"
+                      styleClass="nav-item"
+                      HBox.hgrow="ALWAYS"
+                      maxWidth="Infinity">
+            <graphic>
+                <VBox alignment="CENTER" spacing="6">
+                    <ImageView fx:id="quizIcon"
+                               fitWidth="24"
+                               fitHeight="24"
+                               preserveRatio="true"/>
+                    <Label fx:id="quizLabel"
+                           text="Quizzes"
+                           style="-fx-font-size: 11px;
+              -fx-font-weight: 500;
+              -fx-text-fill: #8C8C8C;"/>
+                </VBox>
+            </graphic>
+        </ToggleButton>
+
+        <ToggleButton fx:id="accountBtn"
+                      onAction="#goAccount"
+                      styleClass="nav-item"
+                      HBox.hgrow="ALWAYS"
+                      maxWidth="Infinity">
+            <graphic>
+                <VBox alignment="CENTER" spacing="6">
+                    <ImageView fx:id="accountIcon"
+                               fitWidth="24"
+                               fitHeight="24"
+                               preserveRatio="true"/>
+                    <Label fx:id="accountLabel"
+                           text="Account"
+                           style="-fx-font-size: 11px;
+              -fx-font-weight: 500;
+              -fx-text-fill: #8C8C8C;"/>
+                </VBox>
+            </graphic>
+        </ToggleButton>
+    </HBox>
+</StackPane>

@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            prefWidth="375" prefHeight="750"
+            style="-fx-background-color: #F6F7FB;">
+
+    <top>
+        <fx:include source="../components/header.fxml"/>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent;">
+            <content>
+                <VBox spacing="12">
+                    <padding>
+                        <Insets top="18" right="18" bottom="20" left="18"/>
+                    </padding>
+
+                    <Label text="Quizzes"
+                           style="-fx-font-size: 22px; -fx-font-weight: 800;"/>
+                    <Label text="This page is not implemented yet."
+                           style="-fx-font-size: 14px; -fx-text-fill: #777;"/>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <AnchorPane prefHeight="95.0">
+            <children>
+                <fx:include source="../components/menu.fxml"
+                            AnchorPane.leftAnchor="0"
+                            AnchorPane.rightAnchor="0"
+                            AnchorPane.bottomAnchor="0"/>
+            </children>
+        </AnchorPane>
+    </bottom>
+
+</BorderPane>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.layout.StackPane?>
+
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="controller.components.TermTileController">
+
+    <Button fx:id="tileButton"
+            text="Term"
+            maxWidth="Infinity"
+            prefHeight="52"
+            onAction="#onClick"
+            style="-fx-background-radius: 16;
+                   -fx-font-size: 16px;
+                   -fx-font-weight: 800;
+                   -fx-text-fill: #1F1F39;"/>
+</StackPane>

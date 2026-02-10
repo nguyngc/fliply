@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.Button?>
+<BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            maxHeight="750.0" maxWidth="375.0"
+            minHeight="750.0" minWidth="375.0"
+            prefHeight="750.0" prefWidth="375.0"
+            style="-fx-background-color: #F6F7FB;"
+            xmlns="http://javafx.com/javafx/24.0.1"
+            fx:controller="controller.HomeController"
+>
+
+    <!-- CENTER: scrollable content -->
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER"
+                    style="-fx-background: transparent; -fx-background-color: transparent;" vbarPolicy="AS_NEEDED">
+            <content>
+                <VBox spacing="18.0" style="-fx-background-color: transparent;">
+
+                    <!-- HEADER -->
+                    <fx:include fx:id="header" source="../components/header.fxml"/>
+
+                    <!-- BODY CONTENT -->
+                    <VBox spacing="10.0">
+                        <padding>
+                            <Insets bottom="10" left="20" right="20" top="10"/>
+                        </padding>
+
+                        <!-- Latest Class title -->
+                        <Label style="-fx-text-fill: #1F1F39; -fx-font-size: 20px; -fx-font-weight: 500;"
+                               text="Latest Class"/>
+
+                        <!-- Latest Class card -->
+                        <StackPane>
+                            <fx:include source="../components/class_card.fxml"/>
+                            <!-- transparent click area -->
+                            <Button onAction="#goClasses"
+                                    maxWidth="Infinity"
+                                    maxHeight="Infinity"
+                                    style="-fx-background-color: transparent; -fx-cursor: hand;"/>
+                        </StackPane>
+
+
+                        <Region prefHeight="20"/>
+
+                        <!-- Latest Quiz title -->
+                        <Label style="-fx-text-fill: #1F1F39; -fx-font-size: 20px; -fx-font-weight: 500;"
+                               text="Latest Quiz"/>
+
+                        <!-- Latest Quiz card -->
+                        <StackPane>
+                            <fx:include source="../components/quiz_card.fxml"/>
+                            <!-- transparent click area -->
+                            <Button onAction="#goQuizzes"
+                                    maxWidth="Infinity"
+                                    maxHeight="Infinity"
+                                    style="-fx-background-color: transparent; -fx-cursor: hand;"/>
+                        </StackPane>
+
+                    </VBox>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+
+    <!-- BOTTOM: your reusable nav -->
+    <bottom>
+        <AnchorPane prefHeight="120.0" style="-fx-background-color: transparent;">
+            <children>
+                <fx:include source="../components/menu.fxml" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
+                            AnchorPane.rightAnchor="0.0"/>
+            </children>
+        </AnchorPane>
+    </bottom>
+
+</BorderPane>

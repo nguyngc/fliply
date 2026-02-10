@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.StackPane?>
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           fx:controller="controller.components.FlashcardFlipCardController"
+           fx:id="root"
+           prefHeight="320"
+           maxWidth="Infinity"
+           onMouseClicked="#flip">
+
+    <!-- TERM side (blue) -->
+    <StackPane fx:id="termPane"
+               style="-fx-background-color: #ACD7FF;
+                      -fx-background-radius: 22;">
+        <padding>
+            <Insets top="18" right="18" bottom="18" left="18"/>
+        </padding>
+
+        <Label fx:id="termLabel"
+               text="Term"
+               style="-fx-text-fill: #2C2C2C;
+                      -fx-font-size: 28px;
+                      -fx-font-weight: 600;"/>
+    </StackPane>
+
+    <!-- DEFINITION side (white) -->
+    <StackPane fx:id="definitionPane"
+               visible="false"
+               managed="false"
+               style="-fx-background-color: white;
+                      -fx-background-radius: 22;
+                      -fx-border-color: #D9F4F1;
+                      -fx-border-radius: 22;">
+        <padding>
+            <Insets top="18" right="18" bottom="18" left="18"/>
+        </padding>
+
+        <Label fx:id="definitionLabel"
+               text="Definition"
+               style="-fx-text-fill: #2C2C2C;
+                      -fx-font-size: 28px;
+                      -fx-font-weight: 600;"/>
+    </StackPane>
+
+</StackPane>

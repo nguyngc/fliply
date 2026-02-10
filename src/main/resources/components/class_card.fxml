@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<HBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="controller.components.ClassCardController"
+      spacing="18"
+      style="-fx-background-color: white;
+             -fx-background-radius: 22;
+             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 18, 0.25, 0, 8);">
+
+    <padding>
+        <Insets top="18" right="18" bottom="18" left="18"/>
+    </padding>
+
+    <!-- Image -->
+    <StackPane prefWidth="130" prefHeight="90"
+               style="-fx-background-color: #D9ECFF; -fx-background-radius: 16;">
+        <ImageView fitWidth="110" fitHeight="70" preserveRatio="true">
+            <image>
+                <Image url="@../images/class_card.png"/>
+            </image>
+        </ImageView>
+    </StackPane>
+
+    <!-- Content -->
+    <VBox spacing="8">
+        <Label fx:id="classNameLabel"
+               text="Class Code"
+               style="-fx-text-fill: #2C2C2C; -fx-font-size: 16px; -fx-font-weight: 500;"/>
+
+        <HBox spacing="8" alignment="CENTER_LEFT">
+            <Label fx:id="teacherNameLabel"
+                   text="Teacher's Name"
+                   style="-fx-text-fill: #8C8C8C; -fx-font-size: 14px; -fx-font-weight: 400;"/>
+        </HBox>
+
+        <Label fx:id="progressTextLabel"
+               text="60% Completed"
+               style="-fx-text-fill: #3D8FEF; -fx-font-size: 12px; -fx-font-weight: 400;"/>
+
+        <ProgressBar fx:id="progressBar"
+                     progress="0.6"
+                     prefWidth="165"
+                     style="-fx-accent: #3D8FEF;"
+                     stylesheets="@../styles/progress_bar.css"
+                     styleClass="progress-bar"/>
+    </VBox>
+
+    <Region HBox.hgrow="ALWAYS"/>
+
+</HBox>

@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.layout.VBox?>
+<VBox xmlns:fx="http://javafx.com/fxml"
+      fx:controller="controller.components.QuizCardController"
+      spacing="10"
+      style="-fx-background-color: white;
+             -fx-background-radius: 22;
+             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 18, 0.25, 0, 8);">
+
+    <padding>
+        <Insets top="18" right="18" bottom="18" left="18"/>
+    </padding>
+
+    <!-- Quiz title -->
+    <Label fx:id="quizTitleLabel"
+           text="Quiz 2"
+           style="-fx-text-fill: #2C2C2C;
+                  -fx-font-size: 16px;
+                  -fx-font-weight: 500;"/>
+
+    <!-- Question count -->
+    <Label fx:id="questionCountLabel"
+           text="10 questions"
+           style="-fx-text-fill: #8C8C8C;
+                  -fx-font-size: 14px;
+                  -fx-font-weight: 400;"/>
+
+    <!-- Progress text -->
+    <Label fx:id="progressTextLabel"
+           text="100%"
+           style="-fx-text-fill: #3D8FEF;
+                  -fx-font-size: 12px;
+                  -fx-font-weight: 400;"/>
+
+    <!-- Progress bar -->
+    <ProgressBar fx:id="progressBar"
+                 progress="1.0"
+                 prefWidth="295"
+                 style="-fx-accent: #3D8FEF;"
+                 stylesheets="@../styles/progress_bar.css"
+                 styleClass="progress-bar"/>
+
+</VBox>

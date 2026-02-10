@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            prefWidth="375.0" prefHeight="750.0"
+            minWidth="375.0" minHeight="750.0"
+            maxWidth="375.0" maxHeight="750.0"
+            style="-fx-background-color: #F6F7FB;"
+            fx:controller="controller.ClassDetailController">
+
+    <top>
+        <fx:include fx:id="header" source="../components/header.fxml"/>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true"
+                    hbarPolicy="NEVER"
+                    vbarPolicy="AS_NEEDED"
+                    style="-fx-background: transparent; -fx-background-color: transparent;">
+            <content>
+                <VBox spacing="18" style="-fx-background-color: transparent;">
+                    <padding>
+                        <Insets top="22" right="22" bottom="20" left="22"/>
+                    </padding>
+
+                    <!-- List container -->
+                    <VBox fx:id="flashcardSetListBox" spacing="16">
+                        <StackPane>
+                            <fx:include source="../components/flashcard_set_card.fxml"/>
+                            <Button onAction="#openFlashcardSet"
+                                    userData="Basic Vocabulary"
+                                    maxWidth="Infinity"
+                                    maxHeight="Infinity"
+                                    style="-fx-background-color: transparent; -fx-cursor: hand;"/>
+                        </StackPane>
+
+                        <StackPane>
+                            <fx:include source="../components/flashcard_set_card.fxml"/>
+                            <Button onAction="#openFlashcardSet"
+                                    userData="Lesson 1 - Verbs"
+                                    maxWidth="Infinity"
+                                    maxHeight="Infinity"
+                                    style="-fx-background-color: transparent; -fx-cursor: hand;"/>
+                        </StackPane>
+                    </VBox>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <AnchorPane prefHeight="95.0" style="-fx-background-color: transparent;">
+            <children>
+                <fx:include source="../components/menu.fxml"
+                            AnchorPane.leftAnchor="0.0"
+                            AnchorPane.rightAnchor="0.0"
+                            AnchorPane.bottomAnchor="0.0"/>
+            </children>
+        </AnchorPane>
+    </bottom>
+
+</BorderPane>
