@@ -75,9 +75,4 @@ class UserServiceTest {
         // cleanup
         userDao.delete(result);
     }
-
-    @AfterAll
-    static void tearDownAll() {
-        MariaDbJPAConnection.shutdown();
-    }
 }

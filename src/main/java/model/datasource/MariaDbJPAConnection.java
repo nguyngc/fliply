@@ -6,10 +6,14 @@ import jakarta.persistence.Persistence;
 
 public class MariaDbJPAConnection {
 
-    private static final EntityManagerFactory emf =
+    private static EntityManagerFactory emf =
             Persistence.createEntityManagerFactory("FliplyDbUnit");
 
     public static EntityManager createEntityManager() {
+        // Recreate EMF if it's closed (for test scenarios)
+        if (emf == null || !emf.isOpen()) {
+            emf = Persistence.createEntityManagerFactory("FliplyDbUnit");
+        }
         return emf.createEntityManager();
     }
 
@@ -19,6 +23,8 @@ public class MariaDbJPAConnection {
     }
 
     public static void shutdown() {
-        if (emf.isOpen()) emf.close();
+        if (emf != null && emf.isOpen()) {
+            emf.close();
+        }
     }
 }

@@ -1,6 +1,5 @@
 package model.dao;
 
-import model.datasource.MariaDbJPAConnection;
 import model.entity.User;
 import org.junit.jupiter.api.*;
 
@@ -15,16 +14,36 @@ class UserDaoTest {
     @BeforeEach
     void setUp() {
         userDao = new UserDao();
+        // Clean any existing test data that might conflict
+        cleanupTestData();
+    }
+
+    @AfterEach
+    void tearDown() {
+        // Clean up after each test
+        cleanupTestData();
+    }
+
+    private void cleanupTestData() {
+        // Clean any users with test emails to avoid conflicts
+        try {
+            User existingUser = userDao.findByEmail("nhut@test.com");
+            if (existingUser != null) {
+                userDao.delete(existingUser);
+            }
+        } catch (Exception e) {
+            // Ignore cleanup errors
+        }
     }
 
     private User newUser() {
         String uid = UUID.randomUUID().toString().substring(0, 8);
 
         User u = new User();
-        u.setFirstName("Nhut");
-        u.setLastName("Vo");
-        u.setEmail("nhut+" + uid + "@test.com");
-        u.setGoogleId("google-" + uid);
+        u.setFirstName("Test");
+        u.setLastName("User");
+        u.setEmail("test+" + uid + "@example.com");
+        u.setGoogleId("test-gid-" + uid);
         u.setRole(1);
         return u;
     }
@@ -67,21 +86,24 @@ class UserDaoTest {
         Integer id = u.getUserId();
         assertNotNull(id);
 
-        // findByEmail
-        User byEmail = userDao.findByEmail(u.getEmail());
-        assertNotNull(byEmail);
-        assertEquals(id, byEmail.getUserId());
+        try {
+            // findByEmail
+            User byEmail = userDao.findByEmail(u.getEmail());
+            assertNotNull(byEmail);
+            assertEquals(id, byEmail.getUserId());
 
-        // existsByGoogleId
-        assertTrue(userDao.existsByGoogleId(u.getGoogleId()));
+            // existsByGoogleId
+            assertTrue(userDao.existsByGoogleId(u.getGoogleId()));
 
-        // findByGoogleId
-        User byGid = userDao.findByGoogleId(u.getGoogleId());
-        assertNotNull(byGid);
-        assertEquals(id, byGid.getUserId());
+            // findByGoogleId
+            User byGid = userDao.findByGoogleId(u.getGoogleId());
+            assertNotNull(byGid);
+            assertEquals(id, byGid.getUserId());
 
-        // cleanup
-        userDao.delete(byGid);
-        assertFalse(userDao.existsByGoogleId(u.getGoogleId()));
+        } finally {
+            // cleanup - ensure deletion even if test fails
+            userDao.delete(u);
+            assertFalse(userDao.existsByGoogleId(u.getGoogleId()));
+        }
     }
 }
