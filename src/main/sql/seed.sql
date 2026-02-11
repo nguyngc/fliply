@@ -13,14 +13,14 @@ TRUNCATE TABLE `USER`;
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- ============================
--- 1) USER
+-- 1) USER  ( Password)
 -- ============================
-INSERT INTO `USER` (Role, Email, FirstName, LastName, GoogleId)
+INSERT INTO `USER` (Role, Email, Password, FirstName, LastName)
 VALUES
-    (1, 'teacher1@example.com', 'Alice',   'Doe',   'g123'),
-    (1, 'teacher2@example.com', 'Bob',     'Chan',  'g456'),
-    (0, 'student1@example.com', 'Charlie', 'David', 'g789'),
-    (0, 'student2@example.com', 'David',   'Helen', 'g101');
+    (1, 'teacher1@example.com', '123', 'Alice',   'Doe'),
+    (1, 'teacher2@example.com', '123', 'Bob',     'Chan'),
+    (0, 'student1@example.com', '123', 'Charlie', 'David'),
+    (0, 'student2@example.com', '123', 'David',   'Helen');
 
 -- Fetch IDs safely (no hard-code 1,2,3...)
 SET @t1 := (SELECT UserId FROM `USER` WHERE Email='teacher1@example.com');
@@ -44,18 +44,18 @@ SET @c2 := (SELECT ClassId FROM `CLASS` WHERE ClassName='DevOps Fundamentals');
 -- ============================
 INSERT INTO `CLASS_DETAILS` (ClassId, UserId)
 VALUES
-    (@c1, @s1),  -- Charlie in Java Programming
-    (@c1, @s2),  -- David in Java Programming
-    (@c2, @s1);  -- Charlie in DevOps Fundamentals
+    (@c1, @s1),
+    (@c1, @s2),
+    (@c2, @s1);
 
 -- ============================
 -- 4) FLASHCARDSET
 -- ============================
 INSERT INTO `FLASHCARDSET` (Subject, ClassId)
 VALUES
-    ('OOP Basics',     @c1),
-    ('Java Keywords',  @c1),
-    ('Docker Concepts',@c2);
+    ('OOP Basics',      @c1),
+    ('Java Keywords',   @c1),
+    ('Docker Concepts', @c2);
 
 SET @fs1 := (SELECT FlashcardSetId FROM `FLASHCARDSET` WHERE Subject='OOP Basics' AND ClassId=@c1);
 SET @fs2 := (SELECT FlashcardSetId FROM `FLASHCARDSET` WHERE Subject='Java Keywords' AND ClassId=@c1);
@@ -66,13 +66,12 @@ SET @fs3 := (SELECT FlashcardSetId FROM `FLASHCARDSET` WHERE Subject='Docker Con
 -- ============================
 INSERT INTO `FLASHCARD` (Term, Definition, FlashcardSetId, UserId)
 VALUES
-    ('Encapsulation', 'Bundling data and methods together',                 @fs1, @t1),
-    ('Inheritance',   'Mechanism to acquire properties of another class',   @fs1, @t1),
-    ('static',        'Keyword for class-level members',                    @fs2, @t1),
-    ('Container',     'A lightweight isolated environment',                 @fs3, @t2),
-    ('Image',         'A template used to create containers',               @fs3, @t2);
+    ('Encapsulation', 'Bundling data and methods together',               @fs1, @t1),
+    ('Inheritance',   'Mechanism to acquire properties of another class', @fs1, @t1),
+    ('static',        'Keyword for class-level members',                  @fs2, @t1),
+    ('Container',     'A lightweight isolated environment',               @fs3, @t2),
+    ('Image',         'A template used to create containers',             @fs3, @t2);
 
--- Get flashcard IDs (for quiz_details)
 SET @f1 := (SELECT FlashcardId FROM `FLASHCARD` WHERE Term='Encapsulation' AND FlashcardSetId=@fs1);
 SET @f2 := (SELECT FlashcardId FROM `FLASHCARD` WHERE Term='Inheritance'   AND FlashcardSetId=@fs1);
 SET @f3 := (SELECT FlashcardId FROM `FLASHCARD` WHERE Term='static'        AND FlashcardSetId=@fs2);
@@ -106,6 +105,6 @@ VALUES
 -- ============================
 INSERT INTO `STUDY` (Statistic, UserId, FlashcardSetId)
 VALUES
-    (5, @s1, @fs1),  -- Charlie studied OOP Basics
-    (2, @s1, @fs2),  -- Charlie studied Java Keywords
-    (1, @s2, @fs3);  -- David studied Docker Concepts
+    (5, @s1, @fs1),
+    (2, @s1, @fs2),
+    (1, @s2, @fs3);
