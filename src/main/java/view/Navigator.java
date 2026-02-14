@@ -32,9 +32,10 @@ public final class Navigator {
             stage.setResizable(false);
             stage.show();
 
-            AppState.currentScreen.set(screen);
-            AppState.activeNav.set(screen.nav);
-
+            // set nav highlight (allow override)
+            AppState.NavItem nav = AppState.navOverride.get() != null ? AppState.navOverride.get() : screen.nav;
+            AppState.activeNav.set(nav);
+            AppState.navOverride.set(null); // clear after using
         } catch (IOException e) {
             throw new RuntimeException("Failed to load " + screen.fxml, e);
         }

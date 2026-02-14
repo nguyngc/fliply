@@ -13,89 +13,116 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FlashcardDetailController {
+
     private final List<Flashcard> cards = new ArrayList<>();
+    private int index = 0;
+
     @FXML
     private Parent header;
     @FXML
     private HeaderController headerController;
+
     @FXML
     private Parent flipCard;
     @FXML
     private FlashcardFlipCardController flipCardController;
+
     @FXML
     private Button prevButton;
     @FXML
     private Button nextButton;
     @FXML
     private Label pageLabel;
-    private int index = 0;
 
     @FXML
     private void initialize() {
-        String term = AppState.selectedTerm.get();
-        String def  = AppState.selectedDefinition.get();
+        boolean isFromFlashcardSet = AppState.isFromFlashcardSet.get();
 
-        if (term != null && !term.isBlank() && def != null && !def.isBlank()) {
-            cards.clear();
-            cards.add(new Flashcard(term, def));
+        // Build cards from passed list
+        cards.clear();
+        if (!AppState.currentDetailList.isEmpty()) {
+            for (AppState.FlashcardItem it : AppState.currentDetailList) {
+                cards.add(new Flashcard(it.getTerm(), it.getDefinition()));
+            }
+            index = clamp(AppState.currentDetailIndex.get(), 0, cards.size() - 1);
+        } else {
+            cards.add(new Flashcard("Term", "Definition"));
             index = 0;
         }
 
-        // 1) Configure header
+        // Header
+        String title = AppState.detailHeaderTitle.get();
+        String subtitle = AppState.detailHeaderSubtitle.get();
+
         if (headerController != null) {
             headerController.setBackVisible(true);
-            headerController.setTitle("Flashcard Set's Subject");
-            headerController.setSubtitle("Total: 20 flashcards");
 
-            headerController.setOnBack(this::goBack);
-            headerController.applyVariant(HeaderController.Variant.STUDENT); // or TEACHER
+            if (title != null && !title.isBlank()) headerController.setTitle(title);
+
+            headerController.setSubtitle("Total: " + cards.size());
+
+            if (isFromFlashcardSet) {
+                headerController.setOnBack(() -> Navigator.go(AppState.Screen.FLASHCARD_SET));
+                headerController.setActionsVisible(false);
+            } else {
+                headerController.setOnBack(() -> Navigator.go(AppState.Screen.FLASHCARDS));
+                headerController.setActionsVisible(true);
+
+                headerController.setOnEdit(() -> {
+                    // Edit the currently shown card in the master list
+                    int idx = index; // index in cards list
+                    AppState.editingIndex.set(idx);
+                    AppState.flashcardFormMode.set(AppState.FormMode.EDIT);
+
+                    // Pre-fill via selectedTerm/Definition (or read directly from list)
+                    Flashcard c = cards.get(idx);
+                    AppState.selectedTerm.set(c.term);
+                    AppState.selectedDefinition.set(c.definition);
+
+                    AppState.navOverride.set(AppState.NavItem.FLASHCARDS);
+                    Navigator.go(AppState.Screen.FLASHCARD_FORM);
+                });
+
+                headerController.setOnDelete(() -> {
+                    if (cards.isEmpty()) return;
+
+                    // remove from master list (and current detail list)
+                    int idx = index;
+                    if (idx >= 0 && idx < AppState.myFlashcards.size()) {
+                        AppState.myFlashcards.remove(idx);
+                    }
+
+                    AppState.currentDetailList.setAll(AppState.myFlashcards);
+
+                    // go back to list
+                    AppState.navOverride.set(AppState.NavItem.FLASHCARDS);
+                    Navigator.go(AppState.Screen.FLASHCARDS);
+                });
+            }
         }
 
-        // 2) Demo cards (replace with real list)
-        seedDemoCards();
-
-        // Update header with real number
-        if (headerController != null) {
-            headerController.setSubtitle("Total: " + cards.size() + " flashcards");
-        }
-
-        // 3) Render first card
         render();
         updateNavButtons();
-    }
-
-    private void seedDemoCards() {
-        cards.clear();
-        cards.add(new Flashcard("Term", "Definition"));
-        cards.add(new Flashcard("CPU", "Central Processing Unit"));
-        cards.add(new Flashcard("RAM", "Random Access Memory"));
-        cards.add(new Flashcard("HTTP", "HyperText Transfer Protocol"));
-        cards.add(new Flashcard("OOP", "Object-Oriented Programming"));
     }
 
     private void render() {
         int total = cards.size();
         int current = total == 0 ? 0 : (index + 1);
-
-        // Update pager label (center under card)
         pageLabel.setText(current + " / " + total);
 
-        // Update flip card content
-        if (flipCardController != null) {
-            if (total == 0) {
-                flipCardController.setTerm("No cards");
-                flipCardController.setDefinition("This set has no flashcards yet.");
-                flipCardController.showTerm();
-                return;
-            }
+        if (flipCardController == null) return;
 
-            Flashcard c = cards.get(index);
-            flipCardController.setTerm(c.term);
-            flipCardController.setDefinition(c.definition);
-
-            // Always reset to Term side when moving prev/next
+        if (total == 0) {
+            flipCardController.setTerm("No cards");
+            flipCardController.setDefinition("This set has no flashcards yet.");
             flipCardController.showTerm();
+            return;
         }
+
+        Flashcard c = cards.get(index);
+        flipCardController.setTerm(c.term);
+        flipCardController.setDefinition(c.definition);
+        flipCardController.showTerm();
     }
 
     private void updateNavButtons() {
@@ -122,13 +149,11 @@ public class FlashcardDetailController {
         }
     }
 
-    // Header back action (wired via headerController.setOnBack)
-    private void goBack() {
-        Navigator.go(AppState.Screen.FLASHCARD_SET);
-        System.out.println("Back pressed (navigate to previous page)");
+    private int clamp(int v, int min, int max) {
+        if (max < min) return min;
+        return Math.max(min, Math.min(max, v));
     }
 
-    // -------- TODO: Demo data model --------
     private record Flashcard(String term, String definition) {
     }
 }

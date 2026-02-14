@@ -40,16 +40,31 @@
                       style="-fx-background-color: white;
                              -fx-background-radius: 26 26 0 0;">
                     <padding>
-                        <Insets top="26" right="26" bottom="26" left="26"/>
+                        <Insets top="26" right="26" bottom="0" left="26"/>
                     </padding>
 
-                    <!-- Name -->
+                    <!-- First Name -->
                     <VBox spacing="8">
-                        <Label text="Name"
+                        <Label text="First Name"
                                style="-fx-text-fill: #8C8C8C; -fx-font-size: 14px; -fx-font-weight: 400;"/>
 
-                        <TextField fx:id="nameField"
-                                   promptText="Name"
+                        <TextField fx:id="firstNameField"
+                                   promptText="First Name"
+                                   style="-fx-background-color: white;
+                                          -fx-background-radius: 14;
+                                          -fx-border-color: rgba(31, 31, 57, 0.20);
+                                          -fx-border-radius: 10;
+                                          -fx-padding: 10 15;
+                                          -fx-font-size: 14px;"/>
+                    </VBox>
+
+                    <!-- Last Name -->
+                    <VBox spacing="8">
+                        <Label text="Last Name"
+                               style="-fx-text-fill: #8C8C8C; -fx-font-size: 14px; -fx-font-weight: 400;"/>
+
+                        <TextField fx:id="lastNameField"
+                                   promptText="Last Name"
                                    style="-fx-background-color: white;
                                           -fx-background-radius: 14;
                                           -fx-border-color: rgba(31, 31, 57, 0.20);
@@ -127,10 +142,17 @@
                                style="-fx-text-fill: #8C8C8C; -fx-font-size: 14px; -fx-font-weight: 400;"/>
 
                         <HBox spacing="22" alignment="CENTER_LEFT">
+                            <!-- Define group -->
+                            <fx:define>
+                                <ToggleGroup fx:id="roleGroup"/>
+                            </fx:define>
+
                             <RadioButton fx:id="teacherYes"
+                                         toggleGroup="$roleGroup"
                                          text="Yes"
                                          style="-fx-text-fill: #8C8C8C; -fx-font-size: 14px; -fx-font-weight: 400;"/>
                             <RadioButton fx:id="teacherNo"
+                                         toggleGroup="$roleGroup"
                                          text="No"
                                          selected="true"
                                          style="-fx-text-fill: #8C8C8C; -fx-font-size: 14px; -fx-font-weight: 400;"/>
@@ -138,9 +160,9 @@
                     </VBox>
 
                     <!-- Terms -->
-                    <HBox spacing="12" alignment="CENTER_LEFT">
+                    <HBox spacing="12" alignment="CENTER_LEFT" HBox.hgrow="ALWAYS" minHeight="40">
                         <CheckBox fx:id="termsCheck"/>
-                        <Label text="By creating an account you have to agree&#10;with our terms &amp; conditions."
+                        <Label text="By creating an account you have to agree with our terms &amp; conditions."
                                wrapText="true"
                                style="-fx-text-fill: #858597; -fx-font-size: 12px; -fx-font-weight: 400;"/>
                     </HBox>
@@ -150,12 +172,12 @@
                             text="Register"
                             onAction="#register"
                             maxWidth="Infinity"
-                            prefHeight="54"
                             style="-fx-background-color: #3D8FEF;
                                    -fx-background-radius: 10;
                                    -fx-text-fill: white;
                                    -fx-font-size: 16px;
                                    -fx-font-weight: 500;
+                                   -fx-padding: 10px 32px 10px 32px;
                                    -fx-cursor: hand;"/>
 
                     <!-- Login link -->

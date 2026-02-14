@@ -1,8 +1,10 @@
 package controller;
 
 import controller.components.HeaderController;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
+import javafx.scene.control.Button;
 import model.AppState;
 import view.Navigator;
 
@@ -15,16 +17,18 @@ public class ClassDetailController {
 
     @FXML
     private void initialize() {
-        String classCode = AppState.selectedClassCode.get();
-        String teacherName = AppState.selectedTeacherName.get();
+        AppState.seedDemoIfNeeded();
 
-        if (classCode == null || classCode.isBlank()) classCode = "Class 00001-A";
-        if (teacherName == null || teacherName.isBlank()) teacherName = "Teacher’s Name";
+        AppState.ClassItem c = AppState.selectedClass.get();
+
+        String classCode = (c != null) ? c.getClassCode() : AppState.selectedClassCode.get();
+        String teacherName = (c != null) ? c.getTeacherName() : AppState.selectedTeacherName.get();
 
         if (headerController != null) {
-            headerController.setTitle(classCode);
-            headerController.setMeta(teacherName);
-            headerController.applyVariant(HeaderController.Variant.STUDENT); // or TEACHER
+            headerController.setTitle(classCode != null && !classCode.isBlank() ? classCode : "Class");
+            headerController.setMeta(teacherName != null ? teacherName : "");
+
+            headerController.applyVariant(HeaderController.Variant.STUDENT);
 
             headerController.setBackVisible(true);
             headerController.setOnBack(() -> Navigator.go(AppState.Screen.CLASSES));
@@ -32,12 +36,12 @@ public class ClassDetailController {
     }
 
     @FXML
-    private void openFlashcardSet(javafx.event.ActionEvent event) {
+    private void openFlashcardSet(ActionEvent event) {
         Object src = event.getSource();
 
         String setName = "Flashcard Set";
 
-        if (src instanceof javafx.scene.control.Button btn) {
+        if (src instanceof Button btn) {
             Object data = btn.getUserData();
             if (data != null) {
                 setName = data.toString();
@@ -49,5 +53,4 @@ public class ClassDetailController {
 
         Navigator.go(AppState.Screen.FLASHCARD_SET);
     }
-
 }

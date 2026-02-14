@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.*?>
 <BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controller.ClassesController"
             prefWidth="375.0" prefHeight="750.0"
             minWidth="375.0" minHeight="750.0"
             maxWidth="375.0" maxHeight="750.0"
-            style="-fx-background-color: #F6F7FB;"
-            fx:controller="controller.ClassesController">
+            style="-fx-background-color: #F6F7FB;">
 
-    <!-- CENTER: scrollable content -->
+    <top>
+        <fx:include fx:id="header" source="../components/header.fxml"/>
+    </top>
+
     <center>
         <ScrollPane fitToWidth="true"
                     hbarPolicy="NEVER"
@@ -19,60 +21,16 @@
                     style="-fx-background: transparent; -fx-background-color: transparent;">
             <content>
                 <VBox spacing="18" style="-fx-background-color: transparent;">
+                    <padding>
+                        <Insets top="18" right="22" bottom="18" left="22"/>
+                    </padding>
 
-                    <!-- HEADER -->
-                    <fx:include fx:id="header" source="../components/header.fxml"/>
-
-
-                    <!-- BODY: list of classes -->
-                    <VBox spacing="18">
-                        <padding>
-                            <Insets top="18" right="22" bottom="20" left="22"/>
-                        </padding>
-
-                        <!-- Container for class cards (easy to populate later in code) -->
-                        <VBox fx:id="classListBox" spacing="18">
-
-                            <!-- Example cards (remove later when you populate dynamically) -->
-                            <!-- Class 1 -->
-                            <StackPane>
-                                <fx:include source="../components/class_card.fxml"/>
-                                <Button onAction="#openClassDetail"
-                                        userData="Class 00001-A|Teacher’s Name"
-                                        maxWidth="Infinity" maxHeight="Infinity"
-                                        style="-fx-background-color: transparent; -fx-cursor: hand;"/>
-                            </StackPane>
-
-                            <!-- Class 2 -->
-                            <StackPane>
-                                <fx:include source="../components/class_card.fxml"/>
-                                <Button onAction="#openClassDetail"
-                                        userData="Class 00002-B|Teacher’s Name"
-                                        maxWidth="Infinity" maxHeight="Infinity"
-                                        style="-fx-background-color: transparent; -fx-cursor: hand;"/>
-                            </StackPane>
-
-                            <!-- Class 3 -->
-                            <StackPane>
-                                <fx:include source="../components/class_card.fxml"/>
-                                <Button onAction="#openClassDetail"
-                                        userData="Class 00003-C|Teacher’s Name"
-                                        maxWidth="Infinity" maxHeight="Infinity"
-                                        style="-fx-background-color: transparent; -fx-cursor: hand;"/>
-                            </StackPane>
-
-
-                        </VBox>
-
-                        <Region prefHeight="8"/>
-                    </VBox>
-
+                    <VBox fx:id="classListBox" spacing="18"/>
                 </VBox>
             </content>
         </ScrollPane>
     </center>
 
-    <!-- BOTTOM: your reusable nav -->
     <bottom>
         <AnchorPane prefHeight="95.0" style="-fx-background-color: transparent;">
             <children>
@@ -83,5 +41,4 @@
             </children>
         </AnchorPane>
     </bottom>
-
 </BorderPane>

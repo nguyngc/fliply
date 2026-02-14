@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.*?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
@@ -11,7 +10,8 @@
       spacing="18"
       style="-fx-background-color: white;
              -fx-background-radius: 22;
-             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 18, 0.25, 0, 8);">
+             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 18, 0.25, 0, 8);
+             -fx-cursor: hand;">
 
     <padding>
         <Insets top="18" right="18" bottom="18" left="18"/>
@@ -28,16 +28,28 @@
     </StackPane>
 
     <!-- Content -->
-    <VBox spacing="8">
+    <VBox spacing="8" HBox.hgrow="ALWAYS">
+
         <Label fx:id="classNameLabel"
                text="Class Code"
                style="-fx-text-fill: #2C2C2C; -fx-font-size: 16px; -fx-font-weight: 500;"/>
 
-        <HBox spacing="8" alignment="CENTER_LEFT">
+        <!-- Student variant -->
+        <VBox fx:id="studentInfoBox" spacing="0">
             <Label fx:id="teacherNameLabel"
                    text="Teacher's Name"
                    style="-fx-text-fill: #8C8C8C; -fx-font-size: 14px; -fx-font-weight: 400;"/>
-        </HBox>
+        </VBox>
+
+        <!-- Teacher variant -->
+        <VBox fx:id="teacherInfoBox" spacing="4" visible="false" managed="false">
+            <Label fx:id="studentsCountLabel"
+                   text="25 students"
+                   style="-fx-text-fill: #8C8C8C; -fx-font-size: 14px; -fx-font-weight: 400;"/>
+            <Label fx:id="setsCountLabel"
+                   text="5 set of flashcards"
+                   style="-fx-text-fill: #8C8C8C; -fx-font-size: 14px; -fx-font-weight: 400;"/>
+        </VBox>
 
         <Label fx:id="progressTextLabel"
                text="60% Completed"
@@ -45,12 +57,10 @@
 
         <ProgressBar fx:id="progressBar"
                      progress="0.6"
-                     prefWidth="165"
+                     prefWidth="210"
                      style="-fx-accent: #3D8FEF;"
                      stylesheets="@../styles/progress_bar.css"
                      styleClass="progress-bar"/>
     </VBox>
-
-    <Region HBox.hgrow="ALWAYS"/>
 
 </HBox>

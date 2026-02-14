@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controller.QuizDetailController"
+            prefWidth="375" prefHeight="750"
+            style="-fx-background-color: #F6F7FB;">
+
+    <top>
+        <fx:include fx:id="header" source="../components/header.fxml"/>
+    </top>
+
+    <center>
+        <VBox spacing="16" alignment="TOP_CENTER">
+            <padding>
+                <Insets top="18" right="18" bottom="18" left="18"/>
+            </padding>
+
+            <!-- TERM TILE -->
+            <Label fx:id="termLabel"
+                   text="Term"
+                   alignment="CENTER"
+                   prefHeight="70"
+                   maxWidth="Infinity"
+                   style="-fx-background-color: #ACD7FF;
+                          -fx-background-radius: 18;
+                          -fx-font-size: 20px;
+                          -fx-font-weight: 600;
+                          -fx-text-fill: #2C2C2C;"/>
+
+            <!-- OPTIONS GRID -->
+            <GridPane fx:id="optionsGrid" hgap="14" vgap="14">
+                <columnConstraints>
+                    <ColumnConstraints percentWidth="50"/>
+                    <ColumnConstraints percentWidth="50"/>
+                </columnConstraints>
+
+                <Button fx:id="opt1" onAction="#chooseOption" GridPane.rowIndex="0" GridPane.columnIndex="0"
+                        maxWidth="Infinity" prefHeight="56"
+                        style="-fx-background-color: white; -fx-background-radius: 16; -fx-font-weight: 600; -fx-border-color: D9F4F1; -fx-border-radius: 16;"/>
+                <Button fx:id="opt2" onAction="#chooseOption" GridPane.rowIndex="0" GridPane.columnIndex="1"
+                        maxWidth="Infinity" prefHeight="56"
+                        style="-fx-background-color: white; -fx-background-radius: 16; -fx-font-weight: 600; -fx-border-color: D9F4F1; -fx-border-radius: 16;"/>
+
+                <Button fx:id="opt3" onAction="#chooseOption" GridPane.rowIndex="1" GridPane.columnIndex="0"
+                        maxWidth="Infinity" prefHeight="56"
+                        style="-fx-background-color: white; -fx-background-radius: 16; -fx-font-weight: 600; -fx-border-color: D9F4F1; -fx-border-radius: 16;"/>
+                <Button fx:id="opt4" onAction="#chooseOption" GridPane.rowIndex="1" GridPane.columnIndex="1"
+                        maxWidth="Infinity" prefHeight="56"
+                        style="-fx-background-color: white; -fx-background-radius: 16; -fx-font-weight: 600; -fx-border-color: D9F4F1; -fx-border-radius: 16;"/>
+            </GridPane>
+
+            <!-- NAV -->
+            <HBox spacing="18" alignment="CENTER">
+                <Button fx:id="prevBtn" onAction="#prev"
+                        style="-fx-background-color: white;
+                                       -fx-background-radius: 8;
+                                       -fx-border-color: #E6EAF2;
+                                       -fx-border-radius: 8;
+                                       -fx-padding: 6 10;
+                                       -fx-cursor: hand;">
+                    <graphic>
+                        <Label text="‹"
+                               style="-fx-text-fill: #7A7A7A; -fx-font-size: 16px; -fx-font-weight: 900;"/>
+                    </graphic>
+                </Button>
+
+                <Label fx:id="pageLabel" text="1 / 10"
+                       style="-fx-text-fill: #0A0A0A; -fx-font-size: 16px; -fx-font-weight: 400;"/>
+
+                <Button fx:id="nextBtn" onAction="#next"
+                        style="-fx-background-color: white;
+                                       -fx-background-radius: 8;
+                                       -fx-border-color: #E6EAF2;
+                                       -fx-border-radius: 8;
+                                       -fx-padding: 6 10;
+                                       -fx-cursor: hand;">
+                    <graphic>
+                        <Label text="›"
+                               style="-fx-text-fill: #7A7A7A; -fx-font-size: 16px; -fx-font-weight: 900;"/>
+                    </graphic>
+                </Button>
+            </HBox>
+
+            <Button fx:id="viewResultBtn"
+                    text="View result"
+                    onAction="#viewResult"
+                    visible="false" managed="false"
+                    prefHeight="48" maxWidth="Infinity"
+                    style="-fx-background-color: #3D8FEF; -fx-text-fill: white; -fx-background-radius: 10; -fx-font-weight: 500;"/>
+        </VBox>
+    </center>
+
+    <bottom>
+        <AnchorPane prefHeight="95">
+            <children>
+                <fx:include source="../components/menu.fxml"
+                            AnchorPane.leftAnchor="0"
+                            AnchorPane.rightAnchor="0"
+                            AnchorPane.bottomAnchor="0"/>
+            </children>
+        </AnchorPane>
+    </bottom>
+</BorderPane>

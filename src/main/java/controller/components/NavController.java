@@ -58,6 +58,8 @@ public class NavController {
 
     @FXML
     private void initialize() {
+        boolean isTeacher = AppState.isTeacher();
+
         // Toggle group
         homeBtn.setToggleGroup(group);
         classBtn.setToggleGroup(group);
@@ -89,7 +91,7 @@ public class NavController {
 
         // Role-based menu visibility (Teacher: Home, Classes, Account)
         AppState.role.addListener((obs, o, n) -> applyRole(n));
-        applyRole(AppState.role.get());
+        applyRole(AppState.getRole());
     }
 
     private void updateFromAppState(AppState.NavItem nav) {
@@ -117,7 +119,7 @@ public class NavController {
     }
 
     private void applyRole(AppState.Role role) {
-        boolean teacher = role == AppState.Role.TEACHER;
+        boolean teacher = AppState.isTeacher();
         flashBtn.setVisible(!teacher);
         flashBtn.setManaged(!teacher);
         quizBtn.setVisible(!teacher);

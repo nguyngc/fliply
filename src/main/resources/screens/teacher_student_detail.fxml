@@ -1,33 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.*?>
 <BorderPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="controller.QuizzesController"
+            fx:controller="controller.TeacherStudentDetailController"
             prefWidth="375" prefHeight="750"
             style="-fx-background-color: #F6F7FB;">
 
-    <!-- Header -->
     <top>
         <fx:include fx:id="header" source="../components/header.fxml"/>
     </top>
 
-    <!-- Content -->
     <center>
-        <ScrollPane fitToWidth="true" hbarPolicy="NEVER"
-                    style="-fx-background-color: transparent;">
-            <content>
-                <VBox fx:id="listBox" spacing="14">
-                    <padding>
-                        <Insets top="18" right="18" bottom="18" left="18"/>
-                    </padding>
-                </VBox>
-            </content>
-        </ScrollPane>
+        <VBox spacing="16">
+            <padding>
+                <Insets top="18" right="18" bottom="18" left="18"/>
+            </padding>
+
+            <Label text="Progress"
+                   style="-fx-font-size: 20px; -fx-font-weight: 500; -fx-text-fill: #1F1F39;"/>
+
+            <!-- progress list injected by controller -->
+            <VBox fx:id="progressListBox" spacing="12"/>
+
+        </VBox>
     </center>
 
-    <!-- Menu -->
     <bottom>
         <AnchorPane prefHeight="95">
             <children>

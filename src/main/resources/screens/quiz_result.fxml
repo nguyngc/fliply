@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controller.QuizResultController"
+            prefWidth="375" prefHeight="750"
+            minWidth="375" minHeight="750"
+            maxWidth="375" maxHeight="750"
+            style="-fx-background-color: #F6F7FB;">
+
+    <top>
+        <fx:include fx:id="header" source="../components/header.fxml"/>
+    </top>
+
+    <center>
+        <!-- Scrollable results list -->
+        <ScrollPane fitToWidth="true"
+                    hbarPolicy="NEVER"
+                    vbarPolicy="AS_NEEDED"
+                    style="-fx-background-color: transparent; -fx-background: transparent;">
+            <content>
+                <VBox fx:id="resultBox" spacing="12">
+                    <!-- IMPORTANT: add bottom padding so list does not hide behind buttons+menu -->
+                    <padding>
+                        <Insets top="18" right="18" bottom="18" left="18"/>
+                    </padding>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <!-- Actions + Menu -->
+        <VBox spacing="12" style="-fx-background-color: transparent;">
+            <HBox spacing="14">
+                <padding>
+                    <Insets top="12" right="18" bottom="0" left="18"/>
+                </padding>
+
+                <Button text="Restart quiz"
+                        onAction="#restart"
+                        maxWidth="Infinity"
+                        HBox.hgrow="ALWAYS"
+                        style="-fx-background-color: #3D8FEF;
+                           -fx-text-fill: white;
+                           -fx-background-radius: 10;
+                           -fx-font-weight: 500;
+                           -fx-font-size: 14px;
+                           -fx-padding: 10px 32px 10px 32px"/>
+
+                <Button text="Back to quizzes"
+                        onAction="#backToList"
+                        maxWidth="Infinity"
+                        HBox.hgrow="ALWAYS"
+                        style="-fx-background-color: #FFFFFF;
+                           -fx-border-color: #3D8FEF;
+                           -fx-border-radius: 10;
+                           -fx-text-fill: #3D8FEF;
+                           -fx-font-weight: 500;
+                           -fx-font-size: 14px;
+                           -fx-padding: 10px 32px 10px 32px"/>
+            </HBox>
+
+            <!-- Bottom menu -->
+            <AnchorPane prefHeight="95.0">
+                <children>
+                    <fx:include source="../components/menu.fxml"
+                                AnchorPane.leftAnchor="0"
+                                AnchorPane.rightAnchor="0"
+                                AnchorPane.bottomAnchor="0"/>
+                </children>
+            </AnchorPane>
+        </VBox>
+    </bottom>
+
+</BorderPane>

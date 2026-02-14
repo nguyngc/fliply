@@ -1,20 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.*?>
 <BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controller.FlashcardSetController"
             prefWidth="375.0" prefHeight="750.0"
             minWidth="375.0" minHeight="750.0"
             maxWidth="375.0" maxHeight="750.0"
-            style="-fx-background-color: #F6F7FB;"
-            fx:controller="controller.FlashcardSetController">
+            style="-fx-background-color: #F6F7FB;">
 
     <top>
         <fx:include fx:id="header" source="../components/header.fxml"/>
     </top>
 
-    <!-- CENTER: scrollable term grid -->
     <center>
         <ScrollPane fitToWidth="true"
                     hbarPolicy="NEVER"
@@ -31,58 +30,20 @@
                             <ColumnConstraints percentWidth="50"/>
                             <ColumnConstraints percentWidth="50"/>
                         </columnConstraints>
-
-                        <!-- Tile 1 -->
-                        <StackPane GridPane.rowIndex="0" GridPane.columnIndex="0">
-                            <fx:include source="../components/term_tile.fxml"/>
-                            <Button onAction="#openFlashcardDetail"
-                                    userData="Term 1|This is the definition for Term 1"
-                                    maxWidth="Infinity" maxHeight="Infinity"
-                                    style="-fx-background-color: transparent; -fx-cursor: hand;"/>
-                        </StackPane>
-
-                        <!-- Tile 2 -->
-                        <StackPane GridPane.rowIndex="0" GridPane.columnIndex="1">
-                            <fx:include source="../components/term_tile.fxml"/>
-                            <Button onAction="#openFlashcardDetail"
-                                    userData="Term 2|This is the definition for Term 2"
-                                    maxWidth="Infinity" maxHeight="Infinity"
-                                    style="-fx-background-color: transparent; -fx-cursor: hand;"/>
-                        </StackPane>
-
-                        <!-- Tile 3 -->
-                        <StackPane GridPane.rowIndex="1" GridPane.columnIndex="0">
-                            <fx:include source="../components/term_tile.fxml"/>
-                            <Button onAction="#openFlashcardDetail"
-                                    userData="Term 3|This is the definition for Term 3"
-                                    maxWidth="Infinity" maxHeight="Infinity"
-                                    style="-fx-background-color: transparent; -fx-cursor: hand;"/>
-                        </StackPane>
-
-                        <!-- Tile 4 -->
-                        <StackPane GridPane.rowIndex="1" GridPane.columnIndex="1">
-                            <fx:include source="../components/term_tile.fxml"/>
-                            <Button onAction="#openFlashcardDetail"
-                                    userData="Term 4|This is the definition for Term 4"
-                                    maxWidth="Infinity" maxHeight="Infinity"
-                                    style="-fx-background-color: transparent; -fx-cursor: hand;"/>
-                        </StackPane>
                     </GridPane>
-
 
                 </VBox>
             </content>
         </ScrollPane>
     </center>
 
-    <!-- BOTTOM: your reusable nav -->
     <bottom>
-        <AnchorPane prefHeight="95.0" style="-fx-background-color: transparent;">
+        <AnchorPane prefHeight="95.0">
             <children>
                 <fx:include source="../components/menu.fxml"
-                            AnchorPane.leftAnchor="0.0"
-                            AnchorPane.rightAnchor="0.0"
-                            AnchorPane.bottomAnchor="0.0"/>
+                            AnchorPane.leftAnchor="0"
+                            AnchorPane.rightAnchor="0"
+                            AnchorPane.bottomAnchor="0"/>
             </children>
         </AnchorPane>
     </bottom>

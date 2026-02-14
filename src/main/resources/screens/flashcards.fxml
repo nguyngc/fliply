@@ -1,34 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.*?>
 <BorderPane xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="controller.FlashcardsController"
             prefWidth="375" prefHeight="750"
             style="-fx-background-color: #F6F7FB;">
 
+    <!-- Header -->
     <top>
-        <fx:include source="../components/header.fxml"/>
+        <fx:include fx:id="header" source="../components/header.fxml"/>
     </top>
 
+    <!-- Content -->
     <center>
-        <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: transparent;">
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER"
+                    style="-fx-background-color: transparent;">
             <content>
-                <VBox spacing="12">
+                <VBox spacing="14">
                     <padding>
-                        <Insets top="18" right="18" bottom="20" left="18"/>
+                        <Insets top="18" right="18" bottom="24" left="18"/>
                     </padding>
 
-                    <Label text="Flashcards"
-                           style="-fx-font-size: 22px; -fx-font-weight: 800;"/>
-                    <Label text="This page is not implemented yet."
-                           style="-fx-font-size: 14px; -fx-text-fill: #777;"/>
+                    <GridPane fx:id="termGrid" hgap="14" vgap="14">
+                        <columnConstraints>
+                            <ColumnConstraints percentWidth="50"/>
+                            <ColumnConstraints percentWidth="50"/>
+                        </columnConstraints>
+                    </GridPane>
                 </VBox>
             </content>
         </ScrollPane>
     </center>
 
+    <!-- Menu -->
     <bottom>
         <AnchorPane prefHeight="95.0">
             <children>
@@ -39,5 +45,4 @@
             </children>
         </AnchorPane>
     </bottom>
-
 </BorderPane>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controller.TeacherAddClassController"
+            prefWidth="375" prefHeight="750"
+            style="-fx-background-color: #F6F7FB;">
+
+    <top>
+        <fx:include fx:id="header" source="../components/header.fxml"/>
+    </top>
+
+    <center>
+        <VBox spacing="14">
+            <padding>
+                <Insets top="18" right="18" bottom="18" left="18"/>
+            </padding>
+
+            <Label text="Class Code" style="-fx-text-fill: #8C8C8C;"/>
+
+            <TextField fx:id="classCodeField" promptText="Class Code"
+                       style="-fx-background-color: white;
+                              -fx-background-radius: 14;
+                              -fx-border-color: rgba(31,31,57,0.20);
+                              -fx-border-radius: 10;
+                              -fx-padding: 10 15;"/>
+
+            <HBox spacing="14">
+                <Button text="Add" onAction="#onAdd"
+                        HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                        style="-fx-background-color: #3D8FEF;
+                            -fx-text-fill: white;
+                            -fx-background-radius: 10;
+                            -fx-font-weight: 500;
+                            -fx-font-size: 14px;
+                            -fx-padding: 10px 32px 10px 32px"/>
+
+                <Button text="Cancel" onAction="#onCancel"
+                        HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                        style="-fx-background-color: white;
+                            -fx-border-color: #3D8FEF;
+                            -fx-border-radius: 10;
+                            -fx-text-fill: #3D8FEF;
+                            -fx-font-weight: 500;
+                            -fx-font-size: 14px;
+                            -fx-padding: 10px 32px 10px 32px"/>
+            </HBox>
+        </VBox>
+    </center>
+
+    <bottom>
+        <AnchorPane prefHeight="95">
+            <children>
+                <fx:include source="../components/menu.fxml"
+                            AnchorPane.leftAnchor="0"
+                            AnchorPane.rightAnchor="0"
+                            AnchorPane.bottomAnchor="0"/>
+            </children>
+        </AnchorPane>
+    </bottom>
+</BorderPane>

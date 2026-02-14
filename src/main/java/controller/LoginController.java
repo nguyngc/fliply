@@ -57,7 +57,7 @@ public class LoginController {
     @FXML
     public void login() {
         // DEMO: no validation/auth yet
-        AppState.role.set(AppState.Role.STUDENT);
+        AppState.setRole(AppState.Role.STUDENT);
         Navigator.go(AppState.Screen.HOME);
     }
 
@@ -76,7 +76,7 @@ public class LoginController {
     public void onGoogleLogin() {
         // DEMO only
         System.out.println("Google login clicked (not implemented)");
-        AppState.role.set(AppState.Role.STUDENT);
+        AppState.setRole(AppState.Role.STUDENT);
         Navigator.go(AppState.Screen.HOME);
     }
 }

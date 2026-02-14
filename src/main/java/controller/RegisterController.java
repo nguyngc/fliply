@@ -13,7 +13,9 @@ public class RegisterController {
     private final Image eyeOpen = new Image(getClass().getResourceAsStream("/images/eye_open.png"));
     private final Image eyeClosed = new Image(getClass().getResourceAsStream("/images/eye_closed.png"));
     @FXML
-    private TextField nameField;
+    private TextField firstNameField;
+    @FXML
+    private TextField lastNameField;
     @FXML
     private TextField emailField;
     @FXML
@@ -69,7 +71,7 @@ public class RegisterController {
         }
 
         boolean isTeacher = teacherYes != null && teacherYes.isSelected();
-        AppState.role.set(isTeacher ? AppState.Role.TEACHER : AppState.Role.STUDENT);
+        AppState.setRole(isTeacher ? AppState.Role.TEACHER : AppState.Role.STUDENT);
 
         Navigator.go(AppState.Screen.HOME);
     }

@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controller.TeacherClassDetailController"
+            prefWidth="375" prefHeight="750"
+            style="-fx-background-color: #F6F7FB;">
+
+    <top>
+        <fx:include fx:id="header" source="../components/header.fxml"/>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true"
+                    hbarPolicy="NEVER"
+                    style="-fx-background-color: transparent; -fx-background: transparent;">
+            <content>
+                <VBox spacing="18">
+                    <padding>
+                        <Insets top="18" right="18" bottom="18" left="18"/>
+                    </padding>
+
+                    <!-- Students Section -->
+                    <Label fx:id="studentsSectionLabel"
+                           text="Students (0)"
+                           style="-fx-font-size: 20px; -fx-font-weight: 500; -fx-text-fill: #1F1F39;"/>
+
+                    <VBox spacing="12"
+                          style="-fx-background-color: white; -fx-background-radius: 18;
+                                 -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 14, 0.2, 0, 6);">
+                        <padding>
+                            <Insets top="14" right="14" bottom="14" left="14"/>
+                        </padding>
+
+                        <!-- Enrolled students list -->
+                        <VBox fx:id="enrolledStudentsBox" spacing="10"/>
+
+                        <!-- Add more students (first load only shows this) -->
+                        <Button fx:id="showSearchBtn"
+                                text="+ Add more students"
+                                onAction="#onShowStudentSearch"
+                                style="-fx-background-color: transparent;
+                                       -fx-text-fill: #3D8FEF;
+                                       -fx-font-weight: 700;
+                                       -fx-cursor: hand;"/>
+
+                        <!-- Search UI (hidden until Add clicked) -->
+                        <VBox fx:id="studentSearchBox" spacing="10"
+                              visible="false" managed="false">
+
+                            <StackPane maxWidth="Infinity">
+                                <TextField fx:id="studentSearchField"
+                                           promptText="Search student..."
+                                           style="-fx-background-color: white;
+                                              -fx-background-radius: 14;
+                                              -fx-border-color: rgba(31,31,57,0.20);
+                                              -fx-border-radius: 10;
+                                              -fx-padding: 10 14 10 38;
+                                              -fx-font-size: 14px;"/>
+                                <!-- Search icon -->
+                                <ImageView fitWidth="16" fitHeight="16"
+                                           preserveRatio="true"
+                                           StackPane.alignment="CENTER_LEFT"
+                                           translateX="12">
+                                    <image>
+                                        <Image url="@../images/search_icon.png"/>
+                                    </image>
+                                </ImageView>
+                            </StackPane>
+
+                            <VBox fx:id="searchResultsBox" spacing="10"/>
+
+                            <Button text="Close"
+                                    onAction="#onHideStudentSearch"
+                                    style="-fx-background-color: transparent;
+                                           -fx-text-fill: rgba(0,0,0,0.55);
+                                           -fx-font-weight: 700;
+                                           -fx-cursor: hand;"/>
+                        </VBox>
+
+                    </VBox>
+
+                    <!-- Flashcard Sets -->
+                    <Label fx:id="setsSectionLabel"
+                           text="Flashcard Sets (0)"
+                           style="-fx-font-size: 20px; -fx-font-weight: 500; -fx-text-fill: #1F1F39;"/>
+
+                    <VBox fx:id="setListBox" spacing="14"/>
+
+                    <!-- Add set button under list -->
+                    <Button text="+ Add more Flashcard set"
+                            onAction="#onAddSet"
+                            prefHeight="54"
+                            maxWidth="Infinity"
+                            style="-fx-background-color: white;
+                                   -fx-background-radius: 14;
+                                   -fx-text-fill: #3D8FEF;
+                                   -fx-font-size: 14px;
+                                   -fx-font-weight: 700;
+                                   -fx-cursor: hand;
+                                   -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 14, 0.2, 0, 6);"/>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <AnchorPane prefHeight="95">
+            <children>
+                <fx:include source="../components/menu.fxml"
+                            AnchorPane.leftAnchor="0"
+                            AnchorPane.rightAnchor="0"
+                            AnchorPane.bottomAnchor="0"/>
+            </children>
+        </AnchorPane>
+    </bottom>
+</BorderPane>

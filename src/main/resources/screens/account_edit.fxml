@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<BorderPane xmlns:fx="http://javafx.com/fxml"
+            fx:controller="controller.AccountEditController"
+            prefWidth="375" prefHeight="750"
+            style="-fx-background-color: #F6F7FB;">
+
+    <top>
+        <fx:include fx:id="header" source="../components/header.fxml"/>
+    </top>
+
+    <center>
+        <ScrollPane fitToWidth="true" hbarPolicy="NEVER"
+                    style="-fx-background-color: transparent; -fx-background: transparent;">
+            <content>
+                <VBox spacing="14">
+                    <padding>
+                        <Insets top="18" right="18" bottom="18" left="18"/>
+                    </padding>
+
+                    <Label text="First Name"
+                           style="-fx-font-size: 14px; -fx-text-fill: #8C8C8C;"/>
+
+                    <TextField fx:id="firstNameField"
+                               promptText="First Name"
+                               style="-fx-background-color: white;
+                                      -fx-background-radius: 14;
+                                      -fx-border-color: rgba(31,31,57,0.20);
+                                      -fx-border-radius: 10;
+                                      -fx-padding: 10 14;
+                                      -fx-font-size: 14px;"/>
+
+                    <Label text="Last Name"
+                           style="-fx-font-size: 14px; -fx-text-fill: #8C8C8C;"/>
+
+                    <TextField fx:id="lastNameField"
+                               promptText="Last Name"
+                               style="-fx-background-color: white;
+                                      -fx-background-radius: 14;
+                                      -fx-border-color: rgba(31,31,57,0.20);
+                                      -fx-border-radius: 10;
+                                      -fx-padding: 10 14;
+                                      -fx-font-size: 14px;"/>
+
+                    <Label text="Email"
+                           style="-fx-font-size: 14px; -fx-text-fill: #8C8C8C;"/>
+
+                    <TextField fx:id="emailField"
+                               editable="false"
+                               style="-fx-background-color: rgba(255,255,255,0.70);
+                                      -fx-background-radius: 14;
+                                      -fx-border-color: rgba(31,31,57,0.15);
+                                      -fx-border-radius: 10;
+                                      -fx-padding: 10 14;
+                                      -fx-font-size: 14px;"/>
+
+                    <HBox spacing="14">
+                        <Button text="Save"
+                                onAction="#onSave"
+                                HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                                style="-fx-background-color: #3D8FEF;
+                                       -fx-text-fill: white;
+                                       -fx-background-radius: 12;
+                                       -fx-font-size: 14px;
+                                       -fx-font-weight: 500;
+                                       -fx-padding: 10px 32px 10px 32px;
+                                       -fx-cursor: hand;"/>
+
+                        <Button text="Cancel"
+                                onAction="#onCancel"
+                                HBox.hgrow="ALWAYS" maxWidth="Infinity"
+                                style="-fx-background-color: white;
+                                       -fx-border-color: #3D8FEF;
+                                       -fx-border-width: 1;
+                                       -fx-text-fill: #3D8FEF;
+                                       -fx-background-radius: 12;
+                                       -fx-border-radius: 12;
+                                       -fx-font-weight: 500;
+                                       -fx-font-size: 14px;
+                                       -fx-padding: 10px 32px 10px 32px;
+                                       -fx-cursor: hand;"/>
+                    </HBox>
+                </VBox>
+            </content>
+        </ScrollPane>
+    </center>
+
+    <bottom>
+        <AnchorPane prefHeight="95">
+            <children>
+                <fx:include source="../components/menu.fxml"
+                            AnchorPane.leftAnchor="0"
+                            AnchorPane.rightAnchor="0"
+                            AnchorPane.bottomAnchor="0"/>
+            </children>
+        </AnchorPane>
+    </bottom>
+</BorderPane>

@@ -31,7 +31,7 @@
 .button {
     -fx-font-family: "Poppins";
     -fx-font-size: 16px;
-    -fx-font-weight: bold;
+    -fx-font-weight: 500;
     -fx-background-radius: 10;
     -fx-border-radius: 10;
     -fx-padding: 10px 32px 10px 32px;
@@ -43,22 +43,26 @@
 .secondary-button {
     -fx-text-fill: #3D8FEF;
     -fx-background-color: #FFFFFF;
-    /*-fx-border-color: #3D8FEF;*/
 }
 
-.menu {
-    -fx-background-color: #FFFFFF;
+/* Remove the inner “line” / default skin background */
+.form-textarea {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
+}
+
+/* The actual editable area */
+.form-textarea .content {
+    -fx-background-color: white;
+    -fx-background-insets: 0;
     -fx-background-radius: 10;
-    -fx-border-radius: 10;
+    -fx-padding: 10 15 10 15;
 }
 
-.menu-item {
-
-}
-
-.menu-button {
-    -fx-font-family: "Poppins";
-    -fx-font-size: 11px;
-    -fx-text-fill: #8C8C8C;
-    -fx-background-color: #FFFFFF;
+/* Make inner scrollpane/viewport transparent so no extra line appears */
+.form-textarea .scroll-pane,
+.form-textarea .scroll-pane .viewport {
+    -fx-background-color: transparent;
 }

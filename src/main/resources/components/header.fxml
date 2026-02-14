@@ -1,29 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.image.Image?>
-<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <StackPane xmlns:fx="http://javafx.com/fxml"
            fx:controller="controller.components.HeaderController"
            style="-fx-background-color: #3D8FEF;">
 
-    <HBox alignment="TOP_LEFT" spacing="16" StackPane.alignment="TOP_LEFT">
+    <HBox alignment="CENTER_LEFT" spacing="16" StackPane.alignment="TOP_LEFT">
         <padding>
             <Insets top="24" right="24" bottom="24" left="24"/>
         </padding>
 
+        <!-- Back -->
         <Button fx:id="backButton"
                 onAction="#onBack"
                 visible="false"
                 managed="false"
                 style="-fx-background-color: white;
-                       -fx-background-radius: 16;
+                       -fx-background-radius: 10;
+                       -fx-padding: 5 0;
                        -fx-cursor: hand;">
             <graphic>
-                <ImageView fitWidth="40" fitHeight="40" preserveRatio="true">
+                <ImageView fitWidth="30" fitHeight="40" preserveRatio="true">
                     <image>
                         <Image url="@../images/back_arrow.png"/>
                     </image>
@@ -31,7 +31,8 @@
             </graphic>
         </Button>
 
-        <VBox spacing="10" alignment="TOP_LEFT" style="-fx-padding: 0 0 0 0;" HBox.hgrow="ALWAYS">
+        <!-- Title area -->
+        <VBox spacing="10" alignment="TOP_LEFT" HBox.hgrow="ALWAYS">
             <Label fx:id="titleLabel"
                    text="Title"
                    wrapText="true"
@@ -54,9 +55,26 @@
                 <Label fx:id="metaLabel"
                        text=""
                        style="-fx-text-fill: rgba(255,255,255,0.95); -fx-font-size: 24px; -fx-font-weight: 400;"/>
-
-                <Region HBox.hgrow="ALWAYS"/>
             </HBox>
         </VBox>
+
     </HBox>
+
+    <!-- More (⋯) -->
+    <Button fx:id="moreButton"
+            onAction="#onMore"
+            visible="false"
+            managed="false"
+            StackPane.alignment="TOP_RIGHT"
+            style="-fx-background-color: transparent;
+                   -fx-cursor: hand;
+                   -fx-padding: 16 20 0 0;">
+        <graphic>
+            <ImageView fx:id="moreIcon" fitWidth="22" fitHeight="22" preserveRatio="true">
+                <image>
+                    <Image url="@../images/more_icon.png"/>
+                </image>
+            </ImageView>
+        </graphic>
+    </Button>
 </StackPane>

@@ -1,33 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.*?>
 <BorderPane xmlns:fx="http://javafx.com/fxml"
-            fx:controller="controller.QuizzesController"
+            fx:controller="controller.AccountAboutController"
             prefWidth="375" prefHeight="750"
             style="-fx-background-color: #F6F7FB;">
 
-    <!-- Header -->
     <top>
         <fx:include fx:id="header" source="../components/header.fxml"/>
     </top>
 
-    <!-- Content -->
     <center>
         <ScrollPane fitToWidth="true" hbarPolicy="NEVER"
-                    style="-fx-background-color: transparent;">
+                    style="-fx-background-color: transparent; -fx-background: transparent;">
             <content>
-                <VBox fx:id="listBox" spacing="14">
+                <VBox spacing="12">
                     <padding>
                         <Insets top="18" right="18" bottom="18" left="18"/>
                     </padding>
+
+                    <Label text="About Us"
+                           style="-fx-font-size: 20px; -fx-font-weight: 500; -fx-text-fill: #1F1F39;"/>
+
+                    <Label text="About this app..."
+                           wrapText="true"
+                           style="-fx-font-size: 14px; -fx-text-fill: rgba(0,0,0,0.55); -fx-font-weight: 400;"/>
                 </VBox>
             </content>
         </ScrollPane>
     </center>
 
-    <!-- Menu -->
     <bottom>
         <AnchorPane prefHeight="95">
             <children>
