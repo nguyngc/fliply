@@ -1,6 +1,5 @@
 package model.dao;
 
-import model.datasource.MariaDbJPAConnection;
 import model.entity.ClassModel;
 import model.entity.User;
 import org.junit.jupiter.api.*;
@@ -28,7 +27,7 @@ class ClassModelDaoTest {
         u.setFirstName("Test");
         u.setLastName("Teacher");
         u.setEmail("teacher+" + uid + "@test.com");
-        u.setGoogleId("gid-" + uid);
+        u.setPassword("password123");
         u.setRole(1);
         return u;
     }

@@ -1,6 +1,5 @@
 package model.dao;
 
-import model.datasource.MariaDbJPAConnection;
 import model.entity.ClassModel;
 import model.entity.FlashcardSet;
 import model.entity.User;
@@ -31,7 +30,7 @@ class FlashcardSetDaoTest {
         u.setFirstName("Test");
         u.setLastName("User");
         u.setEmail("set+" + uid + "@test.com");
-        u.setGoogleId("gid-" + uid);
+        u.setPassword("password123");
         u.setRole(1);
         return u;
     }

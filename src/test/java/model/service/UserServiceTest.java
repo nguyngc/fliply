@@ -1,7 +1,6 @@
 package model.service;
 
 import model.dao.UserDao;
-import model.datasource.MariaDbJPAConnection;
 import model.entity.User;
 import org.junit.jupiter.api.*;
 
@@ -21,58 +20,88 @@ class UserServiceTest {
     }
 
     @Test
-    void login_createUser() {
+    void register_newUser() {
         String uid = UUID.randomUUID().toString().substring(0, 8);
+        String email = "register+" + uid + "@test.com";
+        String password = "password123";
 
-        String googleId = "gid-" + uid;
-        String email = "u+" + uid + "@test.com";
-
-        // if no user -> create new
-        User u = userService.loginOrCreateUser(googleId, email, "Nhut", "Vo");
+        User u = userService.register(email, password, "Nhut", "Vo");
 
         assertNotNull(u);
         assertNotNull(u.getUserId());
-        assertEquals(googleId, u.getGoogleId());
         assertEquals(email, u.getEmail());
+        assertEquals(password, u.getPassword());
         assertEquals("Nhut", u.getFirstName());
         assertEquals("Vo", u.getLastName());
-        assertEquals(1, u.getRole());
+        assertEquals(0, u.getRole()); // default student role
 
         // cleanup
         userDao.delete(u);
     }
 
     @Test
-    void login_existingUser() {
+    void register_duplicateEmail_throwsException() {
         String uid = UUID.randomUUID().toString().substring(0, 8);
+        String email = "duplicate+" + uid + "@test.com";
 
-        String googleId = "gid-" + uid;
-        String email = "u+" + uid + "@test.com";
+        // First registration succeeds
+        User first = userService.register(email, "pass1", "First", "User");
+        assertNotNull(first);
 
-        // create user in DB
-        User seeded = new User();
-        seeded.setGoogleId(googleId);
-        seeded.setEmail(email);
-        seeded.setFirstName("Old");
-        seeded.setLastName("Name");
-        seeded.setRole(2);
-        userDao.persist(seeded);
-
-        Integer existingId = seeded.getUserId();
-        assertNotNull(existingId);
-
-
-        User result = userService.loginOrCreateUser(googleId, "new@mail.com", "New", "User");
-
-        assertNotNull(result);
-        assertEquals(existingId, result.getUserId());
-        assertEquals("Old", result.getFirstName());
-        assertEquals("Name", result.getLastName());
-        assertEquals(email, result.getEmail());
-        assertEquals(googleId, result.getGoogleId());
-        assertEquals(2, result.getRole());
+        // Second registration with same email throws exception
+        assertThrows(IllegalArgumentException.class, () -> {
+            userService.register(email, "pass2", "Second", "User");
+        });
 
         // cleanup
-        userDao.delete(result);
+        userDao.delete(first);
+    }
+
+    @Test
+    void login_validCredentials() {
+        String uid = UUID.randomUUID().toString().substring(0, 8);
+        String email = "login+" + uid + "@test.com";
+        String password = "password123";
+
+        // First register a user
+        User registered = userService.register(email, password, "Test", "Login");
+        assertNotNull(registered);
+
+        // Then login
+        User loggedIn = userService.login(email, password);
+        assertNotNull(loggedIn);
+        assertEquals(registered.getUserId(), loggedIn.getUserId());
+        assertEquals(email, loggedIn.getEmail());
+
+        // cleanup
+        userDao.delete(registered);
+    }
+
+    @Test
+    void login_invalidCredentials() {
+        String uid = UUID.randomUUID().toString().substring(0, 8);
+        String email = "invalid+" + uid + "@test.com";
+
+        // Try login with non-existent user
+        User result = userService.login(email, "wrongpass");
+        assertNull(result);
+    }
+
+    @Test
+    void login_wrongPassword() {
+        String uid = UUID.randomUUID().toString().substring(0, 8);
+        String email = "wrongpass+" + uid + "@test.com";
+        String password = "correctpass";
+
+        // Register user
+        User registered = userService.register(email, password, "Test", "User");
+        assertNotNull(registered);
+
+        // Try login with wrong password
+        User result = userService.login(email, "wrongpassword");
+        assertNull(result);
+
+        // cleanup
+        userDao.delete(registered);
     }
 }

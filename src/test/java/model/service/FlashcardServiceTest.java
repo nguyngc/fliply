@@ -4,7 +4,6 @@ import model.dao.ClassModelDao;
 import model.dao.FlashcardDao;
 import model.dao.FlashcardSetDao;
 import model.dao.UserDao;
-import model.datasource.MariaDbJPAConnection;
 import model.entity.ClassModel;
 import model.entity.Flashcard;
 import model.entity.FlashcardSet;
@@ -39,7 +38,7 @@ class FlashcardServiceTest {
         u.setFirstName(prefix);
         u.setLastName("User");
         u.setEmail(prefix.toLowerCase() + "+" + uid + "@test.com");
-        u.setGoogleId("gid-" + uid);
+        u.setPassword("password123");
         u.setRole(1);
         return u;
     }

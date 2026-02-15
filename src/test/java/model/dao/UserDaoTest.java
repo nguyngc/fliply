@@ -43,7 +43,7 @@ class UserDaoTest {
         u.setFirstName("Test");
         u.setLastName("User");
         u.setEmail("test+" + uid + "@example.com");
-        u.setGoogleId("test-gid-" + uid);
+        u.setPassword("password123");
         u.setRole(1);
         return u;
     }
@@ -61,7 +61,7 @@ class UserDaoTest {
         User found = userDao.find(id);
         assertNotNull(found);
         assertEquals(u.getEmail(), found.getEmail());
-        assertEquals(u.getGoogleId(), found.getGoogleId());
+        assertEquals(u.getPassword(), found.getPassword());
 
         // UPDATE
         found.setLastName("VoUpdated");
@@ -92,18 +92,18 @@ class UserDaoTest {
             assertNotNull(byEmail);
             assertEquals(id, byEmail.getUserId());
 
-            // existsByGoogleId
-            assertTrue(userDao.existsByGoogleId(u.getGoogleId()));
+            // existsByEmail
+            assertTrue(userDao.existsByEmail(u.getEmail()));
 
-            // findByGoogleId
-            User byGid = userDao.findByGoogleId(u.getGoogleId());
-            assertNotNull(byGid);
-            assertEquals(id, byGid.getUserId());
+            // findByEmailAndPassword
+            User byEmailAndPassword = userDao.findByEmailAndPassword(u.getEmail(), u.getPassword());
+            assertNotNull(byEmailAndPassword);
+            assertEquals(id, byEmailAndPassword.getUserId());
 
         } finally {
             // cleanup - ensure deletion even if test fails
             userDao.delete(u);
-            assertFalse(userDao.existsByGoogleId(u.getGoogleId()));
+            assertFalse(userDao.existsByEmail(u.getEmail()));
         }
     }
 }

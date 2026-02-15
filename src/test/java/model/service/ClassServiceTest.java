@@ -2,7 +2,6 @@ package model.service;
 
 import model.dao.ClassModelDao;
 import model.dao.UserDao;
-import model.datasource.MariaDbJPAConnection;
 import model.entity.ClassModel;
 import model.entity.User;
 import org.junit.jupiter.api.*;
@@ -31,7 +30,7 @@ class ClassServiceTest {
         t.setFirstName("Teacher");
         t.setLastName("User");
         t.setEmail("teacher+" + uid + "@test.com");
-        t.setGoogleId("gid-" + uid);
+        t.setPassword("password123");
         t.setRole(1);
         return t;
     }

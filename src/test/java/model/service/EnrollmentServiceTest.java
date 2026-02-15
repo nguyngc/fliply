@@ -3,7 +3,6 @@ package model.service;
 import model.dao.ClassDetailsDao;
 import model.dao.ClassModelDao;
 import model.dao.UserDao;
-import model.datasource.MariaDbJPAConnection;
 import model.entity.ClassDetails;
 import model.entity.ClassModel;
 import model.entity.User;
@@ -35,7 +34,7 @@ class EnrollmentServiceTest {
         u.setFirstName(prefix);
         u.setLastName("User");
         u.setEmail(prefix.toLowerCase() + "+" + uid + "@test.com");
-        u.setGoogleId("gid-" + uid);
+        u.setPassword("password123");
         u.setRole(1);
         return u;
     }
