@@ -23,8 +23,7 @@
             <content>
                 <VBox spacing="14" style="-fx-background-color: transparent;">
                     <padding>
-                        <!-- bottom 120 keeps space for menu like your other pages -->
-                        <Insets top="18" right="18" bottom="20" left="18"/>
+                        <Insets top="22" right="22" bottom="22" left="22"/>
                     </padding>
 
                     <!-- The flip card component -->

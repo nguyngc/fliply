@@ -2,11 +2,13 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
 <StackPane xmlns:fx="http://javafx.com/fxml"
            fx:controller="controller.components.FlashcardFlipCardController"
            fx:id="root"
-           prefHeight="350"
+           prefHeight="380"
            maxWidth="Infinity"
            onMouseClicked="#flip">
 
@@ -14,6 +16,7 @@
     <StackPane fx:id="termPane"
                style="-fx-background-color: #ACD7FF;
                       -fx-background-radius: 22;
+                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 18, 0.25, 0, 8);
                       -fx-cursor: hand;">
         <padding>
             <Insets top="18" right="18" bottom="18" left="18"/>
@@ -32,6 +35,7 @@
                managed="false"
                style="-fx-background-color: white;
                       -fx-background-radius: 22;
+                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.10), 18, 0.25, 0, 8);
                       -fx-border-color: #D9F4F1;
                       -fx-border-radius: 22;
                       -fx-cursor: hand;">
@@ -46,5 +50,19 @@
                       -fx-font-weight: 600;
                       -fx-wrap-text: true;"/>
     </StackPane>
+
+    <!-- Flip icon overlay (bottom-right) -->
+    <ImageView fitWidth="26"
+               fitHeight="26"
+               preserveRatio="true"
+               mouseTransparent="true"
+               StackPane.alignment="BOTTOM_RIGHT">
+        <StackPane.margin>
+            <Insets top="0" right="14" bottom="14" left="0"/>
+        </StackPane.margin>
+        <image>
+            <Image url="@../images/flip_icon.png"/>
+        </image>
+    </ImageView>
 
 </StackPane>
