@@ -9,10 +9,20 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import model.AppState;
+import model.entity.ClassDetails;
+import model.entity.ClassModel;
+import model.entity.FlashcardSet;
+import model.entity.User;
+import model.service.ClassDetailsService;
+import model.service.StudyService;
 import view.Navigator;
 
-public class HomeController {
+import java.util.List;
 
+import static model.AppState.isTeacher;
+
+public class HomeController {
+    private final ClassDetailsService classDetailsService = new ClassDetailsService();
     @FXML
     private Label nameLabel;
     @FXML
@@ -26,12 +36,14 @@ public class HomeController {
 
     @FXML
     private void initialize() {
-        AppState.seedDemoIfNeeded();
-
-        boolean isTeacher = AppState.isTeacher();
+        //AppState.seedDemoIfNeeded();
+        //boolean isTeacher = AppState.isTeacher();
+        User user = AppState.currentUser.get();
+        boolean isTeacher = AppState.currentUser.get().isTeacher();
 
         // header text
-        nameLabel.setText(isTeacher ? "Teacher" : "Student");
+        //nameLabel.setText(isTeacher ? "Teacher" : "Student");
+        nameLabel.setText(user.getFirstName() + "!");
         subtitleLabel.setText(isTeacher ? "Manage your classes" : "Let's start learning");
 
         // hide quiz section for teacher
@@ -43,27 +55,39 @@ public class HomeController {
 
     private void renderLatestClass() {
         latestClassHolder.getChildren().clear();
-
-        if (AppState.demoClasses.isEmpty()) return;
-
-        AppState.ClassItem c = AppState.demoClasses.get(0); // latest class demo
-
+        User user = AppState.currentUser.get();
+        //if (AppState.demoClasses.isEmpty()) return;
+        //AppState.ClassItem c = AppState.demoClasses.get(0); // latest class demo
+        List<ClassModel> classes = classDetailsService.getClassesOfUser(user.getUserId());
+        if (classes.isEmpty()) return;
+        // sort newest first
+        classes.sort((a, b) -> b.getClassId() - a.getClassId());
+        ClassModel cd = classes.getFirst();
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/components/class_card.fxml"));
             Node node = loader.load();
             ClassCardController ctrl = loader.getController();
-
-            double progress = 0.80; // demo
-            if (AppState.isTeacher()) {
-                ctrl.setTeacherCard(c.getClassCode(), c.getStudentCount(), c.getSetCount(), progress);
-            } else {
-                ctrl.setStudentCard(c.getClassCode(), c.getTeacherName(), progress);
+            // progress
+            StudyService studyService = new StudyService();
+            double progress = 0.0;
+            if (!user.isTeacher()) {
+                int totalLearned = 0;
+                int totalCards = 0;
+                for (FlashcardSet set : cd.getFlashcardSets()) {
+                    totalLearned += (int) (studyService.getProgressPercent(user, set) * set.getCards().size());
+                    totalCards += set.getCards().size(); }
+                progress = (totalCards == 0) ? 0.0 : (double) totalLearned / totalCards;
             }
+            // Set cards UI
+            if (user.isTeacher()) {
+                ctrl.setTeacherCard( cd.getClassName(), cd.getStudents().size(), cd.getFlashcardSets().size(), progress );
+            } else {
+                ctrl.setStudentCard( cd.getClassName(), cd.getTeacherName(), progress ); }
 
             node.setOnMouseClicked(e -> {
-                AppState.selectedClass.set(c);
-                if (AppState.isTeacher()) Navigator.go(AppState.Screen.TEACHER_CLASS_DETAIL);
-                else Navigator.go(AppState.Screen.CLASS_DETAIL);
+                AppState.selectedClass.set(cd);
+                if (isTeacher()) Navigator.go(AppState.Screen.CLASSES);
+                else Navigator.go(AppState.Screen.CLASSES);
             });
 
             latestClassHolder.getChildren().add(node);
@@ -75,15 +99,15 @@ public class HomeController {
     @FXML
     private void onLatestQuizClicked(MouseEvent event) {
         // Teacher has no quiz section
-        if (AppState.isTeacher()) return;
+        if (isTeacher()) return;
 
-        if (AppState.myQuizzes == null || AppState.myQuizzes.isEmpty()) {
+        if (AppState.myQuizzes.isEmpty()) {
             Navigator.go(AppState.Screen.QUIZZES);
             return;
         }
 
         // Pick the latest quiz (first one for demo)
-        AppState.selectedQuiz.set(AppState.myQuizzes.get(0));
+        AppState.selectedQuiz.set(AppState.myQuizzes.getFirst());
 
         // Reset quiz session state
         AppState.quizQuestionIndex.set(0);

@@ -1,8 +1,10 @@
 package model;
 
+import com.sun.javafx.collections.ElementObservableListDecorator;
 import javafx.beans.property.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import model.entity.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,10 +16,14 @@ import java.util.UUID;
 public final class AppState {
 
     // ---------- Current User -----------
-    public static final SimpleStringProperty currentFirstName = new SimpleStringProperty("Student");
-    public static final SimpleStringProperty currentLastName = new SimpleStringProperty("User");
-    public static final SimpleStringProperty currentEmail = new SimpleStringProperty("student@email.com");
-    public static final SimpleStringProperty demoPassword = new SimpleStringProperty("123456");
+    //save real user after login
+    public static final ObjectProperty<User> currentUser = new SimpleObjectProperty<>();
+
+//    //demo
+//    public static final SimpleStringProperty currentFirstName = new SimpleStringProperty("Student");
+//    public static final SimpleStringProperty currentLastName = new SimpleStringProperty("User");
+//    public static final SimpleStringProperty currentEmail = new SimpleStringProperty("student@email.com");
+//    public static final SimpleStringProperty demoPassword = new SimpleStringProperty("123456");
 
     // ---------- Navigation / session ----------
     public static final ObjectProperty<Screen> currentScreen = new SimpleObjectProperty<>(Screen.WELCOME);
@@ -31,30 +37,37 @@ public final class AppState {
 
     // ---------- Flashcards  ----------
     public static final StringProperty selectedFlashcardSetName = new SimpleStringProperty("");
-    public static final ObservableList<FlashcardItem> myFlashcards = FXCollections.observableArrayList();
+    public static final ObservableList<Flashcard> myFlashcards = FXCollections.observableArrayList();
     public static final ObjectProperty<FormMode> flashcardFormMode = new SimpleObjectProperty<>(FormMode.ADD);
     public static final IntegerProperty editingIndex = new SimpleIntegerProperty(-1);
-    public static final ObservableList<FlashcardItem> currentDetailList = FXCollections.observableArrayList();
+    public static final ObservableList<Flashcard> currentDetailList = FXCollections.observableArrayList();
+    public static final ObjectProperty<Flashcard> currentFlashcard = new SimpleObjectProperty<>();
     public static final IntegerProperty currentDetailIndex = new SimpleIntegerProperty(0);
     public static final StringProperty selectedTerm = new SimpleStringProperty("");
     public static final StringProperty selectedDefinition = new SimpleStringProperty("");
 
     // ---------- Quizzes ------------
-    public static final ObservableList<QuizItem> myQuizzes = FXCollections.observableArrayList();
-    public static final ObjectProperty<QuizItem> selectedQuiz = new SimpleObjectProperty<>(null);
+    public static final ObservableList<Quiz> myQuizzes = FXCollections.observableArrayList();
+    public static final ObjectProperty<Quiz> selectedQuiz = new SimpleObjectProperty<>(null);
     public static final IntegerProperty quizQuestionIndex = new SimpleIntegerProperty(0);
     public static final IntegerProperty quizPoints = new SimpleIntegerProperty(0);
     public static final Map<Integer, String> quizAnswers = new HashMap<>();
     public static final Map<Integer, Boolean> quizCorrectMap = new HashMap<>();
+    public static final ObservableList<Quiz> quizList = FXCollections.observableArrayList();
 
     // ---------- Classes ----------
     public static final ObjectProperty<Role> role = new SimpleObjectProperty<>(Role.STUDENT);
     public static final ObservableList<ClassItem> demoClasses = FXCollections.observableArrayList();
     public static final StringProperty selectedClassCode = new SimpleStringProperty("");
-    public static final ObjectProperty<ClassItem> selectedClass = new SimpleObjectProperty<>(null);
-    public static final ObjectProperty<StudentItem> selectedStudent = new SimpleObjectProperty<>(null);
+    //public static final ObjectProperty<ClassItem> selectedClass = new SimpleObjectProperty<>(null);
+    public static final ObjectProperty<ClassModel> selectedClass = new SimpleObjectProperty<>(null);
+    //public static final ObjectProperty<StudentItem> selectedStudent = new SimpleObjectProperty<>(null);
+    public static final ObjectProperty<User> selectedStudent = new SimpleObjectProperty<>(null);
     public static final StringProperty selectedTeacherName = new SimpleStringProperty("");
-    public static final ObjectProperty<FlashcardSetItem> selectedSet = new SimpleObjectProperty<>(null);
+    //public static final ObjectProperty<FlashcardSetItem> selectedSet = new SimpleObjectProperty<>(null);
+    public static final ObjectProperty<FlashcardSet> selectedSet = new SimpleObjectProperty<>(null);
+    public static final ObjectProperty<FlashcardSet> selectedFlashcardSet = new SimpleObjectProperty<>();
+
 
     // -------- ENUM -----------
     public enum FormMode {ADD, EDIT}
@@ -297,4 +310,6 @@ public final class AppState {
 
         demoClasses.addAll(c1, c2);
     }
+
+
 }

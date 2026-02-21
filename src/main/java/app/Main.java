@@ -73,13 +73,13 @@ public class Main {
         ClassDetailsDao cdDao = new ClassDetailsDao();
 
         ClassDetails cd = new ClassDetails();
-        cd.setUser(u);
+        cd.setStudent(u);
         cd.setClassModel(c);
         cdDao.persist(cd);
 
         System.out.println("ClassDetails: " + cd);
         System.out.println("Students in class: " + cdDao.findByClassId(c.getClassId()).size());
-        System.out.println("Classes joined by user: " + cdDao.findByUserId(u.getUserId()).size());
+        System.out.println("Classes joined by user: " + cdDao.findByStudentId(u.getUserId()).size());
         System.out.println("Exists enrollment? " + cdDao.existsByUserAndClass(u.getUserId(), c.getClassId()));
 
 

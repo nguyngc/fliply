@@ -5,6 +5,8 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.TextField;
 import model.AppState;
+import model.entity.User;
+import model.service.UserService;
 import view.Navigator;
 
 public class AccountEditController {
@@ -21,6 +23,8 @@ public class AccountEditController {
     @FXML
     private TextField emailField;
 
+    private final UserService userService = new UserService();
+
     @FXML
     private void initialize() {
         headerController.setBackVisible(true);
@@ -33,16 +37,27 @@ public class AccountEditController {
 
         AppState.navOverride.set(AppState.NavItem.ACCOUNT);
 
-        // Demo binding
-        firstNameField.setText(AppState.currentFirstName.get());
-        lastNameField.setText(AppState.currentLastName.get());
-        emailField.setText(AppState.currentEmail.get());
+//        // Demo binding
+//        firstNameField.setText(AppState.currentFirstName.get());
+//        lastNameField.setText(AppState.currentLastName.get());
+//        emailField.setText(AppState.currentEmail.get());
+        // Load user
+        User user = AppState.currentUser.get();
+        firstNameField.setText(user.getFirstName());
+        lastNameField.setText(user.getLastName());
+        emailField.setText(user.getEmail());
+
+
     }
 
     @FXML
     private void onSave() {
-        AppState.currentFirstName.set(firstNameField.getText() == null ? "" : firstNameField.getText().trim());
-        AppState.currentLastName.set(lastNameField.getText() == null ? "" : lastNameField.getText().trim());
+        User user = AppState.currentUser.get();
+        user.setFirstName(firstNameField.getText() == null ? "" : firstNameField.getText().trim());
+        user.setLastName(lastNameField.getText() == null ? "" : lastNameField.getText().trim());
+        user.setEmail(emailField.getText() == null ? "" : emailField.getText().trim());
+        userService.update(user);
+
         Navigator.go(AppState.Screen.ACCOUNT);
     }
 

@@ -42,7 +42,7 @@ SET @c2 := (SELECT ClassId FROM `CLASS` WHERE ClassName='DevOps Fundamentals');
 -- ============================
 -- 3) CLASS_DETAILS (students in class)
 -- ============================
-INSERT INTO `CLASS_DETAILS` (ClassId, UserId)
+INSERT INTO `CLASS_DETAILS` (ClassId, StudentId)
 VALUES
     (@c1, @s1),
     (@c1, @s2),

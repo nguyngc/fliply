@@ -5,6 +5,9 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.TextField;
 import model.AppState;
+import model.dao.ClassModelDao;
+import model.entity.ClassModel;
+import model.service.TeacherAddClassService;
 import view.Navigator;
 
 public class TeacherAddClassController {
@@ -17,6 +20,8 @@ public class TeacherAddClassController {
     @FXML
     private TextField classCodeField;
 
+    private final TeacherAddClassService teacherAddClass = new TeacherAddClassService();
+
     @FXML
     private void initialize() {
         headerController.setTitle("New Class");
@@ -28,11 +33,12 @@ public class TeacherAddClassController {
     private void onAdd() {
         String code = classCodeField.getText() == null ? "" : classCodeField.getText().trim();
         if (code.isBlank()) return;
-
-        AppState.ClassItem newC = new AppState.ClassItem(code, "Teacher's Name");
-        AppState.demoClasses.add(newC);
-
+        // create class
+        try {
+        teacherAddClass.createClass(code);
         Navigator.go(AppState.Screen.CLASSES);
+        } catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());}
     }
 
     @FXML

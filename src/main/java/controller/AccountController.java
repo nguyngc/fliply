@@ -44,4 +44,9 @@ public class AccountController {
     private void onAbout() {
         Navigator.go(AppState.Screen.ACCOUNT_ABOUT);
     }
+
+    @FXML
+    private void onLogout() {
+        Navigator.go(AppState.Screen.LOGIN);
+    }
 }

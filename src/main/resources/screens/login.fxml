@@ -33,6 +33,12 @@
                     <Label text="Enter your login details to access your account"
                            wrapText="true"
                            style="-fx-text-fill: #8C8C8C; -fx-font-size: 14px; -fx-font-weight: 400;"/>
+
+                    <Label fx:id="errorLabel"
+                           textFill="red"
+                           style="-fx-font-size: 12px;"
+                           visible="false"/>
+
                 </VBox>
 
                 <!-- White section: FULL WIDTH + grows to bottom -->

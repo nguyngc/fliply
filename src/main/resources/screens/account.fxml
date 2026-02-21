@@ -60,6 +60,16 @@
                                -fx-alignment: CENTER_LEFT;
                                -fx-cursor: hand;"
                         maxWidth="Infinity"/>
+
+                <Button text="Log out"
+                        onAction="#onLogout"
+                        style="-fx-background-color: transparent;
+                               -fx-font-size: 16px;
+                               -fx-text-fill: #1F1F39;
+                               -fx-font-weight: 500;
+                               -fx-alignment: CENTER_LEFT;
+                               -fx-cursor: hand;"
+                        maxWidth="Infinity"/>
             </VBox>
         </VBox>
     </center>

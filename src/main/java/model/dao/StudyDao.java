@@ -86,6 +86,21 @@ public class StudyDao {
         }
     }
 
+    public Study findByStudentAndSet(int studentId, int setId) {
+        try(EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+            TypedQuery<Study> query = em.createQuery(
+                    "SELECT s FROM Study s WHERE s.user.userId = :uid AND s.flashcardSet.flashcardSetId = :sid",
+                 Study.class
+            );
+
+            query.setParameter("uid", studentId);
+            query.setParameter("sid", setId);
+
+        return query.getResultStream().findFirst().orElse(null);
+    }
+}
+
+
     public boolean existsByUserAndSet(int userId, int setId) {
         try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
             TypedQuery<Long> query = em.createQuery(

@@ -3,6 +3,8 @@ package model.service;
 import model.dao.UserDao;
 import model.entity.User;
 
+import java.util.List;
+
 public class UserService {
 
     private final UserDao userDao = new UserDao();
@@ -26,4 +28,13 @@ public class UserService {
     public User login(String email, String password) {
         return userDao.findByEmailAndPassword(email, password);
     }
+
+    public List<User> getAllStudents() {
+        return userDao.findByRole(0); // 0 = student
+    }
+
+    public void update(User user) {
+        userDao.update(user);
+    }
+
 }

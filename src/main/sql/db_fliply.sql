@@ -13,7 +13,7 @@ CREATE TABLE `USER`
     FirstName VARCHAR(50)  NOT NULL,
     LastName  VARCHAR(50)  NOT NULL,
     Email     VARCHAR(255) NOT NULL,
-    GoogleId  VARCHAR(128) NOT NULL,
+    Password  VARCHAR(128) NOT NULL,
     Role      INT NOT NULL,
     PRIMARY KEY (UserId)
 );
@@ -60,13 +60,13 @@ CREATE TABLE QUIZ
 CREATE TABLE CLASS_DETAILS
 (
     ClassDetailsId INT NOT NULL AUTO_INCREMENT,
-    UserId  INT NOT NULL,
+    StudentId  INT NOT NULL,
     ClassId INT NOT NULL,
 
     PRIMARY KEY (ClassDetailsId),
-    UNIQUE (UserId, ClassId),
+    UNIQUE (StudentId, ClassId),
 
-    FOREIGN KEY (UserId) REFERENCES `USER`(UserId),
+    FOREIGN KEY (StudentId) REFERENCES `USER`(UserId),
     FOREIGN KEY (ClassId) REFERENCES `CLASS`(ClassId)
 );
 

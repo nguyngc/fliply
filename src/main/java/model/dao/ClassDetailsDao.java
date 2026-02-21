@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import model.datasource.MariaDbJPAConnection;
 import model.entity.ClassDetails;
+import model.entity.ClassModel;
 
 import java.util.List;
 
@@ -93,10 +94,10 @@ public class ClassDetailsDao {
         }
     }
 
-    public List<ClassDetails> findByUserId(int userId) {
+    public List<ClassDetails> findByStudentId(int userId) {
         try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
             TypedQuery<ClassDetails> query = em.createQuery(
-                    "SELECT cd FROM ClassDetails cd WHERE cd.user.userId = :uid",
+                    "SELECT cd FROM ClassDetails cd WHERE cd.student.userId = :uid",
                     ClassDetails.class
             );
             query.setParameter("uid", userId);
@@ -108,7 +109,7 @@ public class ClassDetailsDao {
         try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
             TypedQuery<Long> query = em.createQuery(
                     "SELECT COUNT(cd) FROM ClassDetails cd " +
-                            "WHERE cd.user.userId = :uid AND cd.classModel.classId = :cid",
+                            "WHERE cd.student.userId = :uid AND cd.classModel.classId = :cid",
                     Long.class
             );
 

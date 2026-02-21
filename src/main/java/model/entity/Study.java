@@ -48,4 +48,5 @@ public class Study {
                 ", flashcardSetId=" + (flashcardSet != null ? flashcardSet.getFlashcardSetId() : null) +
                 '}';
     }
+
 }

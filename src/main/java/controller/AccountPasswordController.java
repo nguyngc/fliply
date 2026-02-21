@@ -6,6 +6,8 @@ import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import model.AppState;
+import model.entity.User;
+import model.service.UserService;
 import view.Navigator;
 
 public class AccountPasswordController {
@@ -24,6 +26,8 @@ public class AccountPasswordController {
 
     @FXML
     private Label errorLabel;
+
+    private final UserService userService = new UserService();
 
     @FXML
     private void initialize() {
@@ -46,11 +50,23 @@ public class AccountPasswordController {
         String newPwd = newPwdField.getText() == null ? "" : newPwdField.getText();
         String confirm = confirmPwdField.getText() == null ? "" : confirmPwdField.getText();
 
-        // Demo validation
-        if (!current.equals(AppState.demoPassword.get())) {
+//        // Demo validation
+//        if (!current.equals(AppState.demoPassword.get())) {
+//            showError("Current password is incorrect.");
+//            return;
+//        }
+        // get current user
+        User user = AppState.currentUser.get();
+        if (user == null) {
+            showError("User not logged in.");
+            return;
+        }
+        // check old pass
+        if (!current.equals(user.getPassword())) {
             showError("Current password is incorrect.");
             return;
         }
+        // check new pass
         if (newPwd.length() < 6) {
             showError("New password must be at least 6 characters.");
             return;
@@ -60,9 +76,14 @@ public class AccountPasswordController {
             return;
         }
 
-        // Demo save
-        AppState.demoPassword.set(newPwd);
+//        // Demo save
+//        AppState.demoPassword.set(newPwd);
+//        Navigator.go(AppState.Screen.ACCOUNT);
+        // Save pass
+        user.setPassword(newPwd);
+        userService.update(user);
         Navigator.go(AppState.Screen.ACCOUNT);
+
     }
 
     @FXML

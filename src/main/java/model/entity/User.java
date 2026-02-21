@@ -1,6 +1,7 @@
 package model.entity;
 
 import jakarta.persistence.*;
+import model.AppState;
 
 @Entity
 @Table(name = "USER")
@@ -52,4 +53,13 @@ public class User {
                 ", role=" + role +
                 '}';
     }
+
+    public boolean isTeacher() {
+        return role != null && role == 1;
+    }
+
+    public boolean isStudent() {
+        return role != null && role == 0;
+    }
+
 }
