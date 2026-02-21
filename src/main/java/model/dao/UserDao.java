@@ -120,4 +120,19 @@ public class UserDao {
             return results.isEmpty() ? null : results.get(0);
         }
     }
+
+    /**
+     * Find all users by role (0 = student, 1 = teacher, ...)
+     */
+    public List<User> findByRole(int role) {
+        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+            TypedQuery<User> query = em.createQuery(
+                    "SELECT u FROM User u WHERE u.role = :role",
+                    User.class
+            );
+            query.setParameter("role", role);
+            return query.getResultList();
+        }
+    }
+
 }
