@@ -1,6 +1,7 @@
 package model.service;
 
 import model.dao.StudyDao;
+import model.entity.ClassModel;
 import model.entity.FlashcardSet;
 import model.entity.Study;
 import model.entity.User;
@@ -21,4 +22,22 @@ public class StudyService {
 
         return (double) learned / total;
     }
+
+    public double getClassProgress(User student, ClassModel c) {
+        int totalCards = 0;
+        int learnedCards = 0;
+
+        for (FlashcardSet set : c.getFlashcardSets()) {
+            int setTotal = set.getCards().size();
+            totalCards += setTotal;
+
+            double percent = getProgressPercent(student, set);
+            learnedCards += (int) (percent * setTotal);
+        }
+
+        if (totalCards == 0) return 0.0;
+
+        return (double) learnedCards / totalCards;
+    }
+
 }

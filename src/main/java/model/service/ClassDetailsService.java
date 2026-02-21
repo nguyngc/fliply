@@ -5,11 +5,6 @@ import model.dao.ClassModelDao;
 import model.entity.ClassDetails;
 import model.entity.ClassModel;
 import model.entity.User;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
-import util.HibernateUtil;
-
-import java.util.ArrayList;
 import java.util.List;
 
 public class ClassDetailsService {
@@ -27,50 +22,21 @@ public class ClassDetailsService {
     }
 
     public ClassDetails addStudentToClass(User student, ClassModel c) {
-        Transaction tx = null;
         ClassDetails cd = new ClassDetails(c, student);
-
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
-
-            session.persist(cd);
-            session.flush();
-
-            tx.commit();
-            return cd;
-
-        } catch (Exception e) {
-            if (tx != null) tx.rollback();
-            throw new RuntimeException("Failed to add student to class", e);
-        }
+        classDetailsDao.persist(cd);
+        return cd;
     }
-
 
     public void update(ClassDetails cd) {
         classDetailsDao.update(cd);
     }
 
     public void removeStudentFromClass(ClassDetails cd) {
-        Transaction tx = null;
-
-        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-            tx = session.beginTransaction();
-
-            ClassDetails attached = session.get(ClassDetails.class, cd.getClassDetailsId());
-            session.remove(attached);
-
-            tx.commit();
-        } catch (Exception e) {
-            if (tx != null) tx.rollback();
-            throw new RuntimeException("Failed to remove student from class", e);
-        }
+        classDetailsDao.delete(cd);
     }
 
     public ClassModel reloadClass(int classId) {
-        return classDao.findById(classId);
+        return classDao.findByIdWithRelations(classId);
     }
-
-
-
 
 }

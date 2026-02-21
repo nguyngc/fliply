@@ -10,7 +10,14 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import model.AppState;
+import model.entity.ClassDetails;
+import model.entity.ClassModel;
+import model.entity.User;
+import model.service.ClassDetailsService;
+import model.service.StudyService;
 import view.Navigator;
+
+import java.util.List;
 
 public class ClassesController {
 
@@ -22,57 +29,69 @@ public class ClassesController {
     @FXML
     private VBox classListBox;
 
+    private final ClassDetailsService  classDetailsService = new  ClassDetailsService();
+
     @FXML
     private void initialize() {
-        AppState.seedDemoIfNeeded();
+        //AppState.seedDemoIfNeeded();
+        User user = AppState.currentUser.get();
+        boolean isTeacher = user.isTeacher();
 
-        if (headerController != null) {
-            headerController.setTitle("My Classes");
-            headerController.setSubtitle("Total: " + AppState.demoClasses.size());
-            headerController.applyVariant(AppState.isTeacher()
-                    ? HeaderController.Variant.TEACHER
-                    : HeaderController.Variant.STUDENT
-            );
-        }
+        // Header
+        headerController.setTitle("My Classes");
+        headerController.setSubtitle(isTeacher ? "Manage your classes" : "Your enrolled classes");
+        headerController.applyVariant(isTeacher
+                ? HeaderController.Variant.TEACHER
+                : HeaderController.Variant.STUDENT
+        );
 
-        render();
+    render();
     }
 
     private void render() {
         classListBox.getChildren().clear();
+        User user = AppState.currentUser.get();
+        boolean isTeacher = user.isTeacher();
 
-        boolean isTeacher = AppState.isTeacher();
-
-        for (AppState.ClassItem c : AppState.demoClasses) {
-            classListBox.getChildren().add(buildClassCard(c, isTeacher));
-        }
-
+        // Load classes from DB
+        List<ClassModel> classes = classDetailsService.getClassesOfUser(user.getUserId());
+        for (ClassModel c : classes) {
+            classListBox.getChildren().add(buildClassCard(c, isTeacher)); }
+        // Teacher can add more classes
         if (isTeacher) {
             classListBox.getChildren().add(buildAddMoreClassTile());
         }
     }
 
-    private Node buildClassCard(AppState.ClassItem c, boolean isTeacher) {
+    private Node buildClassCard(ClassModel c, boolean isTeacher) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/components/class_card.fxml"));
             Node node = loader.load();
             ClassCardController ctrl = loader.getController();
 
-            double progress = 0.80; // demo
+            //double progress = 0.80; // demo
+            StudyService studyService = new StudyService();
+            double progress = studyService.getClassProgress(AppState.currentUser.get(), c);
+
             if (isTeacher) {
-                ctrl.setTeacherCard(c.getClassCode(), c.getStudentCount(), c.getSetCount(), progress);
+                ctrl.setTeacherCard(
+                        c.getClassName(),
+                        c.getStudents().size(),
+                        c.getFlashcardSets().size(),
+                        progress
+                );
             } else {
-                ctrl.setStudentCard(c.getClassCode(), c.getTeacherName(), progress);
+                ctrl.setStudentCard(
+                        c.getClassName(),
+                        c.getTeacher().getFirstName() + " " + c.getTeacher().getLastName(),
+                        progress
+                );
             }
+
 
             node.setOnMouseClicked(e -> {
                 AppState.selectedClass.set(c);
-
-                if (AppState.selectedClassCode != null) AppState.selectedClassCode.set(c.getClassCode());
-                if (AppState.selectedTeacherName != null) AppState.selectedTeacherName.set(c.getTeacherName());
-
-                if (isTeacher) Navigator.go(AppState.Screen.TEACHER_CLASS_DETAIL);
-                else Navigator.go(AppState.Screen.CLASS_DETAIL);
+                Navigator.go(isTeacher ? AppState.Screen.TEACHER_CLASS_DETAIL : AppState.Screen.CLASS_DETAIL);
             });
 
             return node;

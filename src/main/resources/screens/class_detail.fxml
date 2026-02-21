@@ -28,23 +28,23 @@
 
                     <!-- List container -->
                     <VBox fx:id="flashcardSetListBox" spacing="16">
-                        <StackPane>
-                            <fx:include source="../components/flashcard_set_card.fxml"/>
-                            <Button onAction="#openFlashcardSet"
-                                    userData="Basic Vocabulary"
-                                    maxWidth="Infinity"
-                                    maxHeight="Infinity"
-                                    style="-fx-background-color: transparent; -fx-cursor: hand;"/>
-                        </StackPane>
+<!--                        <StackPane>-->
+<!--                            <fx:include source="../components/flashcard_set_card.fxml"/>-->
+<!--                            <Button onAction="#openFlashcardSet"-->
+<!--                                    userData="Basic Vocabulary"-->
+<!--                                    maxWidth="Infinity"-->
+<!--                                    maxHeight="Infinity"-->
+<!--                                    style="-fx-background-color: transparent; -fx-cursor: hand;"/>-->
+<!--                        </StackPane>-->
 
-                        <StackPane>
-                            <fx:include source="../components/flashcard_set_card.fxml"/>
-                            <Button onAction="#openFlashcardSet"
-                                    userData="Lesson 1 - Verbs"
-                                    maxWidth="Infinity"
-                                    maxHeight="Infinity"
-                                    style="-fx-background-color: transparent; -fx-cursor: hand;"/>
-                        </StackPane>
+<!--                        <StackPane>-->
+<!--                            <fx:include source="../components/flashcard_set_card.fxml"/>-->
+<!--                            <Button onAction="#openFlashcardSet"-->
+<!--                                    userData="Lesson 1 - Verbs"-->
+<!--                                    maxWidth="Infinity"-->
+<!--                                    maxHeight="Infinity"-->
+<!--                                    style="-fx-background-color: transparent; -fx-cursor: hand;"/>-->
+<!--                        </StackPane>-->
                     </VBox>
                 </VBox>
             </content>

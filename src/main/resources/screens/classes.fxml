@@ -34,7 +34,7 @@
     <bottom>
         <AnchorPane prefHeight="95.0" style="-fx-background-color: transparent;">
             <children>
-                <fx:include source="../components/menu.fxml"
+                <fx:include fx:id="nav" source="../components/menu.fxml"
                             AnchorPane.leftAnchor="0.0"
                             AnchorPane.rightAnchor="0.0"
                             AnchorPane.bottomAnchor="0.0"/>

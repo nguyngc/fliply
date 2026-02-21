@@ -6,6 +6,7 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import model.AppState;
+import model.entity.ClassModel;
 import view.Navigator;
 
 public class ClassDetailController {
@@ -17,23 +18,23 @@ public class ClassDetailController {
 
     @FXML
     private void initialize() {
-        AppState.seedDemoIfNeeded();
-
-        AppState.ClassItem c = AppState.selectedClass.get();
-
-        String classCode = (c != null) ? c.getClassCode() : AppState.selectedClassCode.get();
-        String teacherName = (c != null) ? c.getTeacherName() : AppState.selectedTeacherName.get();
-
-        if (headerController != null) {
-            headerController.setTitle(classCode != null && !classCode.isBlank() ? classCode : "Class");
-            headerController.setMeta(teacherName != null ? teacherName : "");
-
-            headerController.applyVariant(HeaderController.Variant.STUDENT);
-
+        //AppState.seedDemoIfNeeded();
+        //AppState.ClassItem c = AppState.selectedClass.get();
+        //String classCode = (c != null) ? c.getClassCode() : AppState.selectedClassCode.get();
+        //String teacherName = (c != null) ? c.getTeacherName() : AppState.selectedTeacherName.get();
+        ClassModel c = AppState.selectedClass.get();
+        if (c == null) {
+            headerController.setTitle("Class");
             headerController.setBackVisible(true);
             headerController.setOnBack(() -> Navigator.go(AppState.Screen.CLASSES));
+            return;
         }
-    }
+        // Header
+        headerController.setTitle(c.getClassName());
+        headerController.setMeta("Teacher: " + c.getTeacher().getFirstName() + " " + c.getTeacher().getLastName());
+        headerController.applyVariant( AppState.currentUser.get().isTeacher() ? HeaderController.Variant.TEACHER : HeaderController.Variant.STUDENT );
+        headerController.setBackVisible(true);
+        headerController.setOnBack(() -> Navigator.go(AppState.Screen.CLASSES)); }
 
     @FXML
     private void openFlashcardSet(ActionEvent event) {

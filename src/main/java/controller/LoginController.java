@@ -72,6 +72,7 @@ public class LoginController {
         if (user != null) {
             errorLabel.setVisible(false);
             AppState.currentUser.set(user);
+            AppState.setRole(user.isTeacher() ? AppState.Role.TEACHER : AppState.Role.STUDENT);
             Navigator.go(AppState.Screen.HOME);
         } else {
             errorLabel.setText("Invalid email or password");

@@ -16,7 +16,7 @@ public class EnrollmentService {
             return null;
         }
         ClassDetails cd = new ClassDetails();
-        cd.setUser(student);
+        cd.setStudent(student);
         cd.setClassModel(clazz);
         cdDao.persist(cd);
         return cd;

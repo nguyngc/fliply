@@ -60,6 +60,8 @@ public class HomeController {
         //AppState.ClassItem c = AppState.demoClasses.get(0); // latest class demo
         List<ClassModel> classes = classDetailsService.getClassesOfUser(user.getUserId());
         if (classes.isEmpty()) return;
+        // sort newest first
+        classes.sort((a, b) -> b.getClassId() - a.getClassId());
         ClassModel cd = classes.getFirst();
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/components/class_card.fxml"));

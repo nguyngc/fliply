@@ -107,4 +107,19 @@ public class ClassModelDao {
                 .getResultList();
     }
 
+    public ClassModel findByIdWithRelations(int classId) {
+        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+            return em.createQuery("""
+            SELECT c FROM ClassModel c
+            LEFT JOIN FETCH c.students s
+            LEFT JOIN FETCH s.student
+            LEFT JOIN FETCH c.flashcardSets fs
+            WHERE c.classId = :id
+        """, ClassModel.class)
+                    .setParameter("id", classId)
+                    .getSingleResult();
+        }
+    }
+
+
 }
