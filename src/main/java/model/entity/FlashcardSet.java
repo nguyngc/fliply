@@ -1,6 +1,7 @@
 package model.entity;
 
 import jakarta.persistence.*;
+import java.util.Collection;
 
 @Entity
 @Table(name = "FLASHCARDSET")
@@ -18,6 +19,11 @@ public class FlashcardSet {
     @JoinColumn(name = "ClassId", referencedColumnName = "ClassId", nullable = false)
     private ClassModel classModel;
 
+    @OneToMany(mappedBy = "flashcardSet", fetch = FetchType.LAZY)
+    private Collection<Flashcard> cards;
+
+    public Collection<Flashcard> getCards() { return cards; }
+
     public FlashcardSet() {}
 
     public FlashcardSet(String subject, ClassModel classModel) {
@@ -28,6 +34,7 @@ public class FlashcardSet {
     public Integer getFlashcardSetId() { return flashcardSetId; }
     public String getSubject() { return subject; }
     public ClassModel getClassModel() { return classModel; }
+    public Collection<Flashcard> getTotalCards() { return cards; }
 
     public void setSubject(String subject) { this.subject = subject; }
     public void setClassModel(ClassModel classModel) { this.classModel = classModel; }
@@ -40,4 +47,7 @@ public class FlashcardSet {
                 ", classId=" + (classModel != null ? classModel.getClassId() : null) +
                 '}';
     }
+
+
+
 }

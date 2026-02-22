@@ -9,9 +9,13 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import model.AppState;
+import model.entity.Quiz;
+import model.entity.User;
+import model.service.QuizService;
 import view.Navigator;
 
 import java.io.IOException;
+import java.util.List;
 
 public class QuizzesController {
     @FXML
@@ -23,20 +27,24 @@ public class QuizzesController {
     @FXML
     private Label totalLabel;
 
+    private final QuizService quizService = new QuizService();
+
     @FXML
     private void initialize() {
-        // Seed demo
-        if (AppState.myQuizzes.isEmpty()) {
-            AppState.myQuizzes.add(DummyQuizFactory.quiz1());
-            AppState.myQuizzes.add(DummyQuizFactory.quiz2());
-        }
+//        // Seed demo
+//        if (AppState.myQuizzes.isEmpty()) {
+//            AppState.myQuizzes.add(DummyQuizFactory.quiz1());
+//            AppState.myQuizzes.add(DummyQuizFactory.quiz2());
+//        }
+        User user = AppState.currentUser.get();
+        if (user == null) return;
+        // Load quizzes from DB
+        List<Quiz> quizzes = quizService.getQuizzesByUser(user.getUserId());
+        AppState.quizList.setAll(quizzes);
 
         if (headerController != null) {
-            String title = "My Quizzes";
-            String subtitle = "Total: " + AppState.myQuizzes.size();
-
-            headerController.setTitle(title);
-            headerController.setSubtitle(subtitle);
+            headerController.setTitle("My Quizzes");
+            headerController.setSubtitle("Total: " + quizzes.size());
         }
 
         render();
@@ -48,15 +56,15 @@ public class QuizzesController {
     private void render() {
         listBox.getChildren().clear();
 
-        for (AppState.QuizItem q : AppState.myQuizzes) {
-            Node card = loadQuizCard(q);
+        for (Quiz quiz : AppState.myQuizzes) {
+            Node card = loadQuizCard(quiz);
             listBox.getChildren().add(card);
         }
 
         listBox.getChildren().add(buildAddTile());
     }
 
-    private Node loadQuizCard(AppState.QuizItem quiz) {
+    private Node loadQuizCard(Quiz quiz) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/components/quiz_card.fxml"));
             Node node = loader.load();

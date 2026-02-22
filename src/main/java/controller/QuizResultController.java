@@ -7,7 +7,11 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import model.AppState;
+import model.entity.Quiz;
+import model.service.QuizService;
 import view.Navigator;
+
+import java.util.List;
 
 public class QuizResultController {
 
@@ -19,7 +23,9 @@ public class QuizResultController {
     @FXML
     private VBox resultBox;
 
-    private AppState.QuizItem quiz;
+    private Quiz quiz;
+    private List<QuizService.QuizQuestion> questions;
+    private final QuizService quizService = new QuizService();
 
     @FXML
     private void initialize() {
@@ -44,10 +50,10 @@ public class QuizResultController {
     private void renderResults() {
         resultBox.getChildren().clear();
 
-        int total = quiz.getQuestions().size();
+        int total = questions.size();
 
         for (int i = 0; i < total; i++) {
-            AppState.QuizQuestion q = quiz.getQuestions().get(i);
+            QuizService.QuizQuestion q = questions.get(i);
 
             boolean answered = AppState.quizCorrectMap.containsKey(i);
             boolean correct = answered && Boolean.TRUE.equals(AppState.quizCorrectMap.get(i));
@@ -61,7 +67,7 @@ public class QuizResultController {
                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 14, 0.2, 0, 6);
                     """);
 
-            Label left = new Label((i + 1) + ". " + q.getTerm());
+            Label left = new Label((i + 1) + ". " + q.getPrompt());
             left.setStyle("-fx-font-size: 14px; -fx-font-weight: 500; -fx-text-fill: #1F1F39;");
             left.setMaxWidth(Double.MAX_VALUE);
             HBox.setHgrow(left, javafx.scene.layout.Priority.ALWAYS);

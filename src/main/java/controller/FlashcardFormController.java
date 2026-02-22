@@ -6,7 +6,12 @@ import javafx.scene.Parent;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import model.AppState;
+import model.entity.Flashcard;
+import model.service.FlashcardService;
 import view.Navigator;
+import model.entity.FlashcardSet;
+import model.entity.User;
+
 
 public class FlashcardFormController {
 
@@ -19,6 +24,8 @@ public class FlashcardFormController {
     private TextField termField;
     @FXML
     private TextArea definitionArea;
+
+    private final FlashcardService flashcardService =  new FlashcardService();
 
     @FXML
     private void initialize() {
@@ -54,19 +61,36 @@ public class FlashcardFormController {
         String term = termField.getText() == null ? "" : termField.getText().trim();
         String def = definitionArea.getText() == null ? "" : definitionArea.getText().trim();
 
-        if (term.isBlank()) return; // simple validation (optional)
+        if (term.isBlank()) return;
 
+        FlashcardSet set = AppState.selectedFlashcardSet.get();
+        User user = AppState.currentUser.get();
+
+        if (set == null || user == null) return;
+
+        // EDIT MODE
         if (AppState.flashcardFormMode.get() == AppState.FormMode.EDIT) {
             int idx = AppState.editingIndex.get();
-            if (idx >= 0 && idx < AppState.myFlashcards.size()) {
-                AppState.myFlashcards.set(idx, new AppState.FlashcardItem(term, def));
+
+            if (idx >= 0 && idx < AppState.currentDetailList.size()) {
+                Flashcard card = AppState.currentDetailList.get(idx);
+
+                card.setTerm(term);
+                card.setDefinition(def);
+
+                flashcardService.update(card);
             }
+
         } else {
-            AppState.myFlashcards.add(new AppState.FlashcardItem(term, def));
+            // ADD MODE
+            Flashcard newCard = new Flashcard(term, def, set, user);
+            flashcardService.save(newCard);
+
+            AppState.currentDetailList.add(newCard);
         }
 
         // After save -> back to list
-        AppState.navOverride.set(AppState.NavItem.FLASHCARDS);
+        //AppState.navOverride.set(AppState.NavItem.FLASHCARDS);
         Navigator.go(AppState.Screen.FLASHCARDS);
     }
 

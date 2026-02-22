@@ -7,9 +7,12 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import model.AppState;
+import model.entity.Quiz;
+import model.service.QuizService;
 import view.Navigator;
 
 import java.util.Arrays;
+import java.util.List;
 
 public class QuizDetailController {
 
@@ -37,11 +40,13 @@ public class QuizDetailController {
     @FXML
     private Button nextBtn;
 
+
     @FXML
     private Button viewResultBtn;
 
-    private AppState.QuizItem quiz;
-    private boolean answeredThisQuestion = false;
+    private Quiz quiz;
+    private List<QuizService.QuizQuestion> questions;
+    private final QuizService quizService = new QuizService();
 
     @FXML
     private void initialize() {
@@ -50,9 +55,11 @@ public class QuizDetailController {
             Navigator.go(AppState.Screen.QUIZZES);
             return;
         }
+        // Build runtime questions
+        questions = quizService.buildQuizQuestions( quiz.getQuizId(), AppState.currentUser.get().getUserId() );
 
         if (headerController != null) {
-            headerController.setTitle(quiz.getTitle());
+            headerController.setTitle("Quiz #" + quiz.getQuizId());
             headerController.setBackVisible(true);
             headerController.setOnBack(() -> Navigator.go(AppState.Screen.QUIZZES));
         }
@@ -63,20 +70,20 @@ public class QuizDetailController {
 
     private void render() {
         int idx = AppState.quizQuestionIndex.get();
-        int total = quiz.getQuestions().size();
+        int total = questions.size();
 
         idx = clamp(idx, 0, total - 1);
         AppState.quizQuestionIndex.set(idx);
 
-        AppState.QuizQuestion q = quiz.getQuestions().get(idx);
+        QuizService.QuizQuestion q = questions.get(idx);
 
-        termLabel.setText(q.getTerm());
-        String[] opts = q.getOptions();
+        termLabel.setText(q.getPrompt());
+        List<String> opts = q.getOptions();
 
-        opt1.setText(opts[0]);
-        opt2.setText(opts[1]);
-        opt3.setText(opts[2]);
-        opt4.setText(opts[3]);
+        opt1.setText(opts.get(0));
+        opt2.setText(opts.get(1));
+        opt3.setText(opts.get(2));
+        opt4.setText(opts.get(3));
 
         pageLabel.setText((idx + 1) + " / " + total);
 
@@ -102,7 +109,7 @@ public class QuizDetailController {
 
         if (AppState.quizAnswers.containsKey(idx)) {
             String chosen = AppState.quizAnswers.get(idx);
-            String correct = q.getCorrect();
+            String correct = q.getCorrectAnswer();
 
             // lock buttons
             setOptionsDisabled(true);
@@ -130,10 +137,10 @@ public class QuizDetailController {
         if (AppState.quizAnswers.containsKey(idx)) return; // already answered
 
         Button clicked = (Button) e.getSource();
-        AppState.QuizQuestion q = quiz.getQuestions().get(idx);
+        QuizService.QuizQuestion q = questions.get(idx);
 
         String chosen = clicked.getText();
-        String correct = q.getCorrect();
+        String correct = q.getCorrectAnswer();
 
         AppState.quizAnswers.put(idx, chosen);
 

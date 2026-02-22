@@ -13,6 +13,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import model.AppState;
+import model.entity.Flashcard;
+import model.entity.FlashcardSet;
 import view.Navigator;
 
 public class TeacherFlashcardSetDetailController {
@@ -34,16 +36,17 @@ public class TeacherFlashcardSetDetailController {
     @FXML
     private Button addMoreBtn;
 
-    private AppState.FlashcardSetItem set;
+    private FlashcardSet set;
+
 
     /**
      * null = adding new, otherwise editing existing row
      */
-    private AppState.FlashcardItem editingRow = null;
+    private Flashcard editingRow = null;
 
     @FXML
     private void initialize() {
-        AppState.seedDemoIfNeeded();
+        //AppState.seedDemoIfNeeded();
 
         set = AppState.selectedSet.get();
         if (set == null) {
@@ -76,7 +79,7 @@ public class TeacherFlashcardSetDetailController {
         termField.requestFocus();
     }
 
-    private void showEditorForEdit(AppState.FlashcardItem row) {
+    private void showEditorForEdit(Flashcard row) {
         editingRow = row;
         termField.setText(row.getTerm());
         definitionArea.setText(row.getDefinition());
@@ -100,12 +103,12 @@ public class TeacherFlashcardSetDetailController {
     private void renderList() {
         cardsBox.getChildren().clear();
 
-        for (AppState.FlashcardItem row : set.getCards()) {
+        for (Flashcard row : set.getCards()) {
             cardsBox.getChildren().add(buildRowCard(row));
         }
     }
 
-    private VBox buildRowCard(AppState.FlashcardItem row) {
+    private VBox buildRowCard(Flashcard row) {
         VBox card = new VBox(6);
         card.setStyle("""
                     -fx-background-color: white;
@@ -190,7 +193,11 @@ public class TeacherFlashcardSetDetailController {
 
         if (editingRow == null) {
             // add new
-            set.getCards().add(new AppState.FlashcardItem(term, def));
+            Flashcard newCard = new Flashcard();
+            newCard.setTerm(term);
+            newCard.setDefinition(def);
+            newCard.setFlashcardSet(set);
+            set.getCards().add(newCard);
         } else {
             // update existing
             editingRow.setTerm(term);

@@ -14,11 +14,12 @@
         <class>model.entity.ClassDetails</class>
         <class>model.entity.Study</class>
         <properties>
-            <property name="jakarta.persistence.jdbc.url" value="jdbc:mariadb://localhost:3306/fliply"/>
+            <property name="jakarta.persistence.jdbc.url" value="jdbc:mariadb://localhost:3307/fliply"/>
             <property name="jakarta.persistence.jdbc.user" value="appuser"/>
             <property name="jakarta.persistence.jdbc.password" value="password"/>
             <property name="jakarta.persistence.jdbc.driver" value="org.mariadb.jdbc.Driver"/>
-            <property name="jakarta.persistence.schema-generation.database.action" value="drop-and-create"/>
+<!--            <property name="jakarta.persistence.schema-generation.database.action" value="drop-and-create"/>-->
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
             <property name="hibernate.dialect" value="org.hibernate.dialect.MariaDBDialect"/>
             <property name="hibernate.show_sql" value="true"/>
         </properties>

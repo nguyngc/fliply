@@ -7,6 +7,7 @@ import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import model.AppState;
+import model.entity.Flashcard;
 import view.Navigator;
 
 import java.util.ArrayList;
@@ -41,13 +42,8 @@ public class FlashcardDetailController {
         // Build cards from passed list
         cards.clear();
         if (!AppState.currentDetailList.isEmpty()) {
-            for (AppState.FlashcardItem it : AppState.currentDetailList) {
-                cards.add(new Flashcard(it.getTerm(), it.getDefinition()));
-            }
+            cards.addAll(AppState.currentDetailList);
             index = clamp(AppState.currentDetailIndex.get(), 0, cards.size() - 1);
-        } else {
-            cards.add(new Flashcard("Term", "Definition"));
-            index = 0;
         }
 
         // Header
@@ -76,8 +72,8 @@ public class FlashcardDetailController {
 
                     // Pre-fill via selectedTerm/Definition (or read directly from list)
                     Flashcard c = cards.get(idx);
-                    AppState.selectedTerm.set(c.term);
-                    AppState.selectedDefinition.set(c.definition);
+                    AppState.selectedTerm.set(c.getTerm());
+                    AppState.selectedDefinition.set(c.getDefinition());
 
                     AppState.navOverride.set(AppState.NavItem.FLASHCARDS);
                     Navigator.go(AppState.Screen.FLASHCARD_FORM);
@@ -120,8 +116,8 @@ public class FlashcardDetailController {
         }
 
         Flashcard c = cards.get(index);
-        flipCardController.setTerm(c.term);
-        flipCardController.setDefinition(c.definition);
+        flipCardController.setTerm(c.getTerm());
+        flipCardController.setDefinition(c.getDefinition());
         flipCardController.showTerm();
     }
 
@@ -154,6 +150,4 @@ public class FlashcardDetailController {
         return Math.max(min, Math.min(max, v));
     }
 
-    private record Flashcard(String term, String definition) {
-    }
 }

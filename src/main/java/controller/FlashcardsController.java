@@ -10,6 +10,8 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import model.AppState;
+import model.entity.Flashcard;
+import model.entity.FlashcardSet;
 import view.Navigator;
 
 import java.io.IOException;
@@ -24,58 +26,26 @@ public class FlashcardsController {
 
     @FXML
     private void initialize() {
-        // Seed demo
-        if (AppState.myFlashcards.isEmpty()) {
-            AppState.myFlashcards.addAll(
-                    new AppState.FlashcardItem("CPU", "Central Processing Unit"),
-                    new AppState.FlashcardItem("RAM", "Random Access Memory"),
-                    new AppState.FlashcardItem("HTTP", "HyperText Transfer Protocol"),
-                    new AppState.FlashcardItem("OOP", "Object-Oriented Programming"),
-                    new AppState.FlashcardItem("API", "Application Programming Interface"),
-                    new AppState.FlashcardItem("SQL", "Structured Query Language"),
-                    new AppState.FlashcardItem("JSON", "JavaScript Object Notation"),
-                    new AppState.FlashcardItem("UI", "User Interface")
-            );
+        FlashcardSet set = AppState.selectedSet.get();
+        if (set == null) {
+            Navigator.go(AppState.Screen.HOME);
+            return;
         }
 
-        if (headerController != null) {
-            String title = "My Flashcards";
-            String subtitle = "Total: " + AppState.myFlashcards.size();
+        headerController.setTitle(set.getSubject());
+        headerController.setSubtitle("Total: " + set.getCards().size());
 
-            headerController.setTitle(title);
-            headerController.setSubtitle(subtitle);
-        }
-
-        // Re-render when list changes (after edit/delete/save)
-        AppState.myFlashcards.addListener((javafx.collections.ListChangeListener<AppState.FlashcardItem>) c -> {
-            if (headerController != null) {
-                headerController.setSubtitle("Total: " + AppState.myFlashcards.size());
-            }
-            renderGrid();
-        });
-
-        renderGrid();
+        renderGrid(set);
     }
 
-    private void renderGrid() {
+    private void renderGrid(FlashcardSet set) {
         termGrid.getChildren().clear();
 
         int idx = 0;
-        for (int i = 0; i < AppState.myFlashcards.size(); i++) {
-            int index = i;
-            AppState.FlashcardItem item = AppState.myFlashcards.get(i);
+        for (Flashcard card : set.getCards()) {
 
-            Node tile = loadTile(item.getTerm(), /*read*/ false, () -> {
-                AppState.currentDetailList.setAll(AppState.myFlashcards);
-                AppState.currentDetailIndex.set(index);
-
-                AppState.isFromFlashcardSet.set(false);
-                AppState.navOverride.set(AppState.NavItem.FLASHCARDS); // highlight Flashcards
-
-                // header for detail
-                AppState.detailHeaderTitle.set("My Flashcards");
-                AppState.detailHeaderSubtitle.set("Total: " + AppState.myFlashcards.size());
-
+            Node tile = loadTile(card.getTerm(), false, () -> {
+                AppState.currentFlashcard.set(card);
                 Navigator.go(AppState.Screen.FLASHCARD_DETAIL);
             });
 
@@ -91,6 +61,7 @@ public class FlashcardsController {
         int row = idx / 2;
         termGrid.add(addTile, col, row);
     }
+
 
     private Node loadTile(String term, boolean read, Runnable onSelected) {
         try {
@@ -130,9 +101,9 @@ public class FlashcardsController {
 
         box.setOnMouseClicked(e -> {
             AppState.flashcardFormMode.set(AppState.FormMode.ADD);
-            AppState.editingIndex.set(-1);
-
-            AppState.navOverride.set(AppState.NavItem.FLASHCARDS);
+//            AppState.editingIndex.set(-1);
+//
+//            AppState.navOverride.set(AppState.NavItem.FLASHCARDS);
             Navigator.go(AppState.Screen.FLASHCARD_FORM);
         });
 

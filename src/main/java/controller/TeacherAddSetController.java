@@ -7,6 +7,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
 import model.AppState;
+import model.entity.ClassModel;
+import model.entity.FlashcardSet;
+import model.service.FlashcardSetService;
 import view.Navigator;
 
 import java.io.File;
@@ -27,6 +30,9 @@ public class TeacherAddSetController {
 
     private File selectedFile;
     private int parsedCount = 0;
+
+    private final FlashcardSetService flashcardSetService = new FlashcardSetService();
+
 
     @FXML
     private void initialize() {
@@ -56,17 +62,24 @@ public class TeacherAddSetController {
 
     @FXML
     private void onAdd() {
-        AppState.ClassItem c = AppState.selectedClass.get();
+        // get class từ AppState
+        ClassModel c = AppState.selectedClass.get();
         if (c == null) return;
 
         String subject = subjectField.getText() == null ? "" : subjectField.getText().trim();
         if (subject.isBlank()) return;
 
-        int total = parsedCount > 0 ? parsedCount : 20; // demo fallback
-        c.getSets().add(new AppState.FlashcardSetItem(subject, total, 0));
+        // create FlashcardSet
+        FlashcardSet set = new FlashcardSet();
+        set.setSubject(subject);
+        set.setClassModel(c);
+
+        // save DB
+        flashcardSetService.save(set);
 
         Navigator.go(AppState.Screen.TEACHER_CLASS_DETAIL);
     }
+
 
     @FXML
     private void onCancel() {

@@ -13,6 +13,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import model.AppState;
+import model.entity.ClassDetails;
+import model.entity.ClassModel;
+import model.entity.FlashcardSet;
+import model.entity.User;
+import model.service.ClassDetailsService;
+import model.service.UserService;
 import view.Navigator;
 
 import java.util.ArrayList;
@@ -46,15 +52,17 @@ public class TeacherClassDetailController {
     @FXML
     private VBox setListBox;
 
-    private AppState.ClassItem c;
-
+    //private AppState.ClassItem c;
+    private ClassModel c;
     // Demo "directory" of all students in the system (later this comes from DB)
-    private static final List<AppState.StudentItem> ALL_STUDENTS = new ArrayList<>();
+    //private static final List<AppState.StudentItem> ALL_STUDENTS = new ArrayList<>();
+    private final ClassDetailsService classDetailsService =  new ClassDetailsService();
+    private final UserService userService = new UserService();
 
     @FXML
     private void initialize() {
-        AppState.seedDemoIfNeeded();
-        seedStudentDirectoryIfNeeded();
+//        AppState.seedDemoIfNeeded();
+//        seedStudentDirectoryIfNeeded();
 
         c = AppState.selectedClass.get();
         if (c == null) {
@@ -65,7 +73,7 @@ public class TeacherClassDetailController {
         // Header
         if (headerController != null) {
             headerController.setBackVisible(true);
-            headerController.setTitle(c.getClassCode());
+            headerController.setTitle(c.getClassName());
             headerController.setOnBack(() -> Navigator.go(AppState.Screen.CLASSES));
             headerController.applyVariant(HeaderController.Variant.TEACHER);
         }
@@ -83,27 +91,27 @@ public class TeacherClassDetailController {
         renderSets();
     }
 
-    private void seedStudentDirectoryIfNeeded() {
-        if (!ALL_STUDENTS.isEmpty()) return;
-
-        // Demo students pool (later: DB)
-        ALL_STUDENTS.add(new AppState.StudentItem("Student 1", "student1@email.com"));
-        ALL_STUDENTS.add(new AppState.StudentItem("Student 2", "student2@email.com"));
-        ALL_STUDENTS.add(new AppState.StudentItem("Student 3", "student3@email.com"));
-        ALL_STUDENTS.add(new AppState.StudentItem("Student 4", "student4@email.com"));
-        ALL_STUDENTS.add(new AppState.StudentItem("Student 5", "student5@email.com"));
-        ALL_STUDENTS.add(new AppState.StudentItem("Student 6", "student6@email.com"));
-        ALL_STUDENTS.add(new AppState.StudentItem("Anna Nguyen", "anna.nguyen@email.com"));
-        ALL_STUDENTS.add(new AppState.StudentItem("Minh Tran", "minh.tran@email.com"));
-        ALL_STUDENTS.add(new AppState.StudentItem("Linh Pham", "linh.pham@email.com"));
-    }
+//    private void seedStudentDirectoryIfNeeded() {
+//        if (!ALL_STUDENTS.isEmpty()) return;
+//
+//        // Demo students pool (later: DB)
+//        ALL_STUDENTS.add(new AppState.StudentItem("Student 1", "student1@email.com"));
+//        ALL_STUDENTS.add(new AppState.StudentItem("Student 2", "student2@email.com"));
+//        ALL_STUDENTS.add(new AppState.StudentItem("Student 3", "student3@email.com"));
+//        ALL_STUDENTS.add(new AppState.StudentItem("Student 4", "student4@email.com"));
+//        ALL_STUDENTS.add(new AppState.StudentItem("Student 5", "student5@email.com"));
+//        ALL_STUDENTS.add(new AppState.StudentItem("Student 6", "student6@email.com"));
+//        ALL_STUDENTS.add(new AppState.StudentItem("Anna Nguyen", "anna.nguyen@email.com"));
+//        ALL_STUDENTS.add(new AppState.StudentItem("Minh Tran", "minh.tran@email.com"));
+//        ALL_STUDENTS.add(new AppState.StudentItem("Linh Pham", "linh.pham@email.com"));
+//    }
 
     private void refreshCounts() {
         if (studentsSectionLabel != null) {
             studentsSectionLabel.setText("Students (" + c.getStudents().size() + ")");
         }
         if (setsSectionLabel != null) {
-            setsSectionLabel.setText("Flashcard Sets (" + c.getSets().size() + ")");
+            setsSectionLabel.setText("Flashcard Sets (" + c.getFlashcardSets().size() + ")");
         }
     }
 
@@ -112,15 +120,16 @@ public class TeacherClassDetailController {
     private void renderEnrolledStudents() {
         enrolledStudentsBox.getChildren().clear();
 
-        for (var s : c.getStudents()) {
-            Node row = buildEnrolledStudentRow(s);
+        for (ClassDetails cd : c.getStudents()) {
+            User student = cd.getStudent();
+            Node row = buildEnrolledStudentRow(student, cd);
             enrolledStudentsBox.getChildren().add(row);
         }
 
         refreshCounts();
     }
 
-    private Node buildEnrolledStudentRow(AppState.StudentItem s) {
+    private Node buildEnrolledStudentRow(User student, ClassDetails cd) {
         HBox row = new HBox(10);
         row.setStyle("""
                 -fx-background-color: rgba(0,0,0,0.02);
@@ -131,7 +140,7 @@ public class TeacherClassDetailController {
                 """);
 
         VBox left = new VBox(4);
-        Label name = new Label(s.getName());
+        Label name = new Label(student.getFirstName() + " " + student.getLastName());
         name.setStyle("-fx-font-size: 14px; -fx-font-weight: 400; -fx-text-fill: #1F1F39;");
 //        Label progress = new Label("80% Completed"); // demo
 //        progress.setStyle("-fx-text-fill: #3D8FEF; -fx-font-weight: 400; -fx-font-size: 12px;");
@@ -147,14 +156,15 @@ public class TeacherClassDetailController {
                         -fx-cursor: hand;
                 """);
         del.setOnAction(e -> {
-            c.getStudents().remove(s);
+            classDetailsService.removeStudentFromClass(cd);
+            c = classDetailsService.reloadClass(c.getClassId());
             renderEnrolledStudents();
             renderSearchResults(); // update search list availability
         });
 
         // Click name/row -> view student detail
         row.setOnMouseClicked(e -> {
-            AppState.selectedStudent.set(s);
+            AppState.selectedStudent.set(student);
             Navigator.go(AppState.Screen.TEACHER_STUDENT_DETAIL);
         });
 
@@ -185,26 +195,32 @@ public class TeacherClassDetailController {
 
         searchResultsBox.getChildren().clear();
 
-        String q = studentSearchField.getText() == null ? "" : studentSearchField.getText().trim().toLowerCase(Locale.ROOT);
+        String q = studentSearchField.getText() == null
+                ? ""
+                : studentSearchField.getText().trim().toLowerCase(Locale.ROOT);
+
+        // get all students
+        List<User> allStudents = userService.getAllStudents();
 
         // Exclude already-enrolled students (by email match)
         var enrolledEmails = c.getStudents().stream()
-                .map(AppState.StudentItem::getEmail)
+                .map(s -> s.getStudent().getEmail())
                 .collect(Collectors.toSet());
 
-        var matches = ALL_STUDENTS.stream()
+        var matches = allStudents.stream()
                 .filter(s -> !enrolledEmails.contains(s.getEmail()))
                 .filter(s -> q.isBlank()
-                        || s.getName().toLowerCase(Locale.ROOT).contains(q)
+                        || s.getFirstName().toLowerCase(Locale.ROOT).contains(q)
+                        || s.getLastName().toLowerCase().contains(q)
                         || s.getEmail().toLowerCase(Locale.ROOT).contains(q))
-                .collect(Collectors.toList());
+                .toList();
 
-        for (var s : matches) {
+        for (User s : matches) {
             searchResultsBox.getChildren().add(buildSearchResultRow(s));
         }
     }
 
-    private Node buildSearchResultRow(AppState.StudentItem s) {
+    private Node buildSearchResultRow(User student) {
         HBox row = new HBox(10);
         row.setStyle("""
                 -fx-background-color: white;
@@ -216,9 +232,9 @@ public class TeacherClassDetailController {
                 """);
 
         VBox left = new VBox(3);
-        Label name = new Label(s.getName());
+        Label name = new Label(student.getFirstName() + " " + student.getLastName());
         name.setStyle("-fx-font-size: 12px; -fx-font-weight: 400; -fx-text-fill: #1F1F39;");
-        Label email = new Label(s.getEmail());
+        Label email = new Label(student.getEmail());
         email.setStyle("-fx-font-size: 12px; -fx-font-weight: 400; -fx-text-fill: rgba(0,0,0,0.45);");
         left.getChildren().addAll(name, email);
         HBox.setHgrow(left, Priority.ALWAYS);
@@ -233,7 +249,8 @@ public class TeacherClassDetailController {
                 """);
         add.setOnAction(e -> {
             // Add to class (later: DB insert into enrollment)
-            c.getStudents().add(new AppState.StudentItem(s.getName(), s.getEmail()));
+            classDetailsService.addStudentToClass(student, c);
+            c = classDetailsService.reloadClass(c.getClassId()); // reload class
             renderEnrolledStudents();
             renderSearchResults();
         });
@@ -247,14 +264,14 @@ public class TeacherClassDetailController {
     private void renderSets() {
         setListBox.getChildren().clear();
 
-        for (var set : c.getSets()) {
+        for (FlashcardSet set : c.getFlashcardSets()) {
             try {
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/components/flashcard_set_card.fxml"));
                 Node node = loader.load();
 
                 FlashcardSetCardController ctrl = loader.getController();
                 ctrl.setSubject(set.getSubject());
-                ctrl.setCardCount(set.getTotalCards());
+                ctrl.setCardCount(set.getTotalCards().size());
 
                 // Teacher mode: hide progress
                 ctrl.setShowProgress(false);
@@ -278,4 +295,12 @@ public class TeacherClassDetailController {
     private void onAddSet() {
         Navigator.go(AppState.Screen.TEACHER_ADD_SET);
     }
+
+//    public ClassDetailsService getClassDetailsService() {
+//        return classDetailsService;
+//    }
+//
+//    public void setClassDetailsService(ClassDetailsService classDetailsService) {
+//        this.classDetailsService = classDetailsService;
+//    }
 }

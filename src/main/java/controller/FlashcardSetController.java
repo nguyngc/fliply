@@ -8,22 +8,24 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.layout.GridPane;
 import model.AppState;
+import model.entity.Flashcard;
+import model.entity.FlashcardSet;
 import view.Navigator;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 public class FlashcardSetController {
-
-    // DEMO set data (replace with DB later)
-    private final List<AppState.FlashcardItem> setCards = List.of(
-            new AppState.FlashcardItem("CPU", "Central Processing Unit"),
-            new AppState.FlashcardItem("RAM", "Random Access Memory"),
-            new AppState.FlashcardItem("HTTP", "HyperText Transfer Protocol"),
-            new AppState.FlashcardItem("OOP", "Object-Oriented Programming"),
-            new AppState.FlashcardItem("API", "Application Programming Interface"),
-            new AppState.FlashcardItem("SQL", "Structured Query Language")
-    );
+        //    // DEMO set data (replace with DB later)
+//    private final List<AppState.FlashcardItem> setCards = List.of(
+//            new AppState.FlashcardItem("CPU", "Central Processing Unit"),
+//            new AppState.FlashcardItem("RAM", "Random Access Memory"),
+//            new AppState.FlashcardItem("HTTP", "HyperText Transfer Protocol"),
+//            new AppState.FlashcardItem("OOP", "Object-Oriented Programming"),
+//            new AppState.FlashcardItem("API", "Application Programming Interface"),
+//            new AppState.FlashcardItem("SQL", "Structured Query Language")
+//    );
     @FXML
     private Parent header;
     @FXML
@@ -31,22 +33,26 @@ public class FlashcardSetController {
     @FXML
     private GridPane termGrid;
 
+    private List<Flashcard> setCards;
+
     @FXML
     private void initialize() {
-        String title = (AppState.selectedFlashcardSetName.get() == null || AppState.selectedFlashcardSetName.get().isBlank())
-                ? "Flashcard Set"
-                : AppState.selectedFlashcardSetName.get();
-        String subtitle = "Total: " + setCards.size();
-
+        FlashcardSet set = AppState.selectedFlashcardSet.get();
+        if (set == null) {
+            Navigator.go(AppState.Screen.CLASS_DETAIL);
+            return;
+        }
+        setCards = new ArrayList<>(set.getCards());
+        // Header
         if (headerController != null) {
-            headerController.setTitle(title);
-            headerController.setSubtitle(subtitle);
+            headerController.setTitle(set.getSubject());
+            headerController.setSubtitle("Total: " + setCards.size());
             headerController.setBackVisible(true);
             headerController.setOnBack(() -> Navigator.go(AppState.Screen.CLASS_DETAIL));
         }
 
         // For detail header
-        AppState.detailHeaderTitle.set(title);
+        AppState.detailHeaderTitle.set(set.getSubject());
         AppState.detailHeaderSubtitle.set("Total: " + setCards.size());
 
         renderGrid();
@@ -57,7 +63,7 @@ public class FlashcardSetController {
 
         for (int i = 0; i < setCards.size(); i++) {
             int index = i;
-            AppState.FlashcardItem item = setCards.get(i);
+            Flashcard item = setCards.get(i);
 
             Node tile = loadTile(item.getTerm(), /*read*/ false, () -> {
                 AppState.currentDetailList.setAll(setCards);

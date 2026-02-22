@@ -27,4 +27,15 @@ public class FlashcardService {
     public List<Flashcard> getFlashcardsBySet(int setId) {
         return flashDao.findByFlashcardSetId(setId);
     }
+
+    public void update(Flashcard card) {
+        flashDao.update(card);
+    }
+    public void delete(Flashcard card) {
+        flashDao.delete(card);
+    }
+
+    public void save(Flashcard newCard) {
+        flashDao.persist(newCard);
+    }
 }

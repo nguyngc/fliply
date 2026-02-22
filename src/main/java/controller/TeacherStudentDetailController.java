@@ -9,6 +9,10 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import model.AppState;
+import model.entity.ClassModel;
+import model.entity.FlashcardSet;
+import model.entity.User;
+import model.service.StudyService;
 import view.Navigator;
 
 public class TeacherStudentDetailController {
@@ -20,10 +24,14 @@ public class TeacherStudentDetailController {
     @FXML
     private VBox progressListBox;
 
+    private final StudyService studyService = new StudyService();
+
     @FXML
     private void initialize() {
-        AppState.StudentItem s = AppState.selectedStudent.get();
-        AppState.ClassItem c = AppState.selectedClass.get();
+//        AppState.StudentItem s = AppState.selectedStudent.get();
+//        AppState.ClassItem c = AppState.selectedClass.get();
+        User s = AppState.selectedStudent.get();
+        ClassModel c =  AppState.selectedClass.get();
 
         if (s == null || c == null) {
             Navigator.go(AppState.Screen.TEACHER_CLASS_DETAIL);
@@ -31,7 +39,7 @@ public class TeacherStudentDetailController {
         }
 
         headerController.setBackVisible(true);
-        headerController.setTitle(s.getName());
+        headerController.setTitle(s.getFirstName() + " " + s.getLastName());
         headerController.setSubtitle(s.getEmail());
         headerController.setOnBack(() -> Navigator.go(AppState.Screen.TEACHER_CLASS_DETAIL));
         headerController.applyVariant(HeaderController.Variant.TEACHER);
@@ -41,11 +49,12 @@ public class TeacherStudentDetailController {
         renderProgress(c);
     }
 
-    private void renderProgress(AppState.ClassItem c) {
+    private void renderProgress(ClassModel c) {
         progressListBox.getChildren().clear();
+        User student = AppState.selectedStudent.get();
 
-        for (var set : c.getSets()) {
-            double pct = set.getProgressPercent();
+        for (FlashcardSet set : c.getFlashcardSets()) {
+            double pct = studyService.getProgressPercent(student, set);
             double progress = pct > 1.0 ? (pct / 100.0) : pct;
 
             String title = set.getSubject() + " (" + set.getTotalCards() + "/" + set.getTotalCards() + ")";
