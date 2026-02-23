@@ -9,10 +9,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import model.AppState;
-import model.entity.ClassDetails;
-import model.entity.ClassModel;
-import model.entity.FlashcardSet;
-import model.entity.User;
+import model.entity.*;
 import model.service.ClassDetailsService;
 import model.service.StudyService;
 import view.Navigator;
@@ -106,8 +103,11 @@ public class HomeController {
             return;
         }
 
-        // Pick the latest quiz (first one for demo)
-        AppState.selectedQuiz.set(AppState.myQuizzes.getFirst());
+        // Pick the latest quiz
+        List<Quiz> quizzes = AppState.myQuizzes;
+        // sort newest first
+        quizzes.sort((a, b) -> b.getQuizId() - a.getQuizId());
+        AppState.selectedQuiz.set(quizzes.getFirst());
 
         // Reset quiz session state
         AppState.quizQuestionIndex.set(0);
