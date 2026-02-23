@@ -65,7 +65,7 @@ class EnrollmentServiceTest {
         assertNull(duplicate);
 
         List<ClassDetails> students = enrollmentService.getStudentsInClass(clazz.getClassId());
-        assertTrue(students.stream().anyMatch(cd -> cd.getUser().getUserId().equals(student.getUserId())));
+        assertTrue(students.stream().anyMatch(cd -> cd.getStudent().getUserId().equals(student.getUserId())));
 
         cdDao.deleteByClassId(clazz.getClassId());
         classDao.delete(clazz);
