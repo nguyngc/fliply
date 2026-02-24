@@ -15,10 +15,11 @@ pipeline {
         }
 
         stage('Test') {
-            steps {
-                bat 'mvn -Dtest=!**/*ControllerTest test'
-            }
-        }
+    steps {
+        bat 'mvn test -Dsurefire.excludes=**/*ControllerTest.java'
+    }
+}
+
 
         stage('Code Coverage') {
             steps {
