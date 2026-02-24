@@ -110,7 +110,7 @@ public class FlashcardDao {
                     "SELECT DISTINCT f FROM Flashcard f " +
                             "WHERE f.user.userId = :uid " +
                             "   OR f.flashcardSet.classModel.classId IN " +
-                            "      (SELECT cd.classModel.classId FROM ClassDetails cd WHERE cd.user.userId = :uid)",
+                            "      (SELECT cd.classModel.classId FROM ClassDetails cd WHERE cd.student.userId = :uid)",
                     Flashcard.class
             );
 
