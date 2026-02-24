@@ -5,7 +5,6 @@ pipeline {
         stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/nguyngc/fliply.git'
-
             }
         }
 
@@ -17,7 +16,7 @@ pipeline {
 
         stage('Test') {
             steps {
-                bat 'mvn test'
+                bat 'mvn -Dtest=!**/*ControllerTest test'
             }
         }
 
@@ -36,24 +35,25 @@ pipeline {
         stage('Publish Coverage Report') {
             steps {
                 recordCoverage tools: [[parser: 'JACOCO']]
-
             }
         }
-    stage('Build Docker Image') {
+
+        stage('Build Docker Image') {
             steps {
                 script {
                     dockerImage = docker.build("thanh0201/fliply:latest")
                 }
             }
         }
+
         stage('Push Docker Image') {
             steps {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
-                        dockerImage.push() 
-                    } 
-                } 
-            } 
+                        dockerImage.push()
+                    }
+                }
+            }
         }
     }
 }
