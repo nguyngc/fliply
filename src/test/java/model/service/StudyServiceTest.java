@@ -52,11 +52,12 @@ class StudyServiceTest {
         return fs;
     }
 
-    private Flashcard newCard(String term, FlashcardSet set) {
+    private Flashcard newCard(String term, FlashcardSet set, User user) {
         Flashcard f = new Flashcard();
         f.setTerm(term);
         f.setDefinition("Def-" + term);
         f.setFlashcardSet(set);
+        f.setUser(user);
         return f;
     }
 
@@ -78,9 +79,9 @@ class StudyServiceTest {
         setDao.persist(set);
 
         // add flashcards
-        Flashcard f1 = newCard("A", set);
-        Flashcard f2 = newCard("B", set);
-        Flashcard f3 = newCard("C", set);
+        Flashcard f1 = newCard("A", set, student);
+        Flashcard f2 = newCard("B", set, student);
+        Flashcard f3 = newCard("C", set, student);
         flashcardDao.persist(f1);
         flashcardDao.persist(f2);
         flashcardDao.persist(f3);
@@ -120,9 +121,9 @@ class StudyServiceTest {
         FlashcardSet set1 = newSet(c);
         setDao.persist(set1);
 
-        Flashcard s1c1 = newCard("A", set1);
-        Flashcard s1c2 = newCard("B", set1);
-        Flashcard s1c3 = newCard("C", set1);
+        Flashcard s1c1 = newCard("A", set1, student);
+        Flashcard s1c2 = newCard("B", set1, student);
+        Flashcard s1c3 = newCard("C", set1, student);
         flashcardDao.persist(s1c1);
         flashcardDao.persist(s1c2);
         flashcardDao.persist(s1c3);
@@ -134,8 +135,8 @@ class StudyServiceTest {
         FlashcardSet set2 = newSet(c);
         setDao.persist(set2);
 
-        Flashcard s2c1 = newCard("X", set2);
-        Flashcard s2c2 = newCard("Y", set2);
+        Flashcard s2c1 = newCard("X", set2, student);
+        Flashcard s2c2 = newCard("Y", set2, student);
         flashcardDao.persist(s2c1);
         flashcardDao.persist(s2c2);
 
