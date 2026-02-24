@@ -44,7 +44,7 @@ class ClassDetailsDaoTest {
 
     private ClassDetails newClassDetails(User user, ClassModel classModel) {
         ClassDetails cd = new ClassDetails();
-        cd.setUser(user);
+        cd.setStudent(user);
         cd.setClassModel(classModel);
         return cd;
     }
@@ -75,7 +75,7 @@ class ClassDetailsDaoTest {
         // READ
         ClassDetails found = classDetailsDao.find(id);
         assertNotNull(found);
-        assertEquals(student.getUserId(), found.getUser().getUserId());
+        assertEquals(student.getUserId(), found.getStudent().getUserId());
         assertEquals(c.getClassId(), found.getClassModel().getClassId());
 
         // DELETE
@@ -112,14 +112,14 @@ class ClassDetailsDaoTest {
         // findByClassId
         List<ClassDetails> byClass = classDetailsDao.findByClassId(c.getClassId());
         assertTrue(byClass.stream().anyMatch(x ->
-                x.getUser().getUserId().equals(student.getUserId()) &&
+                x.getStudent().getUserId().equals(student.getUserId()) &&
                         x.getClassModel().getClassId().equals(c.getClassId())
         ));
 
         // findByUserId
-        List<ClassDetails> byUser = classDetailsDao.findByUserId(student.getUserId());
+        List<ClassDetails> byUser = classDetailsDao.findByStudentId(student.getUserId());
         assertTrue(byUser.stream().anyMatch(x ->
-                x.getUser().getUserId().equals(student.getUserId()) &&
+                x.getStudent().getUserId().equals(student.getUserId()) &&
                         x.getClassModel().getClassId().equals(c.getClassId())
         ));
 
@@ -177,6 +177,95 @@ class ClassDetailsDaoTest {
         classDao.delete(c);
         userDao.delete(student1);
         userDao.delete(student2);
+        userDao.delete(teacher);
+    }
+    @Test
+    void updateClassDetails() {
+        // setup teacher + class
+        User teacher = newUser("Teacher");
+        userDao.persist(teacher);
+
+        ClassModel c = newClass(teacher);
+        classDao.persist(c);
+
+        // setup student ban đầu
+        User student1 = newUser("Student1");
+        userDao.persist(student1);
+
+        // CREATE ClassDetails
+        ClassDetails cd = newClassDetails(student1, c);
+        classDetailsDao.persist(cd);
+
+        // setup student mới
+        User student2 = newUser("Student2");
+        userDao.persist(student2);
+
+        // UPDATE student trong ClassDetails
+        cd.setStudent(student2);
+        classDetailsDao.update(cd);
+
+        // VERIFY
+        ClassDetails updated = classDetailsDao.find(cd.getClassDetailsId());
+        assertNotNull(updated);
+        assertEquals(student2.getUserId(), updated.getStudent().getUserId());
+
+        // cleanup
+        classDetailsDao.delete(updated);
+        classDao.delete(c);
+        userDao.delete(student1);
+        userDao.delete(student2);
+        userDao.delete(teacher);
+    }
+
+    @Test
+    void findByClassId_multipleStudents() {
+        User teacher = newUser("Teacher");
+        userDao.persist(teacher);
+
+        ClassModel c = newClass(teacher);
+        classDao.persist(c);
+
+        User s1 = newUser("S1");
+        userDao.persist(s1);
+        User s2 = newUser("S2");
+        userDao.persist(s2);
+
+        ClassDetails cd1 = newClassDetails(s1, c);
+        classDetailsDao.persist(cd1);
+        ClassDetails cd2 = newClassDetails(s2, c);
+        classDetailsDao.persist(cd2);
+
+        List<ClassDetails> list = classDetailsDao.findByClassId(c.getClassId());
+
+        assertEquals(2, list.size());
+        assertTrue(list.stream().anyMatch(x -> x.getStudent().getUserId().equals(s1.getUserId())));
+        assertTrue(list.stream().anyMatch(x -> x.getStudent().getUserId().equals(s2.getUserId())));
+
+        // cleanup
+        classDetailsDao.delete(cd1);
+        classDetailsDao.delete(cd2);
+        classDao.delete(c);
+        userDao.delete(s1);
+        userDao.delete(s2);
+        userDao.delete(teacher);
+    }
+    @Test
+    void existsByUserAndClass_notFound() {
+        User teacher = newUser("Teacher");
+        userDao.persist(teacher);
+
+        ClassModel c = newClass(teacher);
+        classDao.persist(c);
+
+        User student = newUser("Student");
+        userDao.persist(student);
+
+        boolean exists = classDetailsDao.existsByUserAndClass(student.getUserId(), c.getClassId());
+        assertFalse(exists);
+
+        // cleanup
+        classDao.delete(c);
+        userDao.delete(student);
         userDao.delete(teacher);
     }
 }

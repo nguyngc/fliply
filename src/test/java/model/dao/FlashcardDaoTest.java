@@ -215,7 +215,7 @@ class FlashcardDaoTest {
         userDao.persist(student);
         assertNotNull(student.getUserId());
         ClassDetails cd = new ClassDetails();
-        cd.setUser(student);
+        cd.setStudent(student);
         cd.setClassModel(c);
         classDetailsDao.persist(cd);
         assertNotNull(cd.getClassDetailsId());

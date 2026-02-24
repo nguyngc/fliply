@@ -3,6 +3,7 @@ package model.dao;
 import model.entity.User;
 import org.junit.jupiter.api.*;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -106,4 +107,35 @@ class UserDaoTest {
             assertFalse(userDao.existsByEmail(u.getEmail()));
         }
     }
+    @Test
+    void findAllUsers() {
+        User u = newUser();
+        userDao.persist(u);
+
+        List<User> all = userDao.findAll();
+        assertTrue(all.stream().anyMatch(x -> x.getUserId().equals(u.getUserId())));
+
+        userDao.delete(u);
+    }
+
+    @Test
+    void findByRole() {
+        User teacher = newUser();
+        teacher.setRole(1);
+        userDao.persist(teacher);
+
+        User student = newUser();
+        student.setRole(0);
+        userDao.persist(student);
+
+        List<User> teachers = userDao.findByRole(1);
+        assertTrue(teachers.stream().anyMatch(x -> x.getUserId().equals(teacher.getUserId())));
+
+        List<User> students = userDao.findByRole(0);
+        assertTrue(students.stream().anyMatch(x -> x.getUserId().equals(student.getUserId())));
+
+        userDao.delete(teacher);
+        userDao.delete(student);
+    }
+
 }

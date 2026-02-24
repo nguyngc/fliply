@@ -92,7 +92,7 @@ class QuizServiceTest {
         userDao.persist(student);
 
         ClassDetails enrollment = new ClassDetails();
-        enrollment.setUser(student);
+        enrollment.setStudent(student);
         enrollment.setClassModel(clazz);
         classDetailsDao.persist(enrollment);
 
