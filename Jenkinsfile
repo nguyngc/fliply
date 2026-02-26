@@ -5,10 +5,10 @@ pipeline {
 
         stage('Start MariaDB') {
             steps {
-                // Xóa container cũ nếu còn tồn tại
+                // delete if exist
                 bat 'docker rm -f mariadb_test 2>nul || exit 0'
 
-                // Chạy container mới
+                // run new container
                 bat '''
                     docker run -d ^
                     -e MARIADB_ROOT_PASSWORD=root ^
@@ -84,7 +84,7 @@ pipeline {
 
     post {
         always {
-            // Cleanup container sau khi build
+            // Cleanup container
             bat 'docker rm -f mariadb_test 2>nul || exit 0'
         }
     }
