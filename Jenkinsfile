@@ -82,7 +82,7 @@ pipeline {
     post {
         always {
             script {
-                sh "docker rm -f mariadb_test || true"
+                bat "docker rm -f mariadb_test || true"
             }
         }
     }
