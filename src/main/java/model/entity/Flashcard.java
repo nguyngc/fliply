@@ -18,7 +18,7 @@ public class Flashcard {
     private String definition;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "FlashcardSetId", referencedColumnName = "FlashcardSetId", nullable = false)
+    @JoinColumn(name = "FlashcardSetId", referencedColumnName = "FlashcardSetId", nullable = true)
     private FlashcardSet flashcardSet;
 
     @ManyToOne(fetch = FetchType.EAGER)

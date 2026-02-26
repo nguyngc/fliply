@@ -9,7 +9,11 @@ import javafx.stage.FileChooser;
 import model.AppState;
 import model.entity.ClassModel;
 import model.entity.FlashcardSet;
+import model.entity.User;
+import model.service.ClassDetailsService;
+import model.service.FlashcardService;
 import model.service.FlashcardSetService;
+import util.FlashcardFileParser;
 import view.Navigator;
 
 import java.io.File;
@@ -30,9 +34,6 @@ public class TeacherAddSetController {
 
     private File selectedFile;
     private int parsedCount = 0;
-
-    private final FlashcardSetService flashcardSetService = new FlashcardSetService();
-
 
     @FXML
     private void initialize() {
@@ -62,22 +63,40 @@ public class TeacherAddSetController {
 
     @FXML
     private void onAdd() {
-        // get class từ AppState
-        ClassModel c = AppState.selectedClass.get();
-        if (c == null) return;
+        try {
+            if (selectedFile == null) return;
 
-        String subject = subjectField.getText() == null ? "" : subjectField.getText().trim();
-        if (subject.isBlank()) return;
+            // Parse cards from file
+            List<FlashcardFileParser.ParsedCard> cards = FlashcardFileParser.parse(selectedFile);
+            if (cards.isEmpty()) return;
 
-        // create FlashcardSet
-        FlashcardSet set = new FlashcardSet();
-        set.setSubject(subject);
-        set.setClassModel(c);
+            // get class từ AppState
+            ClassModel c = AppState.selectedClass.get();
+            if (c == null) return;
 
-        // save DB
-        flashcardSetService.save(set);
+            String subject = subjectField.getText() == null ? "" : subjectField.getText().trim();
+            if (subject.isBlank()) return;
 
-        Navigator.go(AppState.Screen.TEACHER_CLASS_DETAIL);
+            // create FlashcardSet
+            final FlashcardSetService flashcardSetService = new FlashcardSetService();
+            FlashcardSet set = flashcardSetService.createSet(subject, c);
+
+            // create Flashcards
+            User teacher = AppState.currentUser.get();
+            final FlashcardService flashcardService = new FlashcardService();
+            for (FlashcardFileParser.ParsedCard card : cards) {
+                flashcardService.createFlashcard(card.term(), card.definition(), set, teacher);
+            }
+
+            // reload Class Details
+            ClassDetailsService classDetailsService = new ClassDetailsService();
+            AppState.selectedClass.set(classDetailsService.reloadClass(c.getClassId()));
+
+            Navigator.go(AppState.Screen.TEACHER_CLASS_DETAIL);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.err.println("Error: " + ex.getMessage());
+        }
     }
 
 

@@ -43,7 +43,7 @@ public class QuizResultController {
         }
 
         AppState.navOverride.set(AppState.NavItem.QUIZZES);
-
+        questions = quizService.buildQuizQuestions(quiz.getQuizId(), AppState.currentUser.get().getUserId());
         renderResults();
     }
 

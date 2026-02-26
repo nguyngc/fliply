@@ -3,6 +3,7 @@ package controller;
 import controller.components.HeaderController;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import model.AppState;
 import model.entity.Quiz;
@@ -38,7 +39,11 @@ public class QuizFormController {
 
         // Build quiz with n questions
         Quiz quiz = quizService.generateQuiz(user, n);
-        if (quiz == null) return;
+        if (quiz == null) {
+            Alert a = new Alert(Alert.AlertType.WARNING, "No flashcards available (or invalid number).");
+            a.showAndWait();
+            return;
+        }
         // save
         AppState.selectedQuiz.set(quiz);
         AppState.quizQuestionIndex.set(0);

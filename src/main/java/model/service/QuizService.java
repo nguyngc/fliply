@@ -46,9 +46,6 @@ public class QuizService {
         for (int i = 0; i < n; i++) {
             Flashcard f = pool.get(i);
 
-            // avoid duplicates
-            if (quizDetailsDao.exists(quiz.getQuizId(), f.getFlashcardId())) continue;
-
             QuizDetails qd = new QuizDetails(quiz, f);
             quizDetailsDao.persist(qd);
         }

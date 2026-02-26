@@ -17,6 +17,7 @@ import view.Navigator;
 import java.io.IOException;
 
 public class FlashcardsController {
+    @SuppressWarnings("unused")
     @FXML
     private Parent header;
     @FXML
@@ -44,8 +45,25 @@ public class FlashcardsController {
         int idx = 0;
         for (Flashcard card : set.getCards()) {
 
+            int index = idx; // preserve for lambda
             Node tile = loadTile(card.getTerm(), false, () -> {
+                // Populate detail list + index so FlashcardDetailController can use the same source
+                AppState.currentDetailList.setAll(set.getCards());
+                AppState.currentDetailIndex.set(index);
+
+                // mark that we came from the Flashcards screen (not the set screen)
+                AppState.isFromFlashcardSet.set(false);
+
+                // set header metadata for detail screen
+                AppState.detailHeaderTitle.set(set.getSubject());
+                AppState.detailHeaderSubtitle.set("Total: " + set.getCards().size());
+
+                // ensure Flashcards nav is highlighted
+                AppState.navOverride.set(AppState.NavItem.FLASHCARDS);
+
+                // also keep a reference to the currentFlashcard (optional)
                 AppState.currentFlashcard.set(card);
+
                 Navigator.go(AppState.Screen.FLASHCARD_DETAIL);
             });
 
