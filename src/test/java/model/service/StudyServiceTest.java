@@ -1,161 +1,155 @@
 package model.service;
 
-import model.dao.*;
+import model.dao.StudyDao;
 import model.entity.*;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 class StudyServiceTest {
 
-    private UserDao userDao;
-    private ClassModelDao classDao;
-    private FlashcardSetDao setDao;
-    private FlashcardDao flashcardDao;
-    private StudyDao studyDao;
     private StudyService service;
+    private StudyDao mockDao;
 
     @BeforeEach
     void setUp() {
-        userDao = new UserDao();
-        classDao = new ClassModelDao();
-        setDao = new FlashcardSetDao();
-        flashcardDao = new FlashcardDao();
-        studyDao = new StudyDao();
         service = new StudyService();
-    }
 
-    private void initCardList(FlashcardSet set) {
+        // Mock StudyDao
+        mockDao = mock(StudyDao.class);
+
+        // Inject mock StudyService
         try {
-            Field f = FlashcardSet.class.getDeclaredField("cards");
+            Field f = StudyService.class.getDeclaredField("dao");
             f.setAccessible(true);
-            f.set(set, new ArrayList<Flashcard>());
+            f.set(service, mockDao);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private User newUser(String prefix) {
-        String uid = UUID.randomUUID().toString().substring(0, 8);
-        User u = new User();
-        u.setFirstName(prefix);
-        u.setLastName("User");
-        u.setEmail(prefix.toLowerCase() + "+" + uid + "@test.com");
-        u.setPassword("password123");
-        u.setRole(1);
-        return u;
-    }
-
-    private ClassModel newClass(User teacher) {
-        ClassModel c = new ClassModel();
-        c.setClassName("Class-" + UUID.randomUUID().toString().substring(0, 6));
-        c.setTeacher(teacher);
-        return c;
-    }
-
-    private FlashcardSet newSet(ClassModel c) {
+    private FlashcardSet newSet(int id, int cardCount) {
         FlashcardSet fs = new FlashcardSet();
-        fs.setSubject("Set-" + UUID.randomUUID().toString().substring(0, 5));
-        fs.setClassModel(c);
+        try {
+            Field f = FlashcardSet.class.getDeclaredField("flashcardSetId");
+            f.setAccessible(true);
+            f.set(fs, id);
+
+            Field cardsField = FlashcardSet.class.getDeclaredField("cards");
+            cardsField.setAccessible(true);
+            ArrayList<Flashcard> list = new ArrayList<>();
+            for (int i = 0; i < cardCount; i++) list.add(new Flashcard());
+            cardsField.set(fs, list);
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
         return fs;
     }
 
-    private Flashcard newCard(String term, FlashcardSet set, User user) {
-        Flashcard f = new Flashcard();
-        f.setTerm(term);
-        f.setDefinition("Def-" + term);
-        f.setFlashcardSet(set);
-        f.setUser(user);
-        return f;
+    private User newUser() {
+        User u = new User();
+        try {
+            Field f = User.class.getDeclaredField("userId");
+            f.setAccessible(true);
+            f.set(u, 1);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        return u;
+    }
+
+    // ---------------- Tests ----------------
+
+    @Test
+    void testGetProgressPercent_noStudyRecord() {
+        User u = newUser();
+        FlashcardSet fs = newSet(10, 3);
+
+        when(mockDao.findByStudentAndSet(1, 10)).thenReturn(null);
+
+        assertEquals(0.0, service.getProgressPercent(u, fs));
     }
 
     @Test
-    void getProgressPercent() {
-        User teacher = newUser("Teacher");
-        userDao.persist(teacher);
+    void testGetProgressPercent_zeroCards() {
+        User u = newUser();
+        FlashcardSet fs = newSet(10, 0);
 
-        ClassModel c = newClass(teacher);
-        classDao.persist(c);
+        when(mockDao.findByStudentAndSet(1, 10))
+                .thenReturn(new Study(5, u, fs));
 
-        User student = newUser("Student");
-        userDao.persist(student);
-
-        FlashcardSet set = newSet(c);
-        setDao.persist(set);
-
-        // FIX: khởi tạo list cards bằng reflection
-        initCardList(set);
-
-        Flashcard f1 = newCard("A", set, student);
-        Flashcard f2 = newCard("B", set, student);
-        Flashcard f3 = newCard("C", set, student);
-
-        flashcardDao.persist(f1);
-        flashcardDao.persist(f2);
-        flashcardDao.persist(f3);
-
-        set.getCards().add(f1);
-        set.getCards().add(f2);
-        set.getCards().add(f3);
-
-        Study study = new Study(2, student, set);
-        studyDao.persist(study);
-
-        double percent = service.getProgressPercent(student, set);
-        assertEquals(2.0 / 3.0, percent, 0.0001);
+        assertEquals(0.0, service.getProgressPercent(u, fs));
     }
 
     @Test
-    void getClassProgress() {
-        User teacher = newUser("Teacher");
-        userDao.persist(teacher);
+    void testGetProgressPercent_normalCase() {
+        User u = newUser();
+        FlashcardSet fs = newSet(10, 3);
 
-        ClassModel c = newClass(teacher);
-        classDao.persist(c);
+        when(mockDao.findByStudentAndSet(1, 10))
+                .thenReturn(new Study(2, u, fs));
 
-        User student = newUser("Student");
-        userDao.persist(student);
+        assertEquals(2.0 / 3.0, service.getProgressPercent(u, fs), 0.0001);
+    }
 
-        FlashcardSet set1 = newSet(c);
-        setDao.persist(set1);
-        initCardList(set1);
+    @Test
+    void testGetClassProgress_noSets() {
+        User u = newUser();
+        ClassModel c = new ClassModel();
 
-        Flashcard s1c1 = newCard("A", set1, student);
-        Flashcard s1c2 = newCard("B", set1, student);
-        Flashcard s1c3 = newCard("C", set1, student);
+        assertEquals(0.0, service.getClassProgress(u, c));
+    }
 
-        flashcardDao.persist(s1c1);
-        flashcardDao.persist(s1c2);
-        flashcardDao.persist(s1c3);
+    @Test
+    void testGetClassProgress_setsButNoCard() {
+        User u = newUser();
+        ClassModel c = new ClassModel();
 
-        set1.getCards().add(s1c1);
-        set1.getCards().add(s1c2);
-        set1.getCards().add(s1c3);
+        FlashcardSet fs = newSet(10, 0);
+        c.getFlashcardSets().add(fs);
 
-        Study st1 = new Study(2, student, set1);
-        studyDao.persist(st1);
+        when(mockDao.findByStudentAndSet(1, 10)).thenReturn(null);
 
-        FlashcardSet set2 = newSet(c);
-        setDao.persist(set2);
-        initCardList(set2);
+        assertEquals(0.0, service.getClassProgress(u, c));
+    }
 
-        Flashcard s2c1 = newCard("X", set2, student);
-        Flashcard s2c2 = newCard("Y", set2, student);
+    @Test
+    void testGetClassProgress_mixedSets() {
+        User u = newUser();
+        ClassModel c = new ClassModel();
 
-        flashcardDao.persist(s2c1);
-        flashcardDao.persist(s2c2);
+        FlashcardSet s1 = newSet(1, 3);
+        FlashcardSet s2 = newSet(2, 2);
 
-        set2.getCards().add(s2c1);
-        set2.getCards().add(s2c2);
+        c.getFlashcardSets().add(s1);
+        c.getFlashcardSets().add(s2);
 
-        Study st2 = new Study(1, student, set2);
-        studyDao.persist(st2);
+        when(mockDao.findByStudentAndSet(1, 1)).thenReturn(new Study(2, u, s1));
+        when(mockDao.findByStudentAndSet(1, 2)).thenReturn(new Study(1, u, s2));
 
-        double progress = service.getClassProgress(student, c);
-        assertEquals(3.0 / 5.0, progress, 0.0001);
+        assertEquals(3.0 / 5.0, service.getClassProgress(u, c), 0.0001);
+    }
+
+    @Test
+    void testGetClassProgress_partialMissingStudy() {
+        User u = newUser();
+        ClassModel c = new ClassModel();
+
+        FlashcardSet s1 = newSet(1, 3);
+        FlashcardSet s2 = newSet(2, 2);
+
+        c.getFlashcardSets().add(s1);
+        c.getFlashcardSets().add(s2);
+
+        when(mockDao.findByStudentAndSet(1, 1)).thenReturn(new Study(2, u, s1));
+        when(mockDao.findByStudentAndSet(1, 2)).thenReturn(null);
+
+        assertEquals(2.0 / 5.0, service.getClassProgress(u, c), 0.0001);
     }
 }

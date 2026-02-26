@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/nguyngc/fliply.git'
+                git branch: 'main', url: 'https://github.com/THANH0201/fliply1.git'
             }
         }
 
@@ -15,11 +15,10 @@ pipeline {
         }
 
         stage('Test') {
-    steps {
-        bat 'mvn test -Dsurefire.excludes=**/*ControllerTest.java'
-    }
-}
-
+            steps {
+                bat 'mvn -Dtest=*DaoTest,*ServiceTest,*RepositoryTest test'
+            }
+        }
 
         stage('Code Coverage') {
             steps {

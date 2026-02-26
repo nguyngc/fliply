@@ -1,27 +1,46 @@
 package controller.components;
 
-import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import model.AppState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.ByteArrayInputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class NavControllerTest {
+    static { new javafx.embed.swing.JFXPanel(); }
 
     private NavController controller;
 
+    private Image dummyImage() {
+        return new Image(new ByteArrayInputStream(new byte[0]));
+    }
+
     @BeforeEach
-    void setUp() {
+    void setUp() throws Exception {
         controller = new NavController();
 
-        // Inject UI components via reflection
+        // Inject dummy images to bypass real resource loading
+        for (String field : new String[]{
+                "homeActive","homeInactive",
+                "classActive","classInactive",
+                "flashcardActive","flashcardInactive",
+                "quizActive","quizInactive",
+                "accountActive","accountInactive"
+        }) {
+            Field f = NavController.class.getDeclaredField(field);
+            f.setAccessible(true);
+            f.set(controller, dummyImage());
+        }
+
+        // Inject UI components
         setPrivate("homeIcon", new ImageView());
         setPrivate("classIcon", new ImageView());
         setPrivate("flashcardIcon", new ImageView());
@@ -47,8 +66,6 @@ class NavControllerTest {
         // Call private initialize()
         callPrivate("initialize");
     }
-
-    // ---------------- Reflection Helpers ----------------
 
     private void setPrivate(String field, Object value) {
         try {
@@ -109,8 +126,8 @@ class NavControllerTest {
         Label flashLabel = (Label) getPrivate("flashLabel");
         Label homeLabel = (Label) getPrivate("homeLabel");
 
-        assertTrue(flashLabel.getStyle().contains("#3D8FEF")); // active
-        assertTrue(homeLabel.getStyle().contains("#8C8C8C"));  // inactive
+        assertTrue(flashLabel.getStyle().contains("#3D8FEF"));
+        assertTrue(homeLabel.getStyle().contains("#8C8C8C"));
     }
 
     @Test
