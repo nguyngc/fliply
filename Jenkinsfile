@@ -5,16 +5,19 @@ pipeline {
 
         stage('Start MariaDB') {
             steps {
-                script {
-                    docker.image('mariadb:10.6').run(
-                        "-e MARIADB_ROOT_PASSWORD=root " +
-                        "-e MARIADB_DATABASE=fliply " +
-                        "-e MARIADB_USER=appuser " +
-                        "-e MARIADB_PASSWORD=password " +
-                        "-p 3306:3306 " +
-                        "--name mariadb_test"
-                    )
-                }
+                // Xóa container cũ nếu còn tồn tại
+                bat 'docker rm -f mariadb_test 2>nul || exit 0'
+
+                // Chạy container mới
+                bat '''
+                    docker run -d ^
+                    -e MARIADB_ROOT_PASSWORD=root ^
+                    -e MARIADB_DATABASE=fliply ^
+                    -e MARIADB_USER=appuser ^
+                    -e MARIADB_PASSWORD=password ^
+                    -p 3306:3306 ^
+                    --name mariadb_test mariadb:10.6
+                '''
             }
         }
 
@@ -81,9 +84,8 @@ pipeline {
 
     post {
         always {
-            script {
-                bat "docker rm -f mariadb_test || true"
-            }
+            // Cleanup container sau khi build
+            bat 'docker rm -f mariadb_test 2>nul || exit 0'
         }
     }
 }
