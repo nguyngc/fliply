@@ -56,7 +56,7 @@ public class QuizzesController {
     private void render() {
         listBox.getChildren().clear();
 
-        for (Quiz quiz : AppState.myQuizzes) {
+        for (Quiz quiz : AppState.quizList) {
             Node card = loadQuizCard(quiz);
             listBox.getChildren().add(card);
         }
