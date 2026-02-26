@@ -13,19 +13,10 @@ import model.entity.FlashcardSet;
 import view.Navigator;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 public class FlashcardSetController {
-        //    // DEMO set data (replace with DB later)
-//    private final List<AppState.FlashcardItem> setCards = List.of(
-//            new AppState.FlashcardItem("CPU", "Central Processing Unit"),
-//            new AppState.FlashcardItem("RAM", "Random Access Memory"),
-//            new AppState.FlashcardItem("HTTP", "HyperText Transfer Protocol"),
-//            new AppState.FlashcardItem("OOP", "Object-Oriented Programming"),
-//            new AppState.FlashcardItem("API", "Application Programming Interface"),
-//            new AppState.FlashcardItem("SQL", "Structured Query Language")
-//    );
+    @SuppressWarnings("unused")
     @FXML
     private Parent header;
     @FXML
@@ -33,7 +24,7 @@ public class FlashcardSetController {
     @FXML
     private GridPane termGrid;
 
-    private List<Flashcard> setCards;
+    private Collection<Flashcard> setCards;
 
     @FXML
     private void initialize() {
@@ -42,18 +33,19 @@ public class FlashcardSetController {
             Navigator.go(AppState.Screen.CLASS_DETAIL);
             return;
         }
-        setCards = new ArrayList<>(set.getCards());
+        // Use the live collection from the selected set so edits/deletes map back correctly
+        setCards = set.getCards();
         // Header
         if (headerController != null) {
             headerController.setTitle(set.getSubject());
-            headerController.setSubtitle("Total: " + setCards.size());
+            headerController.setSubtitle("Total: " + (setCards == null ? 0 : setCards.size()));
             headerController.setBackVisible(true);
             headerController.setOnBack(() -> Navigator.go(AppState.Screen.CLASS_DETAIL));
         }
 
         // For detail header
         AppState.detailHeaderTitle.set(set.getSubject());
-        AppState.detailHeaderSubtitle.set("Total: " + setCards.size());
+        AppState.detailHeaderSubtitle.set("Total: " + (setCards == null ? 0 : setCards.size()));
 
         renderGrid();
     }
@@ -61,9 +53,11 @@ public class FlashcardSetController {
     private void renderGrid() {
         termGrid.getChildren().clear();
 
-        for (int i = 0; i < setCards.size(); i++) {
+        if (setCards == null || setCards.isEmpty()) return;
+
+        int i = 0;
+        for (Flashcard item : setCards) {
             int index = i;
-            Flashcard item = setCards.get(i);
 
             Node tile = loadTile(item.getTerm(), /*read*/ false, () -> {
                 AppState.currentDetailList.setAll(setCards);
@@ -78,6 +72,7 @@ public class FlashcardSetController {
             int col = i % 2;
             int row = i / 2;
             termGrid.add(tile, col, row);
+            i++;
         }
     }
 
