@@ -8,6 +8,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import model.AppState;
 import model.entity.Flashcard;
+import model.entity.FlashcardSet;
 import view.Navigator;
 
 import java.util.ArrayList;
@@ -82,17 +83,43 @@ public class FlashcardDetailController {
                 headerController.setOnDelete(() -> {
                     if (cards.isEmpty()) return;
 
-                    // remove from master list (and current detail list)
                     int idx = index;
-                    if (idx >= 0 && idx < AppState.myFlashcards.size()) {
-                        AppState.myFlashcards.remove(idx);
+                    if (idx < 0 || idx >= cards.size()) return;
+
+                    Flashcard toRemove = cards.get(idx);
+
+                    // Always remove from the current detail list first
+                    if (idx >= 0 && idx < AppState.currentDetailList.size()) {
+                        AppState.currentDetailList.remove(idx);
                     }
 
-                    AppState.currentDetailList.setAll(AppState.myFlashcards);
+                    // If this card belongs to a selected flashcard set, remove it from there as well
+                    FlashcardSet selectedSet = AppState.selectedFlashcardSet.get();
+                    if (selectedSet != null && selectedSet.getCards().contains(toRemove)) {
+                        selectedSet.getCards().remove(toRemove);
+                    }
 
-                    // go back to list
-                    AppState.navOverride.set(AppState.NavItem.FLASHCARDS);
-                    Navigator.go(AppState.Screen.FLASHCARDS);
+                    // Also remove from global myFlashcards if present
+                    AppState.myFlashcards.remove(toRemove);
+
+                    // Update local cards list and index
+                    cards.clear();
+                    cards.addAll(AppState.currentDetailList);
+
+                    if (cards.isEmpty()) {
+                        // go back to list
+                        AppState.navOverride.set(AppState.NavItem.FLASHCARDS);
+                        Navigator.go(AppState.Screen.FLASHCARDS);
+                        return;
+                    }
+
+                    // clamp index and persist the currentDetailIndex
+                    index = clamp(idx, 0, cards.size() - 1);
+                    AppState.currentDetailIndex.set(index);
+
+                    // refresh UI
+                    render();
+                    updateNavButtons();
                 });
             }
         }
@@ -131,6 +158,7 @@ public class FlashcardDetailController {
     private void prev() {
         if (index > 0) {
             index--;
+            AppState.currentDetailIndex.set(index);
             render();
             updateNavButtons();
         }
@@ -140,6 +168,7 @@ public class FlashcardDetailController {
     private void next() {
         if (index < cards.size() - 1) {
             index++;
+            AppState.currentDetailIndex.set(index);
             render();
             updateNavButtons();
         }

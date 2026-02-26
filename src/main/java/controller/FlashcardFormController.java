@@ -86,7 +86,12 @@ public class FlashcardFormController {
             Flashcard newCard = new Flashcard(term, def, set, user);
             flashcardService.save(newCard);
 
+            // Keep all lists in sync: current detail list, the selected set's card list, and global list
             AppState.currentDetailList.add(newCard);
+            if (set != null) {
+                set.getCards().add(newCard);
+            }
+            AppState.myFlashcards.add(newCard);
         }
 
         // After save -> back to list
