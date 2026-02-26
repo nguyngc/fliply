@@ -18,7 +18,7 @@ import java.util.List;
 
 import static model.AppState.isTeacher;
 
-public abstract class HomeController {
+public class HomeController {
     private final ClassDetailsService classDetailsService = new ClassDetailsService();
     @FXML
     private Label nameLabel;
@@ -122,5 +122,5 @@ public abstract class HomeController {
         Navigator.go(AppState.Screen.QUIZ_DETAIL);
     }
 
-    protected abstract ClassCardController createCardController();
+
 }
