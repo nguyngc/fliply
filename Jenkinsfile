@@ -2,6 +2,28 @@ pipeline {
     agent any
 
     stages {
+
+        stage('Start MariaDB') {
+            steps {
+                script {
+                    docker.image('mariadb:10.6').run(
+                        "-e MARIADB_ROOT_PASSWORD=root " +
+                        "-e MARIADB_DATABASE=fliply " +
+                        "-e MARIADB_USER=appuser " +
+                        "-e MARIADB_PASSWORD=password " +
+                        "-p 3306:3306 " +
+                        "--name mariadb_test"
+                    )
+                }
+            }
+        }
+
+        stage('Wait for DB') {
+            steps {
+                bat "ping 127.0.0.1 -n 10 > nul"
+            }
+        }
+
         stage('Checkout') {
             steps {
                 git branch: 'main', url: 'https://github.com/nguyngc/fliply.git'
@@ -53,6 +75,14 @@ pipeline {
                         dockerImage.push()
                     }
                 }
+            }
+        }
+    }
+
+    post {
+        always {
+            script {
+                sh "docker rm -f mariadb_test || true"
             }
         }
     }
