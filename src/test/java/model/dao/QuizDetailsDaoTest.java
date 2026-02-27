@@ -198,5 +198,65 @@ class QuizDetailsDaoTest {
         userDao.delete(cardCreator);
         userDao.delete(teacher);
     }
+
+    @AfterEach
+    void cleanupTestData() {
+
+        QuizDetailsDao qdDao = new QuizDetailsDao();
+        QuizDao quizDao = new QuizDao();
+        FlashcardDao fDao = new FlashcardDao();
+        FlashcardSetDao fsDao = new FlashcardSetDao();
+        ClassModelDao classDao = new ClassModelDao();
+        UserDao userDao = new UserDao();
+
+        // 1) Delete quiz_details created by test
+        for (QuizDetails qd : qdDao.findAll()) {
+            if (qd.getQuiz().getUser().getEmail().startsWith("quiz+")) {
+                qdDao.delete(qd);
+            }
+        }
+
+        // 2) Delete quiz created by test
+        for (Quiz q : quizDao.findAll()) {
+            if (q.getUser().getEmail().startsWith("quiz+")) {
+                quizDao.delete(q);
+            }
+        }
+
+        // 3) Delete flashcard created by test
+        for (Flashcard f : fDao.findAll()) {
+            if (f.getTerm().startsWith("Term-") || f.getTerm().startsWith("QueryTerm-")) {
+                fDao.delete(f);
+            }
+        }
+
+        // 4) Delete flashcardset created by test
+        for (FlashcardSet fs : fsDao.findAll()) {
+            if (fs.getSubject().startsWith("Subject-")) {
+                fsDao.delete(fs);
+            }
+        }
+
+        // 5) Delete classmodel created by test
+        for (ClassModel c : classDao.findAll()) {
+            if (c.getClassName().startsWith("Class-")) {
+                classDao.delete(c);
+            }
+        }
+
+        // 6) Delete test users only
+        for (User u : userDao.findAll()) {
+            String email = u.getEmail();
+            if (email.startsWith("teacher+") ||
+                    email.startsWith("cardcreator+") ||
+                    email.startsWith("quiz+") ||
+                    email.startsWith("student+") ||
+                    email.startsWith("set+") ||
+                    email.startsWith("study+")) {
+                userDao.delete(u);
+            }
+        }
+    }
+
 }
 

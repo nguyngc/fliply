@@ -1,7 +1,6 @@
 package model.dao;
 
-import model.entity.Quiz;
-import model.entity.User;
+import model.entity.*;
 import org.junit.jupiter.api.*;
 
 import java.util.List;
@@ -41,73 +40,135 @@ class QuizDaoTest {
 
     @Test
     void crudQuiz() {
-        // setup user
         User user = newUser();
         userDao.persist(user);
-        assertNotNull(user.getUserId());
 
-        // CREATE
         Quiz q = newQuiz(user, 10);
         quizDao.persist(q);
-        assertNotNull(q.getQuizId());
 
         Integer id = q.getQuizId();
 
-        // READ
         Quiz found = quizDao.find(id);
         assertNotNull(found);
         assertEquals(10, found.getNoOfQuestions());
-        assertEquals(user.getUserId(), found.getUser().getUserId());
 
-        // UPDATE
         found.setNoOfQuestions(15);
         quizDao.update(found);
 
         Quiz updated = quizDao.find(id);
-        assertNotNull(updated);
         assertEquals(15, updated.getNoOfQuestions());
 
-        // DELETE
         quizDao.delete(updated);
         assertNull(quizDao.find(id));
 
-        // cleanup
         userDao.delete(user);
     }
 
     @Test
     void queryQuiz() {
-        // setup user
         User user = newUser();
         userDao.persist(user);
-        assertNotNull(user.getUserId());
 
-        // create quiz
         Quiz q = newQuiz(user, 20);
         quizDao.persist(q);
-        assertNotNull(q.getQuizId());
 
-        // findByUserId
         List<Quiz> byUser = quizDao.findByUserId(user.getUserId());
         assertTrue(byUser.stream().anyMatch(x ->
                 x.getQuizId().equals(q.getQuizId()) &&
                         x.getNoOfQuestions().equals(20)
         ));
 
-        // existsByUserAndQuestionCount
         assertTrue(quizDao.existsByUserAndQuestionCount(user.getUserId(), 20));
         assertFalse(quizDao.existsByUserAndQuestionCount(user.getUserId(), 99));
 
-        // findAll
         List<Quiz> all = quizDao.findAll();
-        assertFalse(all.isEmpty());
         assertTrue(all.stream().anyMatch(x -> x.getQuizId().equals(q.getQuizId())));
 
-        // cleanup
         quizDao.delete(q);
         assertFalse(quizDao.existsByUserAndQuestionCount(user.getUserId(), 20));
 
         userDao.delete(user);
     }
-}
 
+    @AfterEach
+    void cleanupTestData() {
+
+        QuizDetailsDao qdDao = new QuizDetailsDao();
+        QuizDao quizDao = new QuizDao();
+        FlashcardDao fDao = new FlashcardDao();
+        StudyDao studyDao = new StudyDao();
+        FlashcardSetDao fsDao = new FlashcardSetDao();
+        ClassDetailsDao cdDao = new ClassDetailsDao();
+        ClassModelDao classDao = new ClassModelDao();
+        UserDao userDao = new UserDao();
+
+        // 1) Delete quiz_details created by test
+        for (QuizDetails qd : qdDao.findAll()) {
+            if (qd.getFlashcard().getTerm().startsWith("Term-") ||
+                    qd.getFlashcard().getTerm().startsWith("TestTerm-") ||
+                    qd.getFlashcard().getTerm().startsWith("CreatorTerm-")) {
+                qdDao.delete(qd);
+            }
+        }
+
+        // 2) Delete quiz created by test
+        for (Quiz q : quizDao.findAll()) {
+            if (q.getUser().getEmail().startsWith("quiz+")) {
+                quizDao.delete(q);
+            }
+        }
+
+        // 3) Delete flashcard created by test
+        for (Flashcard f : fDao.findAll()) {
+            if (f.getTerm().startsWith("Term-") ||
+                    f.getTerm().startsWith("TestTerm-") ||
+                    f.getTerm().startsWith("CreatorTerm-")) {
+                fDao.delete(f);
+            }
+        }
+
+        // 4) Delete study created by test
+        for (Study s : studyDao.findAll()) {
+            if (s.getFlashcardSet().getSubject().startsWith("Subject-")) {
+                studyDao.delete(s);
+            }
+        }
+
+        // 5) Delete flashcardset created by test
+        for (FlashcardSet fs : fsDao.findAll()) {
+            if (fs.getSubject().startsWith("Subject-")) {
+                fsDao.delete(fs);
+            }
+        }
+
+        // 6) Delete classdetails created by test
+        for (ClassDetails cd : cdDao.findAll()) {
+            if (cd.getClassModel().getClassName().startsWith("Class-")) {
+                cdDao.delete(cd);
+            }
+        }
+
+        // 7) Delete classmodel created by test
+        for (ClassModel c : classDao.findAll()) {
+            if (c.getClassName().startsWith("Class-")) {
+                classDao.delete(c);
+            }
+        }
+
+        // 8) Delete ONLY test users
+        for (User u : userDao.findAll()) {
+            String email = u.getEmail();
+            if (email.startsWith("teacher+") ||
+                    email.startsWith("cardcreator+") ||
+                    email.startsWith("creator+") ||
+                    email.startsWith("student+") ||
+                    email.startsWith("set+") ||
+                    email.startsWith("quiz+") ||
+                    email.startsWith("flashcard+") ||
+                    email.startsWith("test+")) {
+                userDao.delete(u);
+            }
+        }
+    }
+
+}

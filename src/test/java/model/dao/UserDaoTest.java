@@ -26,15 +26,14 @@ class UserDaoTest {
     }
 
     private void cleanupTestData() {
-        // Clean any users with test emails to avoid conflicts
         try {
-            User existingUser = userDao.findByEmail("nhut@test.com");
-            if (existingUser != null) {
-                userDao.delete(existingUser);
+            List<User> all = userDao.findAll();
+            for (User u : all) {
+                if (u.getEmail() != null && (u.getEmail().startsWith("test+"))){
+                    userDao.delete(u);
+                }
             }
-        } catch (Exception e) {
-            // Ignore cleanup errors
-        }
+        } catch (Exception ignored) {}
     }
 
     private User newUser() {

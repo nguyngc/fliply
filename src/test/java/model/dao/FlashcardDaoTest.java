@@ -1,10 +1,6 @@
 package model.dao;
 
-import model.entity.ClassModel;
-import model.entity.ClassDetails;
-import model.entity.Flashcard;
-import model.entity.FlashcardSet;
-import model.entity.User;
+import model.entity.*;
 import org.junit.jupiter.api.*;
 
 import java.util.List;
@@ -237,4 +233,97 @@ class FlashcardDaoTest {
         userDao.delete(creator);
         userDao.delete(teacher);
     }
+    @AfterEach
+    void cleanupTestData() {
+
+        QuizDetailsDao qdDao = new QuizDetailsDao();
+        QuizDao quizDao = new QuizDao();
+        FlashcardDao fDao = new FlashcardDao();
+        StudyDao studyDao = new StudyDao();
+        FlashcardSetDao fsDao = new FlashcardSetDao();
+        ClassDetailsDao cdDao = new ClassDetailsDao();
+        ClassModelDao classDao = new ClassModelDao();
+        UserDao userDao = new UserDao();
+
+        // 1) Delete quiz_details created by test
+        for (QuizDetails qd : qdDao.findAll()) {
+            Flashcard f = qd.getFlashcard();
+            if (f != null) {
+                String term = f.getTerm();
+                if (term.startsWith("Term-") ||
+                        term.startsWith("TestTerm-") ||
+                        term.startsWith("CreatorTerm-")) {
+                    qdDao.delete(qd);
+                }
+            }
+        }
+
+        // 2) Delete quiz created by test
+        for (Quiz q : quizDao.findAll()) {
+            String email = q.getUser().getEmail();
+            if (email.startsWith("quiz+") ||
+                    email.startsWith("teacher+") ||
+                    email.startsWith("cardcreator+") ||
+                    email.startsWith("creator+") ||
+                    email.startsWith("student+")) {
+                quizDao.delete(q);
+            }
+        }
+
+        // 3) Delete flashcard created by test
+        for (Flashcard f : fDao.findAll()) {
+            String term = f.getTerm();
+            if (term.startsWith("Term-") ||
+                    term.startsWith("TestTerm-") ||
+                    term.startsWith("CreatorTerm-")) {
+                fDao.delete(f);
+            }
+        }
+
+        // 4) Delete study created by test
+        for (Study s : studyDao.findAll()) {
+            FlashcardSet fs = s.getFlashcardSet();
+            if (fs != null && fs.getSubject().startsWith("Subject-")) {
+                studyDao.delete(s);
+            }
+        }
+
+        // 5) Delete flashcardset created by test
+        for (FlashcardSet fs : fsDao.findAll()) {
+            if (fs.getSubject().startsWith("Subject-")) {
+                fsDao.delete(fs);
+            }
+        }
+
+        // 6) Delete classdetails created by test
+        for (ClassDetails cd : cdDao.findAll()) {
+            ClassModel c = cd.getClassModel();
+            if (c != null && c.getClassName().startsWith("Class-")) {
+                cdDao.delete(cd);
+            }
+        }
+
+        // 7) Delete classmodel created by test
+        for (ClassModel c : classDao.findAll()) {
+            if (c.getClassName().startsWith("Class-")) {
+                classDao.delete(c);
+            }
+        }
+
+        // 8) Delete ONLY test users
+        for (User u : userDao.findAll()) {
+            String email = u.getEmail();
+            if (email.startsWith("teacher+") ||
+                    email.startsWith("cardcreator+") ||
+                    email.startsWith("creator+") ||
+                    email.startsWith("student+") ||
+                    email.startsWith("set+") ||
+                    email.startsWith("quiz+") ||
+                    email.startsWith("flashcard+") ||
+                    email.startsWith("test+")) {
+                userDao.delete(u);
+            }
+        }
+    }
+
 }

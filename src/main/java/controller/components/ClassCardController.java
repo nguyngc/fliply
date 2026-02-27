@@ -62,7 +62,8 @@ public class ClassCardController {
 
     public void setProgress(double value) {
         if (progressBar != null) progressBar.setProgress(value);
-        if (progressTextLabel != null) progressTextLabel.setText((int) (value * 100) + "% Completed");
+        //if (progressTextLabel != null) progressTextLabel.setText((int) (value * 100) + "% Completed");
+        progressTextLabel.setText("Progress will be implemented later");
     }
 
     public void setOnClick(Runnable r) {
