@@ -199,6 +199,10 @@ public class TeacherClassDetailController {
                 ? ""
                 : studentSearchField.getText().trim().toLowerCase(Locale.ROOT);
 
+        // hide list without searching
+        if (q.isBlank()) {
+            return;
+        }
         // get all students
         List<User> allStudents = userService.getAllStudents();
 

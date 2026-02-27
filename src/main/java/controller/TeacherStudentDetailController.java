@@ -11,6 +11,7 @@ import javafx.scene.layout.VBox;
 import model.AppState;
 import model.entity.ClassModel;
 import model.entity.FlashcardSet;
+import model.entity.Study;
 import model.entity.User;
 import model.service.StudyService;
 import view.Navigator;
@@ -54,13 +55,26 @@ public class TeacherStudentDetailController {
         User student = AppState.selectedStudent.get();
 
         for (FlashcardSet set : c.getFlashcardSets()) {
-            double pct = studyService.getProgressPercent(student, set);
-            double progress = pct > 1.0 ? (pct / 100.0) : pct;
 
-            String title = set.getSubject() + " (" + set.getTotalCards() + "/" + set.getTotalCards() + ")";
+            // total card
+            int totalCards = set.getTotalCards().size();
+
+            // percent
+            double pct = studyService.getProgressPercent(student, set);
+
+            // learned cards
+            int learnedCards = (int) Math.round((pct / 100.0) * totalCards);
+
+            // ProgressBar
+            double progress = pct / 100.0;
+
+            // Title : "subject (1/30)"
+            String title = set.getSubject() + " (" + learnedCards + "/" + totalCards + ")";
+
             addProgressCardRow(title, progress);
         }
     }
+
 
     private void addProgressCardRow(String title, double progress) {
         VBox rowCard = new VBox(8);
@@ -78,7 +92,8 @@ public class TeacherStudentDetailController {
         HBox.setHgrow(left, Priority.ALWAYS);
         top.getChildren().addAll(left);
 
-        Label right = new Label((int) Math.round(progress * 100) + "% Completed");
+        //Label right = new Label((int) Math.round(progress * 100) + "% Completed");
+        Label right = new Label("% Completed will be implemented later");
         right.setStyle("-fx-font-size: 12px; -fx-font-weight: 500; -fx-text-fill: #3D8FEF;");
 
         ProgressBar bar = new ProgressBar(progress);
