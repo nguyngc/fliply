@@ -1,9 +1,6 @@
 package model.dao;
 
-import model.entity.ClassModel;
-import model.entity.User;
-import model.entity.ClassDetails;
-import model.entity.FlashcardSet;
+import model.entity.*;
 import org.junit.jupiter.api.*;
 
 import java.util.List;
@@ -204,6 +201,48 @@ class ClassModelDaoTest {
         userDao.delete(student);
         userDao.delete(teacher);
     }
+    @AfterEach
+    void cleanupTestData() {
+
+        ClassDetailsDao cdDao = new ClassDetailsDao();
+        FlashcardSetDao fsDao = new FlashcardSetDao();
+        ClassModelDao classDao = new ClassModelDao();
+        UserDao userDao = new UserDao();
+
+        // 1) Delete ClassDetails created by test
+        for (ClassDetails cd : cdDao.findAll()) {
+            ClassModel c = cd.getClassModel();
+            if (c != null && c.getClassName().startsWith("Class-")) {
+                cdDao.delete(cd);
+            }
+        }
+
+        // 2) Delete FlashcardSet created by test
+        for (FlashcardSet fs : fsDao.findAll()) {
+            if (fs.getSubject().equals("TestSet") ||
+                    fs.getSubject().startsWith("Subject-")) {
+                fsDao.delete(fs);
+            }
+        }
+
+        // 3) Delete ClassModel created by test
+        for (ClassModel c : classDao.findAll()) {
+            if (c.getClassName().startsWith("Class-")) {
+                classDao.delete(c);
+            }
+        }
+
+        // 4) Delete ONLY test users
+        for (User u : userDao.findAll()) {
+            String email = u.getEmail();
+            if (email.startsWith("teacher+") ||
+                    email.startsWith("test+") ||
+                    email.startsWith("student+")) {
+                userDao.delete(u);
+            }
+        }
+    }
+
 
 }
 

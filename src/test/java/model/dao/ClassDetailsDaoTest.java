@@ -268,5 +268,43 @@ class ClassDetailsDaoTest {
         userDao.delete(student);
         userDao.delete(teacher);
     }
+    @AfterEach
+    void cleanupTestData() {
+
+        ClassDetailsDao cdDao = new ClassDetailsDao();
+        ClassModelDao classDao = new ClassModelDao();
+        UserDao userDao = new UserDao();
+
+        // 1) Delete ClassDetails created by test
+        for (ClassDetails cd : cdDao.findAll()) {
+            ClassModel c = cd.getClassModel();
+            if (c != null && c.getClassName().startsWith("Class-")) {
+                cdDao.delete(cd);
+            }
+        }
+
+        // 2) Delete ClassModel created by test
+        for (ClassModel c : classDao.findAll()) {
+            if (c.getClassName().startsWith("Class-")) {
+                classDao.delete(c);
+            }
+        }
+
+        // 3) Delete ONLY test users
+        for (User u : userDao.findAll()) {
+            String email = u.getEmail();
+            if (email.startsWith("teacher+") ||
+                    email.startsWith("student+") ||
+                    email.startsWith("s1+") ||
+                    email.startsWith("s2+") ||
+                    email.startsWith("student1+") ||
+                    email.startsWith("student2+") ||
+                    email.startsWith("test+") ||
+                    email.startsWith("classdetails+")) {
+                userDao.delete(u);
+            }
+        }
+    }
+
 }
 
