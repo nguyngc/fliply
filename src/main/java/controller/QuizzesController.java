@@ -1,6 +1,7 @@
 package controller;
 
 import controller.components.HeaderController;
+import controller.components.QuizCardController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -18,27 +19,19 @@ import java.io.IOException;
 import java.util.List;
 
 public class QuizzesController {
-    @FXML
-    private Parent header;
-    @FXML
-    private HeaderController headerController;
-    @FXML
-    private VBox listBox;
-    @FXML
-    private Label totalLabel;
+
+    @FXML private Parent header;
+    @FXML private HeaderController headerController;
+    @FXML private VBox listBox;
+    @FXML private Label totalLabel;
 
     private final QuizService quizService = new QuizService();
 
     @FXML
     private void initialize() {
-//        // Seed demo
-//        if (AppState.myQuizzes.isEmpty()) {
-//            AppState.myQuizzes.add(DummyQuizFactory.quiz1());
-//            AppState.myQuizzes.add(DummyQuizFactory.quiz2());
-//        }
         User user = AppState.currentUser.get();
         if (user == null) return;
-        // Load quizzes from DB
+
         List<Quiz> quizzes = quizService.getQuizzesByUser(user.getUserId());
         AppState.quizList.setAll(quizzes);
 
@@ -47,18 +40,15 @@ public class QuizzesController {
             headerController.setSubtitle("Total: " + quizzes.size());
         }
 
-        render();
-
-        // Keep menu highlight
         AppState.navOverride.set(AppState.NavItem.QUIZZES);
+        render();
     }
 
     private void render() {
         listBox.getChildren().clear();
 
         for (Quiz quiz : AppState.quizList) {
-            Node card = loadQuizCard(quiz);
-            listBox.getChildren().add(card);
+            listBox.getChildren().add(loadQuizCard(quiz));
         }
 
         listBox.getChildren().add(buildAddTile());
@@ -69,20 +59,16 @@ public class QuizzesController {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/components/quiz_card.fxml"));
             Node node = loader.load();
 
-            node.setOnMouseClicked(e -> {
-                // Set selected quiz
-                AppState.selectedQuiz.set(quiz);
+            QuizCardController cardCtrl = loader.getController();
+            if (cardCtrl != null) cardCtrl.setQuiz(quiz);
 
-                // RESET QUIZ SESSION STATE
+            node.setOnMouseClicked(e -> {
+                AppState.selectedQuiz.set(quiz);
                 AppState.quizQuestionIndex.set(0);
                 AppState.quizPoints.set(0);
                 AppState.quizAnswers.clear();
                 AppState.quizCorrectMap.clear();
-
-                // Keep menu highlight
                 AppState.navOverride.set(AppState.NavItem.QUIZZES);
-
-                // Navigate
                 Navigator.go(AppState.Screen.QUIZ_DETAIL);
             });
 
