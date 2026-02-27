@@ -4,6 +4,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.layout.VBox?>
+
 <VBox xmlns:fx="http://javafx.com/fxml"
       fx:controller="controller.components.QuizCardController"
       spacing="10"
@@ -17,30 +18,27 @@
 
     <!-- Quiz title -->
     <Label fx:id="quizTitleLabel"
-           text="Quiz 2"
-           style="-fx-text-fill: #2C2C2C;
-                  -fx-font-size: 16px;
-                  -fx-font-weight: 500;"/>
+           text=""
+           style="-fx-text-fill: #2C2C2C; -fx-font-size: 16px; -fx-font-weight: 500;"/>
 
     <!-- Question count -->
     <Label fx:id="questionCountLabel"
-           text="10 questions"
-           style="-fx-text-fill: #8C8C8C;
-                  -fx-font-size: 14px;
-                  -fx-font-weight: 400;"/>
+           text=""
+           style="-fx-text-fill: #8C8C8C; -fx-font-size: 14px; -fx-font-weight: 400;"/>
 
-    <!-- Progress text -->
+    <!-- Progress text (hidden) -->
     <Label fx:id="progressTextLabel"
            text="100%"
-           style="-fx-text-fill: #3D8FEF;
-                  -fx-font-size: 12px;
-                  -fx-font-weight: 400;"/>
+           visible="false"
+           managed="false"
+           style="-fx-text-fill: #3D8FEF; -fx-font-size: 12px; -fx-font-weight: 400;"/>
 
-    <!-- Progress bar -->
+    <!-- Progress bar (hidden) -->
     <ProgressBar fx:id="progressBar"
-                 progress="1.0"
+                 visible="false"
+                 managed="false"
+                 progress="0"
                  prefWidth="295"
-                 style="-fx-accent: #3D8FEF;"
                  stylesheets="@../styles/progress_bar.css"
                  styleClass="progress-bar"/>
 

@@ -3,6 +3,7 @@ package controller.components;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import model.entity.Quiz;
 
 public class QuizCardController {
 
@@ -11,17 +12,22 @@ public class QuizCardController {
     @FXML private Label progressTextLabel;
     @FXML private ProgressBar progressBar;
 
-    public void setTitle(String title) {
-        quizTitleLabel.setText(title);
-    }
+    public void setQuiz(Quiz quiz) {
+        if (quiz == null) return;
 
-    public void setQuestionCount(int count) {
-        questionCountLabel.setText(count + " questions");
-    }
+        quizTitleLabel.setText("Quiz " + quiz.getQuizId());
 
-    /** value: 0.0 - 1.0 */
-    public void setProgress(double value) {
-        progressBar.setProgress(value);
-        progressTextLabel.setText((int) Math.round(value * 100) + "%");
+        int total = (quiz.getNoOfQuestions() == null) ? 0 : quiz.getNoOfQuestions();
+        questionCountLabel.setText(total + " questions");
+
+        // progress hiddne
+        if (progressTextLabel != null) {
+            progressTextLabel.setVisible(false);
+            progressTextLabel.setManaged(false);
+        }
+        if (progressBar != null) {
+            progressBar.setVisible(false);
+            progressBar.setManaged(false);
+        }
     }
 }

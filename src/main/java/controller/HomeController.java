@@ -1,6 +1,7 @@
 package controller;
 
 import controller.components.ClassCardController;
+import controller.components.QuizCardController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -11,6 +12,7 @@ import javafx.scene.layout.VBox;
 import model.AppState;
 import model.entity.*;
 import model.service.ClassDetailsService;
+import model.service.QuizService;
 import model.service.StudyService;
 import view.Navigator;
 
@@ -19,72 +21,80 @@ import java.util.List;
 import static model.AppState.isTeacher;
 
 public class HomeController {
+
     private final ClassDetailsService classDetailsService = new ClassDetailsService();
-    @FXML
-    private Label nameLabel;
-    @FXML
-    private Label subtitleLabel;
+    private final QuizService quizService = new QuizService();
 
-    @FXML
-    private StackPane latestClassHolder;
+    @FXML private Label nameLabel;
+    @FXML private Label subtitleLabel;
 
-    @FXML
-    private VBox latestQuizSection;
+    @FXML private StackPane latestClassHolder;
+
+    @FXML private VBox latestQuizSection;
+
+    @FXML private QuizCardController latestQuizCardController;
+
+    private Quiz latestQuiz; // keep latest quiz for click
 
     @FXML
     private void initialize() {
-        //AppState.seedDemoIfNeeded();
-        //boolean isTeacher = AppState.isTeacher();
         User user = AppState.currentUser.get();
-        boolean isTeacher = AppState.currentUser.get().isTeacher();
+        if (user == null) return;
 
-        // header text
-        //nameLabel.setText(isTeacher ? "Teacher" : "Student");
+        boolean teacher = user.isTeacher();
+
         nameLabel.setText(user.getFirstName() + "!");
-        subtitleLabel.setText(isTeacher ? "Manage your classes" : "Let's start learning");
+        subtitleLabel.setText(teacher ? "Manage your classes" : "Let's start learning");
 
         // hide quiz section for teacher
-        latestQuizSection.setVisible(!isTeacher);
-        latestQuizSection.setManaged(!isTeacher);
+        latestQuizSection.setVisible(!teacher);
+        latestQuizSection.setManaged(!teacher);
 
         renderLatestClass();
+        if (!teacher) {
+            renderLatestQuiz();
+        }
     }
 
     private void renderLatestClass() {
         latestClassHolder.getChildren().clear();
+
         User user = AppState.currentUser.get();
-        //if (AppState.demoClasses.isEmpty()) return;
-        //AppState.ClassItem c = AppState.demoClasses.get(0); // latest class demo
+        if (user == null || user.getUserId() == null) return;
+
         List<ClassModel> classes = classDetailsService.getClassesOfUser(user.getUserId());
         if (classes.isEmpty()) return;
-        // sort newest first
+
         classes.sort((a, b) -> b.getClassId() - a.getClassId());
         ClassModel cd = classes.getFirst();
+
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/components/class_card.fxml"));
             Node node = loader.load();
             ClassCardController ctrl = loader.getController();
-            // progress
+
             StudyService studyService = new StudyService();
             double progress = 0.0;
+
             if (!user.isTeacher()) {
                 int totalLearned = 0;
                 int totalCards = 0;
                 for (FlashcardSet set : cd.getFlashcardSets()) {
                     totalLearned += (int) (studyService.getProgressPercent(user, set) * set.getCards().size());
-                    totalCards += set.getCards().size(); }
+                    totalCards += set.getCards().size();
+                }
                 progress = (totalCards == 0) ? 0.0 : (double) totalLearned / totalCards;
             }
-            // Set cards UI
+
             if (user.isTeacher()) {
-                ctrl.setTeacherCard( cd.getClassName(), cd.getStudents().size(), cd.getFlashcardSets().size(), progress );
+                ctrl.setTeacherCard(cd.getClassName(), cd.getStudents().size(), cd.getFlashcardSets().size(), progress);
             } else {
-                ctrl.setStudentCard( cd.getClassName(), cd.getTeacherName(), progress ); }
+                ctrl.setStudentCard(cd.getClassName(), cd.getTeacherName(), progress);
+            }
 
             node.setOnMouseClicked(e -> {
                 AppState.selectedClass.set(cd);
-                if (isTeacher()) Navigator.go(AppState.Screen.CLASSES);
-                else Navigator.go(AppState.Screen.CLASSES);
+                Navigator.go(AppState.Screen.CLASSES);
             });
 
             latestClassHolder.getChildren().add(node);
@@ -93,34 +103,41 @@ public class HomeController {
         }
     }
 
+    private void renderLatestQuiz() {
+        User user = AppState.currentUser.get();
+        if (user == null || user.getUserId() == null) return;
+
+        List<Quiz> quizzes = quizService.getQuizzesByUser(user.getUserId());
+        if (quizzes == null || quizzes.isEmpty()) {
+            latestQuiz = null;
+            return;
+        }
+
+        quizzes.sort((a, b) -> b.getQuizId() - a.getQuizId());
+        latestQuiz = quizzes.getFirst();
+
+        if (latestQuizCardController != null) {
+            latestQuizCardController.setQuiz(latestQuiz);
+        }
+    }
+
     @FXML
     private void onLatestQuizClicked(MouseEvent event) {
-        // Teacher has no quiz section
         if (isTeacher()) return;
 
-        if (AppState.myQuizzes.isEmpty()) {
+        if (latestQuiz == null) {
             Navigator.go(AppState.Screen.QUIZZES);
             return;
         }
 
-        // Pick the latest quiz
-        List<Quiz> quizzes = AppState.myQuizzes;
-        // sort newest first
-        quizzes.sort((a, b) -> b.getQuizId() - a.getQuizId());
-        AppState.selectedQuiz.set(quizzes.getFirst());
+        AppState.selectedQuiz.set(latestQuiz);
 
-        // Reset quiz session state
         AppState.quizQuestionIndex.set(0);
         AppState.quizPoints.set(0);
         AppState.quizAnswers.clear();
         AppState.quizCorrectMap.clear();
 
-        // Keep menu highlight correct
         AppState.navOverride.set(AppState.NavItem.QUIZZES);
-
-        // Go detail
         Navigator.go(AppState.Screen.QUIZ_DETAIL);
     }
-
-
 }

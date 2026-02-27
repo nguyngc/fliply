@@ -61,7 +61,7 @@
                             <StackPane fx:id="latestQuizCardWrapper"
                                        onMouseClicked="#onLatestQuizClicked"
                                        style="-fx-cursor: hand;">
-                                <fx:include source="../components/quiz_card.fxml"/>
+                                <fx:include fx:id="latestQuizCard" source="../components/quiz_card.fxml"/>
                             </StackPane>
                         </VBox>
 
