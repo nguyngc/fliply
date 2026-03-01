@@ -15,7 +15,7 @@ RUN apt-get update && apt-get install -y \
     libxrender1 \
     libxtst6 \
     libxi6 \
-    libgl1-mesa-glx \
+    libgl1 \
     libgl1-mesa-dri \
     wget \
     unzip \
@@ -34,4 +34,5 @@ COPY --from=build /app/target/*.jar app.jar
 
 # Run JavaFX with module-path
 CMD ["java", "--module-path", "/opt/javafx/lib", "--add-modules", "javafx.controls,javafx.fxml", "-jar", "app.jar"]
+
 
