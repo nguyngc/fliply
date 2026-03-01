@@ -30,9 +30,9 @@ RUN wget https://download2.gluonhq.com/openjfx/21.0.1/openjfx-21.0.1_linux-x64_b
 WORKDIR /app
 
 # Copy JAR from build stage
-COPY --from=build /app/target/*.jar app.jar
+COPY --from=build /app/target/fliply-1.0-SNAPSHOT.jar app.jar
 
 # Run JavaFX with module-path
-CMD ["java", "--module-path", "/opt/javafx/lib", "--add-modules", "javafx.controls,javafx.fxml", "-jar", "app.jar"]
+CMD ["java", "--module-path", "/opt/javafx/lib", "--add-modules", "javafx.controls,javafx.fxml", "--add-opens", "java.base/java.lang=ALL-UNNAMED", "-jar", "app.jar"]
 
 
