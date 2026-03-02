@@ -81,6 +81,11 @@ pipeline {
             }
         }
     }
+    environment {
+        DB_URL = "jdbc:mariadb://localhost:3306/fliply"
+        DB_USER = "appuser"
+        DB_PASS = "password"
+    }
 
     post {
         always {
