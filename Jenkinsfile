@@ -46,12 +46,13 @@ pipeline {
 
         stage('Test') {
             steps {
-                bat """
-                    mvn -Dtest=*DaoTest,*ServiceTest,*RepositoryTest test ^
-                    -Djakarta.persistence.jdbc.url=${env.DB_URL} ^
-                    -Djakarta.persistence.jdbc.user=${env.DB_USER} ^
-                    -Djakarta.persistence.jdbc.password=${env.DB_PASS} ^
-                    """
+               bat """
+                    set DB_URL=${env.DB_URL}
+                    set DB_USER=${env.DB_USER}
+                    set DB_PASS=${env.DB_PASS}
+                    mvn -Dtest=*DaoTest,*ServiceTest,*RepositoryTest test
+                """
+
             }
         }
 
