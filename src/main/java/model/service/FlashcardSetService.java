@@ -30,4 +30,14 @@ public class FlashcardSetService {
             setDao.update(set);
         }
     }
+
+    public FlashcardSet getSetWithCards(int setId) {
+        return setDao.findWithCards(setId);
+    }
+
+    public void deleteSet(FlashcardSet set) {
+        if (set != null && set.getFlashcardSetId() != null) {
+            setDao.delete(set);
+        }
+    }
 }

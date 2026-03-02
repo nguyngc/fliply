@@ -10,13 +10,15 @@ import javafx.scene.layout.GridPane;
 import model.AppState;
 import model.entity.Flashcard;
 import model.entity.FlashcardSet;
+import model.service.FlashcardSetService;
 import view.Navigator;
 
 import java.io.IOException;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 
 public class FlashcardSetController {
-    @SuppressWarnings("unused")
+
     @FXML
     private Parent header;
     @FXML
@@ -24,40 +26,35 @@ public class FlashcardSetController {
     @FXML
     private GridPane termGrid;
 
-    private Collection<Flashcard> setCards;
+    private List<Flashcard> setCards;
+
+    private final FlashcardSetService flashcardSetService = new FlashcardSetService();
 
     @FXML
     private void initialize() {
-        FlashcardSet set = AppState.selectedFlashcardSet.get();
-        if (set == null) {
-            Navigator.go(AppState.Screen.CLASS_DETAIL);
-            return;
-        }
-
-        // Use live collection from selected set
-        setCards = set.getCards();
-
+        FlashcardSet set = flashcardSetService.getSetWithCards( AppState.selectedFlashcardSet.get().getFlashcardSetId() );
+        setCards = new ArrayList<>(set.getCards());
+        // Header
         if (headerController != null) {
             headerController.setTitle(set.getSubject());
-            headerController.setSubtitle("Total: " + (setCards == null ? 0 : setCards.size()));
+            headerController.setSubtitle("Total: " + setCards.size());
             headerController.setBackVisible(true);
             headerController.setOnBack(() -> Navigator.go(AppState.Screen.CLASS_DETAIL));
         }
 
         // For detail header
         AppState.detailHeaderTitle.set(set.getSubject());
-        AppState.detailHeaderSubtitle.set("Total: " + (setCards == null ? 0 : setCards.size()));
+        AppState.detailHeaderSubtitle.set("Total: " + setCards.size());
 
         renderGrid();
     }
 
     private void renderGrid() {
         termGrid.getChildren().clear();
-        if (setCards == null || setCards.isEmpty()) return;
 
-        int i = 0;
-        for (Flashcard item : setCards) {
+        for (int i = 0; i < setCards.size(); i++) {
             int index = i;
+            Flashcard item = setCards.get(i);
 
             Node tile = loadTile(item.getTerm(), false, () -> {
                 AppState.currentDetailList.setAll(setCards);
@@ -72,7 +69,6 @@ public class FlashcardSetController {
             int col = i % 2;
             int row = i / 2;
             termGrid.add(tile, col, row);
-            i++;
         }
     }
 
