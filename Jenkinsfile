@@ -28,7 +28,7 @@ pipeline {
 
         stage('Wait for DB') {
             steps {
-                bat "ping 127.0.0.1 -n 20 >nul"
+                bat "ping 127.0.0.1 -n 40 >nul"
             }
         }
 
