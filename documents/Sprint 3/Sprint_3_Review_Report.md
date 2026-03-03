@@ -20,9 +20,13 @@ The goal of Sprint 3 was to extend the existing prototype, set up and demonstrat
 3. Demo Summary
 During the Sprint Review, the team demonstrated:
 - A fully working prototype with newly extended features.
-- The Jenkins CI/CD pipeline running end-to-end: build → test → coverage report generation.
-- The updated code coverage report, highlighting well-tested areas and parts needing further improvement.
+- The Jenkins CI/CD pipeline running end-to-end: build → test → coverage report generation.  
+  ![jenkins.png](image/jenkins.png)
+- The updated code coverage report, highlighting well-tested areas and parts needing further improvement.  
+  ![jacoco.png](image/jacoco.png)
 - A working Docker image running locally, confirming the application operates correctly inside a container.
+  ![dockerHub.png](image/dockerHub.png)
+  ![UI.png](image/UI.png)
 - Updated GitHub and Trello/Jira boards showing the progress made during Sprint 3.
 
 ---
