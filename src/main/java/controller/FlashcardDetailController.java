@@ -4,11 +4,13 @@ import controller.components.FlashcardFlipCardController;
 import controller.components.HeaderController;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import model.AppState;
 import model.entity.Flashcard;
 import model.entity.FlashcardSet;
+import model.service.FlashcardService;
 import view.Navigator;
 
 import java.util.ArrayList;
@@ -18,6 +20,8 @@ public class FlashcardDetailController {
 
     private final List<Flashcard> cards = new ArrayList<>();
     private int index = 0;
+
+    private final FlashcardService flashcardService = new FlashcardService();
 
     @FXML
     private Parent header;
@@ -47,15 +51,8 @@ public class FlashcardDetailController {
             index = clamp(AppState.currentDetailIndex.get(), 0, cards.size() - 1);
         }
 
-        // Header
-        String title = AppState.detailHeaderTitle.get();
-        String subtitle = AppState.detailHeaderSubtitle.get();
-
         if (headerController != null) {
             headerController.setBackVisible(true);
-
-            if (title != null && !title.isBlank()) headerController.setTitle(title);
-
             headerController.setSubtitle("Total: " + cards.size());
 
             if (isFromFlashcardSet) {
@@ -66,12 +63,12 @@ public class FlashcardDetailController {
                 headerController.setActionsVisible(true);
 
                 headerController.setOnEdit(() -> {
-                    // Edit the currently shown card in the master list
-                    int idx = index; // index in cards list
+                    if (cards.isEmpty()) return;
+
+                    int idx = index;
                     AppState.editingIndex.set(idx);
                     AppState.flashcardFormMode.set(AppState.FormMode.EDIT);
 
-                    // Pre-fill via selectedTerm/Definition (or read directly from list)
                     Flashcard c = cards.get(idx);
                     AppState.selectedTerm.set(c.getTerm());
                     AppState.selectedDefinition.set(c.getDefinition());
@@ -88,36 +85,41 @@ public class FlashcardDetailController {
 
                     Flashcard toRemove = cards.get(idx);
 
-                    // Always remove from the current detail list first
+                    // Delete in DB first
+                    try {
+                        flashcardService.delete(toRemove);
+                    } catch (Exception ex) {
+                        Alert a = new Alert(Alert.AlertType.ERROR,
+                                "Delete failed. Could not delete flashcard from database.");
+                        a.showAndWait();
+                        return;
+                    }
+
+                    // Remove from state lists
                     if (idx >= 0 && idx < AppState.currentDetailList.size()) {
                         AppState.currentDetailList.remove(idx);
                     }
 
-                    // If this card belongs to a selected flashcard set, remove it from there as well
                     FlashcardSet selectedSet = AppState.selectedFlashcardSet.get();
-                    if (selectedSet != null && selectedSet.getCards().contains(toRemove)) {
+                    if (selectedSet != null) {
                         selectedSet.getCards().remove(toRemove);
                     }
 
-                    // Also remove from global myFlashcards if present
                     AppState.myFlashcards.remove(toRemove);
 
-                    // Update local cards list and index
+                    // Refresh local list + UI
                     cards.clear();
                     cards.addAll(AppState.currentDetailList);
 
                     if (cards.isEmpty()) {
-                        // go back to list
                         AppState.navOverride.set(AppState.NavItem.FLASHCARDS);
                         Navigator.go(AppState.Screen.FLASHCARDS);
                         return;
                     }
 
-                    // clamp index and persist the currentDetailIndex
                     index = clamp(idx, 0, cards.size() - 1);
                     AppState.currentDetailIndex.set(index);
 
-                    // refresh UI
                     render();
                     updateNavButtons();
                 });
@@ -178,5 +180,4 @@ public class FlashcardDetailController {
         if (max < min) return min;
         return Math.max(min, Math.min(max, v));
     }
-
 }

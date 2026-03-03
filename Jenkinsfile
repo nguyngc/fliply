@@ -1,5 +1,10 @@
 pipeline {
     agent any
+    environment {
+            DB_URL = "jdbc:mariadb://localhost:3306/fliply"
+            DB_USER = "appuser"
+            DB_PASS = "password"
+        }
 
     stages {
 
@@ -23,7 +28,7 @@ pipeline {
 
         stage('Wait for DB') {
             steps {
-                bat "ping 127.0.0.1 -n 10 > nul"
+                bat "ping 127.0.0.1 -n 40 >nul"
             }
         }
 
@@ -35,16 +40,21 @@ pipeline {
 
         stage('Build') {
             steps {
-                bat 'mvn clean install'
+                bat 'mvn clean install -DskipTests'
             }
         }
 
-        stage('Test') {
-            steps {
-                bat 'mvn -Dtest=*DaoTest,*ServiceTest,*RepositoryTest test'
-            }
-        }
-
+      stage('Test') {
+        steps {
+            bat """
+set DB_URL=${env.DB_URL} && ^
+set DB_USER=${env.DB_USER} && ^
+set DB_PASS=${env.DB_PASS} && ^
+mvn -DDB_URL=%DB_URL% -DDB_USER=%DB_USER% -DDB_PASS=%DB_PASS% -Dtest=*DaoTest,*ServiceTest,*RepositoryTest test
+        """
+    }
+}
+        
         stage('Code Coverage') {
             steps {
                 bat 'mvn jacoco:report'
@@ -81,6 +91,7 @@ pipeline {
             }
         }
     }
+
 
     post {
         always {

@@ -3,17 +3,24 @@ package controller;
 import controller.components.HeaderController;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import model.AppState;
 import model.entity.Flashcard;
 import model.service.FlashcardService;
+import model.service.FlashcardSetService;
 import view.Navigator;
 import model.entity.FlashcardSet;
 import model.entity.User;
 
+import java.util.List;
+
 
 public class FlashcardFormController {
+
+    @FXML
+    private ComboBox<FlashcardSet> subjectCombo;
 
     @FXML
     private Parent header;
@@ -26,9 +33,19 @@ public class FlashcardFormController {
     private TextArea definitionArea;
 
     private final FlashcardService flashcardService =  new FlashcardService();
+    private final FlashcardSetService flashcardSetService =  new FlashcardSetService();
 
     @FXML
     private void initialize() {
+        List<FlashcardSet> sets = flashcardSetService.getAllSets();
+        subjectCombo.getItems().setAll(sets);
+
+        // EDIT MODE
+        if (AppState.flashcardFormMode.get() == AppState.FormMode.EDIT) {
+            subjectCombo.getSelectionModel().select(AppState.selectedFlashcardSet.get());
+        }
+
+
         if (headerController != null) {
             headerController.setBackVisible(true);
             headerController.setOnBack(() -> {
@@ -63,7 +80,7 @@ public class FlashcardFormController {
 
         if (term.isBlank()) return;
 
-        FlashcardSet set = AppState.selectedFlashcardSet.get();
+        FlashcardSet set = subjectCombo.getSelectionModel().getSelectedItem();
         User user = AppState.currentUser.get();
 
         if (set == null || user == null) return;
@@ -77,8 +94,11 @@ public class FlashcardFormController {
 
                 card.setTerm(term);
                 card.setDefinition(def);
+                card.setFlashcardSet(set);
 
                 flashcardService.update(card);
+
+                AppState.currentDetailList.set(idx, card);
             }
 
         } else {
@@ -86,17 +106,15 @@ public class FlashcardFormController {
             Flashcard newCard = new Flashcard(term, def, set, user);
             flashcardService.save(newCard);
 
-            // Keep all lists in sync: current detail list, the selected set's card list, and global list
-            AppState.currentDetailList.add(newCard);
-            if (set != null) {
-                set.getCards().add(newCard);
-            }
             AppState.myFlashcards.add(newCard);
         }
 
-        // After save -> back to list
-        //AppState.navOverride.set(AppState.NavItem.FLASHCARDS);
-        Navigator.go(AppState.Screen.FLASHCARDS);
+        // navigate
+        if (AppState.isFromFlashcardSet.get()) {
+            Navigator.go(AppState.Screen.FLASHCARD_SET);
+        } else {
+            Navigator.go(AppState.Screen.FLASHCARDS);
+        }
     }
 
     @FXML

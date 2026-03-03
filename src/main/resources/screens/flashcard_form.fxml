@@ -22,6 +22,18 @@
                         <Insets top="18" right="18" bottom="18" left="18"/>
                     </padding>
 
+                    <ComboBox fx:id="subjectCombo"
+                              promptText="Subject"
+                              maxWidth="Infinity"
+                              prefHeight="42"
+                              style="-fx-background-color: white;
+                                      -fx-background-radius: 14;
+                                      -fx-border-color: rgba(31,31,57,0.20);
+                                      -fx-border-radius: 10;
+                                      -fx-padding: 10 15;
+                                      -fx-font-size: 14px;"/>
+
+
                     <Label text="Term"
                            style="-fx-font-size: 14px; -fx-text-fill: #8C8C8C;"/>
 

@@ -38,4 +38,8 @@ public class FlashcardService {
     public void save(Flashcard newCard) {
         flashDao.persist(newCard);
     }
+
+    public List<Flashcard> getFlashcardsByUser(int userId) {
+        return flashDao.findByUserId(userId);
+    }
 }

@@ -41,12 +41,9 @@ public class FlashcardSet {
 
     @Override
     public String toString() {
-        return "FlashcardSet{" +
-                "flashcardSetId=" + flashcardSetId +
-                ", subject='" + subject + '\'' +
-                ", classId=" + (classModel != null ? classModel.getClassId() : null) +
-                '}';
+        return subject;
     }
+
 
 
 

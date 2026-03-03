@@ -90,4 +90,13 @@ public class FlashcardSetDao {
             return query.getSingleResult() > 0;
         }
     }
+
+public FlashcardSet findWithCards(int id) {
+    try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+        return em.createQuery(
+                "SELECT s FROM FlashcardSet s LEFT JOIN FETCH s.cards WHERE s.flashcardSetId = :id",
+                FlashcardSet.class
+        ).setParameter("id", id).getSingleResult();
+    }
+}
 }
