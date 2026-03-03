@@ -97,18 +97,9 @@ class FlashcardSetTest {
     @Test
     void testToString() {
         FlashcardSet fs = new FlashcardSet();
-        ClassModel cm = new ClassModel();
-
-        setId(fs, "flashcardSetId", 5);
-        setId(cm, "classId", 20);
-
         fs.setSubject("History");
-        fs.setClassModel(cm);
 
-        String s = fs.toString();
-
-        assertTrue(s.contains("flashcardSetId=5"));
-        assertTrue(s.contains("subject='History'"));
-        assertTrue(s.contains("classId=20"));
+        assertEquals("History", fs.toString());
     }
+
 }
