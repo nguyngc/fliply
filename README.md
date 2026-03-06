@@ -50,12 +50,12 @@ src/
 │  │  ├─ view/
 │  │  ├─ util/
 │  │  └─ Main.java
-│  └─ resources/
-│     ├─ META-INF/
-│     │  └─ persistence.xml
-│     └─ sql/
-│        ├─ db_fliply.sql
-│        └─ seed.sql
+│  ├─ resources/
+│  │  └─ META-INF/
+│  │     └─ persistence.xml
+│  └─ sql/
+│     ├─ db_fliply.sql
+│     └─ seed.sql
 ├─ test/
 Dockerfile
 Jenkinsfile
@@ -84,9 +84,7 @@ The project uses JPA with Hibernate and MariaDB.
 1. Make sure MariaDB is installed and running.
 2. Create a database named `fliply`.
 3. Create the user `appuser` and give it access to the `fliply` database.
-4. Run the SQL scripts in `src/main/resources/sql/` if needed:
-   - `db_fliply.sql`
-   - `seed.sql`
+4. Run the SQL scripts in `src/main/sql/` as needed (run `db_fliply.sql` to recreate the schema, then `seed.sql` to populate sample data).
 
 Example SQL:
 
@@ -96,6 +94,18 @@ CREATE USER 'appuser'@'localhost' IDENTIFIED BY 'password';
 GRANT ALL PRIVILEGES ON fliply.* TO 'appuser'@'localhost';
 FLUSH PRIVILEGES;
 ```
+
+## Authentication Flow
+Fliply now authenticates users with email and password credentials (Google Sign-In has been removed). Create accounts through the UI or by running the database scripts in `src/main/sql/` (`db_fliply.sql` resets the schema, `seed.sql` inserts the sample accounts below):
+
+| Role     | Email                   | Password |
+|----------|-------------------------|----------|
+| Teacher  | teacher1@example.com    | 123      |
+| Teacher  | teacher2@example.com    | 123      |
+| Student  | student1@example.com    | 123      |
+| Student  | student2@example.com    | 123      |
+
+Run `db_fliply.sql` followed by `seed.sql` whenever you need a clean database that already contains these starter accounts, and update the passwords immediately after first login if you retain these seed accounts in any shared environment.
 
 ## Build the Project
 ``` mvn clean install```
@@ -134,8 +144,3 @@ The project uses the Maven Shade Plugin and the main class is `Main`.
 
 ### Important
 Because Fliply is a JavaFX desktop application, running it in Docker may require an X server or GUI forwarding on your machine.
-
-
-
-
-
