@@ -51,11 +51,17 @@
                    style="-fx-text-fill: #8C8C8C; -fx-font-size: 14px; -fx-font-weight: 400;"/>
         </VBox>
 
+        <!-- (hidden) -->
         <Label fx:id="progressTextLabel"
+               visible="false"
+               managed="false"
                text="60% Completed"
                style="-fx-text-fill: #3D8FEF; -fx-font-size: 12px; -fx-font-weight: 400;"/>
 
+        <!-- Progress bar (hidden) -->
         <ProgressBar fx:id="progressBar"
+                     visible="false"
+                     managed="false"
                      progress="0.6"
                      prefWidth="210"
                      style="-fx-accent: #3D8FEF;"
