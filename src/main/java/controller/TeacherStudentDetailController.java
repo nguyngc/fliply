@@ -92,8 +92,7 @@ public class TeacherStudentDetailController {
         HBox.setHgrow(left, Priority.ALWAYS);
         top.getChildren().addAll(left);
 
-        //Label right = new Label((int) Math.round(progress * 100) + "% Completed");
-        Label right = new Label("% Completed will be implemented later");
+        Label right = new Label((int) Math.round(progress * 100) + "% Completed");
         right.setStyle("-fx-font-size: 12px; -fx-font-weight: 500; -fx-text-fill: #3D8FEF;");
 
         ProgressBar bar = new ProgressBar(progress);
