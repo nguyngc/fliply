@@ -20,7 +20,7 @@ pipeline {
                     -e MARIADB_DATABASE=fliply ^
                     -e MARIADB_USER=appuser ^
                     -e MARIADB_PASSWORD=password ^
-                    -p 3306:3306 ^
+                    -p 3307:3306 ^
                     --name mariadb_test mariadb:10.6
                 '''
             }
