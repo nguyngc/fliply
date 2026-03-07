@@ -12,6 +12,8 @@ Fliply is an online flashcard learning application for students and teachers. Th
 - Classroom management
 - Progress tracking
 - Statistics
+
+
 ## Diagrams
 ### Use Case Diagram
 
@@ -19,11 +21,11 @@ Fliply is an online flashcard learning application for students and teachers. Th
 
 ### ER Diagram
 
-![ER Diagram](documents/Diagrams/ER Diagram.png)
+![ER Diagram](documents/Diagrams/ERDiagram.png)
 
 ### Relational Schema
 
-![Relational Schema](documents/Diagrams/Relational Schema.png)
+![Relational Schema](documents/Diagrams/RelationalSchema.png)
 ## Technologies Used
 - Java 21
 - JavaFX
@@ -40,6 +42,11 @@ Fliply is an online flashcard learning application for students and teachers. Th
 ```
 git clone https://github.com/nguyngc/fliply.git
 ```
+## Trello Board
+[https://trello.com/w/sep1_group3/home](https://trello.com/w/sep1_group3/home)
+
+## Figma Design
+[Fliply Prototype](https://www.figma.com/proto/vr1e9M1MRVlRu9v6x4GVHH/Untitled?node-id=1-2&p=f&t=KOn9wktxFwEu72ek-0&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=1%3A2&show-proto-sidebar=1)
 
 ## Project Structure
 ```text
@@ -48,6 +55,7 @@ src/
 │  ├─ java/
 │  │  ├─ model/
 │  │  ├─ view/
+│  │  ├─ controller/
 │  │  ├─ util/
 │  │  └─ Main.java
 │  ├─ resources/
