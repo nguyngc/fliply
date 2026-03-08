@@ -53,6 +53,7 @@ public class FlashcardDetailController {
 
         if (headerController != null) {
             headerController.setBackVisible(true);
+            headerController.setTitle(AppState.detailHeaderTitle.get());
             headerController.setSubtitle("Total: " + cards.size());
 
             if (isFromFlashcardSet) {
