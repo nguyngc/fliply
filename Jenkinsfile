@@ -13,7 +13,6 @@ pipeline {
         DOCKERHUB_CREDENTIALS_ID = 'DockerID'
         DOCKERHUB_REPO = 'nguyngc/fliply'
         DOCKER_IMAGE_TAG = 'latest'
-        DOCKER_BIN = '/usr/local/bin/docker'
     }
 
     stages {
@@ -84,10 +83,13 @@ pipeline {
         }
 
         stage('Build Docker Image') {
+            environment {
+                PATH = "/usr/local/bin:/opt/homebrew/bin:${env.PATH}"
+            }
             steps {
                 script {
                     if (isUnix()) {
-                        sh "${DOCKER_BIN} build --platform linux/amd64 -t ${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG} ."
+                        sh "${docker build --platform linux/amd64 -t ${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG} ."
                     } else {
                         bat "docker build -t ${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG} ."
                     }
@@ -96,13 +98,16 @@ pipeline {
         }
 
         stage('Push Docker Image') {
+            environment {
+                PATH = "/usr/local/bin:/opt/homebrew/bin:${env.PATH}"
+            }
             steps {
                 script {
                     if (isUnix()) {
                         withCredentials([usernamePassword(credentialsId: DOCKERHUB_CREDENTIALS_ID, usernameVariable: 'DH_USER', passwordVariable: 'DH_PASS')]) {
                             sh '''
-                                echo "$DH_PASS" | ${DOCKER_BIN} login -u "$DH_USER" --password-stdin
-                                ${DOCKER_BIN} push ${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}
+                                echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
+                                docker push ${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}
                             '''
                         }
                     } else {
@@ -115,6 +120,9 @@ pipeline {
         }
 
         stage('Deploy') {
+            environment {
+                PATH = "/usr/local/bin:/opt/homebrew/bin:${env.PATH}"
+            }
             steps {
                 script {
                     if (isUnix()) {
@@ -130,7 +138,7 @@ DOCKERHUB_REPO=${DOCKERHUB_REPO}
 IMAGE_TAG=${DOCKER_IMAGE_TAG}
 HOST_DB_PORT=3307
 EOF
-                                ${DOCKER_BIN} compose --env-file .env up -d --remove-orphans
+                                docker compose --env-file .env up -d --remove-orphans
                             '''
                         }
                     } else {
