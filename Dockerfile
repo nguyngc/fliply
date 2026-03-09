@@ -32,7 +32,13 @@ WORKDIR /app
 # Copy JAR from build stage
 COPY --from=build /app/target/fliply-1.0-SNAPSHOT.jar app.jar
 
+ENV DISPLAY=host.docker.internal:0
+ENV DB_HOST=host.docker.internal
+ENV DB_PORT=3306
+ENV DB_NAME=fliply
+ENV DB_USER=appuser
+ENV DB_PASS=password
+
 # Run JavaFX with module-path
 CMD ["java", "--module-path", "/opt/javafx/lib", "--add-modules", "javafx.controls,javafx.fxml", "--add-opens", "java.base/java.lang=ALL-UNNAMED", "-jar", "app.jar"]
-
 

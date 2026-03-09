@@ -42,8 +42,6 @@ public class FlashcardsController {
         if (headerController != null) {
             headerController.setTitle("My Flashcards");
             headerController.setSubtitle("Total: " + AppState.myFlashcards.size());
-            headerController.setBackVisible(true);
-            headerController.setOnBack(() -> Navigator.go(AppState.Screen.HOME));
         }
 
         renderGrid();
