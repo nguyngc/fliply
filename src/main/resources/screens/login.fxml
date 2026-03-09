@@ -36,7 +36,7 @@
 
                     <Label fx:id="errorLabel"
                            textFill="red"
-                           style="-fx-font-size: 12px;"
+                           style="-fx-text-fill: #FF0000;-fx-font-size: 12px;"
                            visible="false"/>
 
                 </VBox>
