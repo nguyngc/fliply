@@ -152,14 +152,12 @@ EOF
 
     post {
         always {
-            steps {
-                script {
-                    if (isUnix()) {
-                        sh 'rm -f .env'
-                    } else {
-                        // Cleanup container
-                        bat 'docker rm -f mariadb_test 2>nul || exit 0'
-                    }
+            script {
+                if (isUnix()) {
+                    sh 'rm -f .env'
+                } else {
+                    // Cleanup container
+                    bat 'docker rm -f mariadb_test 2>nul || exit 0'
                 }
             }
         }
