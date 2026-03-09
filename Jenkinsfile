@@ -1,63 +1,72 @@
 pipeline {
     agent any
+    tools {
+        maven 'Maven 3.9.12'
+    }
+
     environment {
-            DB_URL = "jdbc:mariadb://localhost:3306/fliply"
-            DB_USER = "appuser"
-            DB_PASS = "password"
-        }
+        DB_HOST = "localhost"
+        DB_PORT = "3306"
+        DB_NAME = "fliply"
+        DB_USER = "appuser"
+        DB_PASS = "password"
+        DOCKERHUB_CREDENTIALS_ID = 'DockerID'
+        DOCKERHUB_REPO = 'nguyngc/fliply'
+        DOCKER_IMAGE_TAG = 'latest'
+    }
 
     stages {
-
-        stage('Start MariaDB') {
-            steps {
-                // delete if exist
-                bat 'docker rm -f mariadb_test 2>nul || exit 0'
-
-                // run new container
-                bat '''
-                    docker run -d ^
-                    -e MARIADB_ROOT_PASSWORD=root ^
-                    -e MARIADB_DATABASE=fliply ^
-                    -e MARIADB_USER=appuser ^
-                    -e MARIADB_PASSWORD=password ^
-                    -p 3306:3306 ^
-                    --name mariadb_test mariadb:10.6
-                '''
-            }
-        }
-
-        stage('Wait for DB') {
-            steps {
-                bat "ping 127.0.0.1 -n 40 >nul"
-            }
-        }
-
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/nguyngc/fliply.git'
+                git branch: 'main',
+                url: 'https://github.com/nguyngc/fliply.git'
             }
         }
 
         stage('Build') {
             steps {
-                bat 'mvn clean install -DskipTests'
+                script {
+                    if (isUnix()) {
+                        sh 'mvn clean package -DskipTests'
+                    } else {
+                        bat 'mvn clean install -DskipTests'
+                    }
+                }
             }
         }
 
-      stage('Test') {
-        steps {
-            bat """
-set DB_URL=${env.DB_URL} && ^
-set DB_USER=${env.DB_USER} && ^
-set DB_PASS=${env.DB_PASS} && ^
-mvn -DDB_URL=%DB_URL% -DDB_USER=%DB_USER% -DDB_PASS=%DB_PASS% -Dtest=*DaoTest,*ServiceTest,*RepositoryTest test
-        """
-    }
-}
+        stage('Test') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        sh '''
+                            mvn -DDB_HOST=${DB_HOST} -DDB_PORT=${DB_PORT} -DDB_NAME=${DB_NAME} \
+                                -DDB_USER=${DB_USER} -DDB_PASS=${DB_PASS} \
+                                -Dtest=*DaoTest,*ServiceTest,*RepositoryTest test
+                        '''
+                    } else {
+                        bat """
+                        set DB_HOST=${env.DB_HOST} && ^
+                        set DB_PORT=${env.DB_PORT} && ^
+                        set DB_NAME=${env.DB_NAME} && ^
+                        set DB_USER=${env.DB_USER} && ^
+                        set DB_PASS=${env.DB_PASS} && ^
+                        mvn -DDB_HOST=%DB_HOST% -DDB_PORT=%DB_PORT% -DDB_NAME=%DB_NAME% -DDB_USER=%DB_USER% -DDB_PASS=%DB_PASS% -Dtest=*DaoTest,*ServiceTest,*RepositoryTest test
+                                """
+                    }
+                }
+            }
+        }
         
         stage('Code Coverage') {
             steps {
-                bat 'mvn jacoco:report'
+                script {
+                    if (isUnix()) {
+                        sh 'mvn jacoco:report'
+                    } else {
+                        bat 'mvn jacoco:report'
+                    }
+                }
             }
         }
 
@@ -76,7 +85,11 @@ mvn -DDB_URL=%DB_URL% -DDB_USER=%DB_USER% -DDB_PASS=%DB_PASS% -Dtest=*DaoTest,*S
         stage('Build Docker Image') {
             steps {
                 script {
-                    dockerImage = docker.build("thanh0201/fliply:latest")
+                    if (isUnix()) {
+                        sh "docker build --platform linux/amd64 -t ${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG} ."
+                    } else {
+                        bat "docker build -t ${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG} ."
+                    }
                 }
             }
         }
@@ -84,8 +97,43 @@ mvn -DDB_URL=%DB_URL% -DDB_USER=%DB_USER% -DDB_PASS=%DB_PASS% -Dtest=*DaoTest,*S
         stage('Push Docker Image') {
             steps {
                 script {
-                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
-                        dockerImage.push()
+                    if (isUnix()) {
+                        withCredentials([usernamePassword(credentialsId: DOCKERHUB_CREDENTIALS_ID, usernameVariable: 'DH_USER', passwordVariable: 'DH_PASS')]) {
+                            sh '''
+                                echo "$DH_PASS" | docker login -u "$DH_USER" --password-stdin
+                                docker push ${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}
+                            '''
+                        }
+                    } else {
+                        docker.withRegistry('https://index.docker.io/v1/', DOCKERHUB_CREDENTIALS_ID) {
+                            docker.image("${DOCKERHUB_REPO}:${DOCKER_IMAGE_TAG}").push()
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                script {
+                    if (isUnix()) {
+                        withCredentials([string(credentialsId: 'fliply-db-pass', variable: 'SECRET_DB_PASS')]) {
+                            sh '''
+                                cat > .env <<EOF
+DB_HOST=${DB_HOST}
+DB_PORT=${DB_PORT}
+DB_NAME=${DB_NAME}
+DB_USER=${DB_USER}
+DB_PASS=${SECRET_DB_PASS}
+DOCKERHUB_REPO=${DOCKERHUB_REPO}
+IMAGE_TAG=${DOCKER_IMAGE_TAG}
+HOST_DB_PORT=3307
+EOF
+                                docker compose --env-file .env up -d --remove-orphans
+                            '''
+                        }
+                    } else {
+                        bat 'echo Deploy stage is currently configured for Unix agents only.'
                     }
                 }
             }
@@ -95,8 +143,12 @@ mvn -DDB_URL=%DB_URL% -DDB_USER=%DB_USER% -DDB_PASS=%DB_PASS% -Dtest=*DaoTest,*S
 
     post {
         always {
-            // Cleanup container
-            bat 'docker rm -f mariadb_test 2>nul || exit 0'
+            if (isUnix()) {
+                sh 'rm -f .env'
+            } else {
+                // Cleanup container
+                bat 'docker rm -f mariadb_test 2>nul || exit 0'
+            }
         }
     }
 }

@@ -1,0 +1,40 @@
+services:
+  db:
+    image: mariadb:11
+    container_name: fliply-db
+    environment:
+      MYSQL_ROOT_PASSWORD: "${DB_PASS}"
+      MYSQL_DATABASE: "${DB_NAME:-fliply}"
+      MYSQL_USER: "${DB_USER:-appuser}"
+      MYSQL_PASSWORD: "${DB_PASS}"
+    ports:
+      - "${HOST_DB_PORT:-3307}:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mariadb-admin ping -h 127.0.0.1 -uroot -p$$MYSQL_ROOT_PASSWORD || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  app:
+    image: ${DOCKERHUB_REPO}:${IMAGE_TAG:-latest}
+    build: .
+    container_name: fliply-app
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_NAME: "${DB_NAME:-fliply}"
+      # make sure your DB_USER name is correct mine is root
+      DB_USER: "${DB_USER:-appuser}"
+      # make sure your DB_PASS is correct mine is root
+      DB_PASS: "${DB_PASS}"
+      JAVA_TOOL_OPTIONS: "-DDB_HOST=db -DDB_PORT=3306 -DDB_NAME=${DB_NAME:-fliply} -DDB_USER=${DB_USER:-appuser} -DDB_PASS=${DB_PASS}"
+      DISPLAY: host.docker.internal:0
+
+volumes:
+  db_data:
