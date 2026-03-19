@@ -66,3 +66,34 @@
 .form-textarea .scroll-pane .viewport {
     -fx-background-color: transparent;
 }
+
+/* Language MenuButton */
+.menu-button {
+    -fx-cursor: hand;
+}
+
+.menu-button .label {
+    -fx-text-fill: #1F1F39;
+}
+
+.menu-button:hover {
+    -fx-background-color: white;
+}
+
+.menu-item {
+    -fx-cursor: hand;
+}
+
+.menu-item .label {
+    -fx-text-fill: #1F1F39;
+}
+
+.menu-item:focused,
+.menu-item:hover {
+    -fx-background-color: #F2F6FF;
+}
+
+.menu-item:focused .label,
+.menu-item:hover .label {
+    -fx-text-fill: #1F1F39;
+}
