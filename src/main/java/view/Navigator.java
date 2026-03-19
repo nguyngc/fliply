@@ -7,6 +7,7 @@ import javafx.stage.Stage;
 import model.AppState;
 
 import java.io.IOException;
+import java.util.ResourceBundle;
 
 public final class Navigator {
 
@@ -22,7 +23,9 @@ public final class Navigator {
     public static void go(AppState.Screen screen) {
         try {
             // Load the screen from FXML resource
-            FXMLLoader loader = new FXMLLoader(Navigator.class.getResource(screen.fxml));
+            FXMLLoader loader = new FXMLLoader(
+                    Navigator.class.getResource(screen.fxml),
+                    ResourceBundle.getBundle("Messages", util.LocaleManager.getLocale()));
             Parent root = loader.load();
 
             // Set up the scene and stage
@@ -39,5 +42,9 @@ public final class Navigator {
         } catch (IOException e) {
             throw new RuntimeException("Failed to load " + screen.fxml, e);
         }
+    }
+
+    public static void reloadCurrent() {
+        go(AppState.currentScreen.get());
     }
 }
