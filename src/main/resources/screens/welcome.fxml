@@ -8,6 +8,9 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
 <VBox xmlns="http://javafx.com/javafx/24.0.1"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="controller.WelcomeController"
@@ -17,38 +20,59 @@
       style="-fx-background-color: #D9F4F1;"
       stylesheets="@../styles/style.css">
 
-    <children>
+    <padding>
+        <Insets top="24" right="24" bottom="50" left="24"/>
+    </padding>
 
-        <VBox alignment="CENTER" spacing="12">
-            <ImageView fitHeight="200.0" fitWidth="322.0" pickOnBounds="true" preserveRatio="true">
-                <image>
-                    <Image url="@../images/welcome_image.png"/>
-                </image>
-            </ImageView>
+    <!-- Top language bar -->
+    <HBox alignment="TOP_RIGHT">
+        <Region HBox.hgrow="ALWAYS"/>
+        <MenuButton fx:id="languageMenuButton"
+                    text="%language.current"
+                    style="-fx-background-color: white; -fx-background-radius: 12; -fx-cursor: hand;">
+            <items>
+                <MenuItem text="English" onAction="#switchToEnglish"/>
+                <MenuItem text="Finnish" onAction="#switchToFinnish"/>
+                <MenuItem text="Korea" onAction="#switchToKorea"/>
+                <MenuItem text="Laos" onAction="#switchToLaos"/>
+                <MenuItem text="Tiếng Việt" onAction="#switchToVietnamese"/>
+            </items>
+        </MenuButton>
+    </HBox>
 
-            <Label styleClass="title-label" text="Fliply"/>
+    <Region prefHeight="100"/>
 
-            <Label styleClass="subtitle-label"
-                   text="Quick and Easy Learning"
-                   textAlignment="CENTER"
-                   wrapText="true"/>
-        </VBox>
+    <VBox alignment="CENTER" spacing="12">
+        <ImageView fitHeight="200.0" fitWidth="322.0" pickOnBounds="true" preserveRatio="true">
+            <image>
+                <Image url="@../images/welcome_image.png"/>
+            </image>
+        </ImageView>
 
-        <HBox alignment="BOTTOM_CENTER" spacing="12">
-            <padding>
-                <Insets top="18"/>
-            </padding>
+        <Label styleClass="title-label" text="%welcome.title"/>
 
-            <Button prefWidth="140.0"
-                    text="Register"
-                    mnemonicParsing="false"
-                    onAction="#goRegister"/>
+        <Label styleClass="subtitle-label"
+               text="%welcome.subtitle"
+               textAlignment="CENTER"
+               wrapText="true"/>
+    </VBox>
 
-            <Button prefWidth="140.0"
-                    text="Login"
-                    mnemonicParsing="false"
-                    onAction="#goLogin"/>
-        </HBox>
+    <HBox alignment="BOTTOM_CENTER" spacing="12">
+        <padding>
+            <Insets top="18"/>
+        </padding>
 
-    </children>
+        <Button prefWidth="140.0"
+                text="%welcome.register"
+                mnemonicParsing="false"
+                onAction="#goRegister"/>
+
+        <Button prefWidth="140.0"
+                text="%welcome.login"
+                mnemonicParsing="false"
+                onAction="#goLogin"/>
+    </HBox>
+
+    <Region prefHeight="150"/>
+
 </VBox>
