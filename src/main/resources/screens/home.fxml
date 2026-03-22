@@ -27,15 +27,17 @@
 
                             <HBox spacing="10">
                                 <Label style="-fx-text-fill: white; -fx-font-size: 40px; -fx-font-weight: 700;"
-                                       text="Hi,"/>
+                                       text="%home.hi"/>
+
+                                <!-- Name is dynamic, set in controller -->
                                 <Label fx:id="nameLabel"
                                        style="-fx-text-fill: white; -fx-font-size: 40px; -fx-font-weight: 700;"
-                                       text="Student"/>
+                                       text=""/>
                             </HBox>
 
                             <Label fx:id="subtitleLabel"
                                    style="-fx-text-fill: rgba(255,255,255,0.92); -fx-font-size: 24px; -fx-font-weight: 400;"
-                                   text="Let’s start learning"/>
+                                   text="%home.subtitle"/>
                         </VBox>
                     </StackPane>
 
@@ -45,7 +47,7 @@
                             <Insets bottom="10" left="20" right="20" top="10"/>
                         </padding>
 
-                        <Label text="Latest Class"
+                        <Label text="%home.latestClass"
                                style="-fx-text-fill: #1F1F39; -fx-font-size: 20px; -fx-font-weight: 500;"/>
 
                         <!-- latest class injected by controller -->
@@ -55,7 +57,7 @@
 
                         <!-- Quiz section hidden for teacher -->
                         <VBox fx:id="latestQuizSection" spacing="10">
-                            <Label text="Latest Quiz"
+                            <Label text="%home.latestQuiz"
                                    style="-fx-text-fill: #1F1F39; -fx-font-size: 20px; -fx-font-weight: 500;"/>
 
                             <StackPane fx:id="latestQuizCardWrapper"

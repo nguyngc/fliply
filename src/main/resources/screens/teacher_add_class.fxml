@@ -20,9 +20,9 @@
                 <Insets top="18" right="18" bottom="18" left="18"/>
             </padding>
 
-            <Label text="Class Code" style="-fx-text-fill: #8C8C8C;"/>
+            <Label text="%addClass.code" style="-fx-text-fill: #8C8C8C;"/>
 
-            <TextField fx:id="classCodeField" promptText="Class Code"
+            <TextField fx:id="classCodeField" promptText="%addClass.code.placeholder"
                        style="-fx-background-color: white;
                               -fx-background-radius: 14;
                               -fx-border-color: rgba(31,31,57,0.20);
@@ -30,7 +30,7 @@
                               -fx-padding: 10 15;"/>
 
             <HBox spacing="14">
-                <Button text="Add" onAction="#onAdd"
+                <Button text="%addClass.code.placeholder" onAction="#onAdd"
                         HBox.hgrow="ALWAYS" maxWidth="Infinity"
                         style="-fx-background-color: #3D8FEF;
                             -fx-text-fill: white;
@@ -39,7 +39,7 @@
                             -fx-font-size: 14px;
                             -fx-padding: 10px 32px 10px 32px"/>
 
-                <Button text="Cancel" onAction="#onCancel"
+                <Button text="%addClass.cancel" onAction="#onCancel"
                         HBox.hgrow="ALWAYS" maxWidth="Infinity"
                         style="-fx-background-color: white;
                             -fx-border-color: #3D8FEF;

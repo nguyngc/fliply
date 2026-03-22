@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="fliply@localhost" uuid="2a5e8b7a-6bb4-437f-96e8-1d2f34f5e089">
+    <data-source source="LOCAL" name="@localhost" uuid="2a5e8b7a-6bb4-437f-96e8-1d2f34f5e089">
       <driver-ref>mariadb</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.mariadb.jdbc.Driver</jdbc-driver>
