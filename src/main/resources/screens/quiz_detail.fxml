@@ -85,7 +85,7 @@
             </HBox>
 
             <Button fx:id="viewResultBtn"
-                    text="View result"
+                    text="%quizDetail.viewResult"
                     onAction="#viewResult"
                     visible="false" managed="false"
                     prefHeight="48" maxWidth="Infinity"

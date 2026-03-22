@@ -20,11 +20,11 @@
                 <Insets top="18" right="18" bottom="18" left="18"/>
             </padding>
 
-            <Label text="Number of questions"
+            <Label text="%quizForm.numberLabel"
                    style="-fx-font-size: 14px; -fx-text-fill: #8C8C8C;"/>
 
             <TextField fx:id="countField"
-                       promptText="Number of questions"
+                       promptText="%quizForm.numberPrompt"
                        style="-fx-background-color: white;
                               -fx-background-radius: 14;
                               -fx-border-color: rgba(31,31,57,0.20);
@@ -33,7 +33,7 @@
                               -fx-font-size: 14px;"/>
 
             <HBox spacing="14">
-                <Button text="Generate"
+                <Button text="%quizForm.generate"
                         onAction="#generate"
                         HBox.hgrow="ALWAYS"
                         maxWidth="Infinity"
@@ -44,7 +44,7 @@
                                -fx-font-size: 14px;
                                -fx-padding: 10px 32px 10px 32px"/>
 
-                <Button text="Cancel"
+                <Button text="%quizForm.cancel"
                         onAction="#cancel"
                         HBox.hgrow="ALWAYS"
                         maxWidth="Infinity"
