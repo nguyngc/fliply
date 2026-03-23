@@ -16,7 +16,10 @@ import model.service.QuizService;
 import view.Navigator;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.List;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 public class QuizzesController {
 
@@ -24,6 +27,7 @@ public class QuizzesController {
     @FXML private HeaderController headerController;
     @FXML private VBox listBox;
     @FXML private Label totalLabel;
+    @FXML private ResourceBundle resources;
 
     private final QuizService quizService = new QuizService();
 
@@ -36,8 +40,11 @@ public class QuizzesController {
         AppState.quizList.setAll(quizzes);
 
         if (headerController != null) {
-            headerController.setTitle("My Quizzes");
-            headerController.setSubtitle("Total: " + quizzes.size());
+            headerController.setTitle(getMessage("quizzes.title", "My Quizzes"));
+            setTotalSubtitle(quizzes.size());
+        }
+        if (totalLabel != null) {
+            totalLabel.setText(formatTotal(quizzes.size()));
         }
 
         AppState.navOverride.set(AppState.NavItem.QUIZZES);
@@ -52,6 +59,12 @@ public class QuizzesController {
         }
 
         listBox.getChildren().add(buildAddTile());
+        if (headerController != null) {
+            setTotalSubtitle(AppState.quizList.size());
+        }
+        if (totalLabel != null) {
+            totalLabel.setText(formatTotal(AppState.quizList.size()));
+        }
     }
 
     private Node loadQuizCard(Quiz quiz) {
@@ -99,5 +112,24 @@ public class QuizzesController {
         });
 
         return box;
+    }
+
+    private String formatTotal(int total) {
+        return MessageFormat.format(getMessage("quizzes.subtitle", "Total: {0}"), total);
+    }
+
+    private void setTotalSubtitle(int total) {
+        headerController.setSubtitle(formatTotal(total));
+    }
+
+    private String getMessage(String key, String fallback) {
+        if (resources == null) {
+            return fallback;
+        }
+        try {
+            return resources.getString(key);
+        } catch (MissingResourceException ignored) {
+            return fallback;
+        }
     }
 }

@@ -10,19 +10,22 @@ import model.entity.Quiz;
 import model.entity.User;
 import model.service.QuizService;
 import view.Navigator;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 public class QuizFormController {
 
     @FXML private Parent header;
     @FXML private HeaderController headerController;
     @FXML private TextField countField;
+    @FXML private ResourceBundle resources;
 
     private final QuizService quizService = new QuizService();
 
     @FXML
     private void initialize() {
         if (headerController != null) {
-            headerController.setTitle("New Quiz");
+            headerController.setTitle(getMessage("quizForm.header", "New Quiz"));
             headerController.setBackVisible(true);
             headerController.setOnBack(() -> Navigator.go(AppState.Screen.QUIZZES));
         }
@@ -40,7 +43,9 @@ public class QuizFormController {
         // Build quiz with n questions
         Quiz quiz = quizService.generateQuiz(user, n);
         if (quiz == null) {
-            Alert a = new Alert(Alert.AlertType.WARNING, "No flashcards available (or invalid number).");
+            Alert a = new Alert(Alert.AlertType.WARNING,
+                    getMessage("quizForm.noFlashcards", "No flashcards available (or invalid number)."));
+            a.setHeaderText(null);
             a.showAndWait();
             return;
         }
@@ -59,5 +64,16 @@ public class QuizFormController {
     private void cancel() {
         AppState.navOverride.set(AppState.NavItem.QUIZZES);
         Navigator.go(AppState.Screen.QUIZZES);
+    }
+
+    private String getMessage(String key, String fallback) {
+        if (resources == null) {
+            return fallback;
+        }
+        try {
+            return resources.getString(key);
+        } catch (MissingResourceException ignored) {
+            return fallback;
+        }
     }
 }
