@@ -17,6 +17,9 @@ import model.entity.Flashcard;
 import model.entity.FlashcardSet;
 import view.Navigator;
 
+import java.text.MessageFormat;
+import java.util.ResourceBundle;
+
 public class TeacherFlashcardSetDetailController {
 
     @FXML
@@ -35,6 +38,9 @@ public class TeacherFlashcardSetDetailController {
     private VBox cardsBox;
     @FXML
     private Button addMoreBtn;
+
+    @FXML
+    private ResourceBundle resources;
 
     private FlashcardSet set;
 
@@ -57,7 +63,7 @@ public class TeacherFlashcardSetDetailController {
         // Header
         headerController.setBackVisible(true);
         headerController.setTitle(set.getSubject());
-        headerController.setSubtitle("Total: " + set.getCards().size());
+        headerController.setSubtitle(MessageFormat.format(resources.getString("teacherFlashcardSetDetail.subtitle"), set.getCards().size()));
         headerController.setOnBack(() -> Navigator.go(AppState.Screen.TEACHER_CLASS_DETAIL));
         headerController.applyVariant(HeaderController.Variant.TEACHER);
 
@@ -95,7 +101,7 @@ public class TeacherFlashcardSetDetailController {
     }
 
     private void updateHeaderTotal() {
-        headerController.setSubtitle("Total: " + set.getCards().size());
+        headerController.setSubtitle(MessageFormat.format(resources.getString("teacherFlashcardSetDetail.subtitle"), set.getCards().size()));
     }
 
     // ---------------- Rendering ----------------
