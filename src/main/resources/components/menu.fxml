@@ -25,7 +25,7 @@
                                fitHeight="24"
                                preserveRatio="true"/>
                     <Label fx:id="homeLabel"
-                           text="Home"
+                           text="%menu.home"
                            style="-fx-font-size: 11px;
               -fx-font-weight: 500;
               -fx-text-fill: #8C8C8C;"/>
@@ -45,7 +45,7 @@
                                fitHeight="24"
                                preserveRatio="true"/>
                     <Label fx:id="classLabel"
-                           text="Classes"
+                           text="%menu.class"
                            style="-fx-font-size: 11px;
               -fx-font-weight: 500;
               -fx-text-fill: #8C8C8C;"/>
@@ -65,7 +65,7 @@
                                fitHeight="24"
                                preserveRatio="true"/>
                     <Label fx:id="flashLabel"
-                           text="Flashcards"
+                           text="%menu.flashcard"
                            style="-fx-font-size: 11px;
               -fx-font-weight: 500;
               -fx-text-fill: #8C8C8C;"/>
@@ -85,7 +85,7 @@
                                fitHeight="24"
                                preserveRatio="true"/>
                     <Label fx:id="quizLabel"
-                           text="Quizzes"
+                           text="%menu.quiz"
                            style="-fx-font-size: 11px;
               -fx-font-weight: 500;
               -fx-text-fill: #8C8C8C;"/>
@@ -105,7 +105,7 @@
                                fitHeight="24"
                                preserveRatio="true"/>
                     <Label fx:id="accountLabel"
-                           text="Account"
+                           text="%menu.account"
                            style="-fx-font-size: 11px;
               -fx-font-weight: 500;
               -fx-text-fill: #8C8C8C;"/>
