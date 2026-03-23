@@ -69,7 +69,7 @@
                                        -fx-padding: 10px 32px 10px 32px;
                                        -fx-cursor: hand;"/>
 
-                        <Button text="%edit.save"
+                        <Button text="%edit.cancel"
                                 onAction="#onCancel"
                                 HBox.hgrow="ALWAYS" maxWidth="Infinity"
                                 style="-fx-background-color: white;

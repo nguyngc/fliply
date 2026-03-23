@@ -30,7 +30,7 @@
                               -fx-padding: 10 15;"/>
 
             <HBox spacing="14">
-                <Button text="%addClass.code.placeholder" onAction="#onAdd"
+                <Button text="%addClass.add" onAction="#onAdd"
                         HBox.hgrow="ALWAYS" maxWidth="Infinity"
                         style="-fx-background-color: #3D8FEF;
                             -fx-text-fill: white;

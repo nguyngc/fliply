@@ -8,7 +8,10 @@ import javafx.scene.control.PasswordField;
 import model.AppState;
 import model.entity.User;
 import model.service.UserService;
+import util.LocaleManager;
 import view.Navigator;
+
+import java.util.ResourceBundle;
 
 public class AccountPasswordController {
 
@@ -29,10 +32,12 @@ public class AccountPasswordController {
 
     private final UserService userService = new UserService();
 
+    private final ResourceBundle rb =  ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
+
     @FXML
     private void initialize() {
         headerController.setBackVisible(true);
-        headerController.setTitle("Change Password");
+        headerController.setTitle(rb.getString("pwd.header.title"));
         headerController.setSubtitle("");
         headerController.setOnBack(() -> Navigator.go(AppState.Screen.ACCOUNT));
         headerController.applyVariant(AppState.isTeacher()
@@ -58,21 +63,21 @@ public class AccountPasswordController {
         // get current user
         User user = AppState.currentUser.get();
         if (user == null) {
-            showError("User not logged in.");
+            showError(rb.getString("pwd.error.user"));
             return;
         }
         // check old pass
         if (!current.equals(user.getPassword())) {
-            showError("Current password is incorrect.");
+            showError(rb.getString("pwd.error.oldPwd"));
             return;
         }
         // check new pass
         if (newPwd.length() < 6) {
-            showError("New password must be at least 6 characters.");
+            showError(rb.getString("pwd.error.newPwd1"));
             return;
         }
         if (!newPwd.equals(confirm)) {
-            showError("New password and confirm password do not match.");
+            showError(rb.getString("pwd.error.newPwd2"));
             return;
         }
 

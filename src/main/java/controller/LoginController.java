@@ -1,6 +1,7 @@
 package controller;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
@@ -9,7 +10,10 @@ import javafx.scene.image.ImageView;
 import model.AppState;
 import model.dao.UserDao;
 import model.entity.User;
+import util.LocaleManager;
 import view.Navigator;
+
+import java.util.ResourceBundle;
 
 public class LoginController {
 
@@ -28,7 +32,7 @@ public class LoginController {
     @FXML
     private ImageView eyeIcon;
 
-
+    private final ResourceBundle rb =  ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
 
     @FXML
     private void initialize() {
@@ -75,7 +79,7 @@ public class LoginController {
             AppState.setRole(user.isTeacher() ? AppState.Role.TEACHER : AppState.Role.STUDENT);
             Navigator.go(AppState.Screen.HOME);
         } else {
-            errorLabel.setText("Invalid email or password");
+            errorLabel.setText(rb.getString("login.error"));
             errorLabel.setVisible(true);
             System.out.println("Invalid email or password");
         }
@@ -91,9 +95,16 @@ public class LoginController {
 
     @FXML
     public void onForgotPassword() {
-        // DEMO only
-        System.out.println("Forgot password clicked (not implemented)");
+        String title = rb.getString("login.forgot");
+        String message = rb.getString("login.forgot");
+
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
+
 
     @FXML
     public void onGoogleLogin() {

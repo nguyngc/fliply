@@ -10,9 +10,11 @@ import model.AppState;
 import model.entity.ClassModel;
 import model.entity.FlashcardSet;
 import model.service.FlashcardSetService;
+import util.LocaleManager;
 import view.Navigator;
 
 import java.util.List;
+import java.util.ResourceBundle;
 
 public class ClassDetailController {
 
@@ -25,12 +27,14 @@ public class ClassDetailController {
 
     private final FlashcardSetService flashcardSetService = new FlashcardSetService();
 
+    private final ResourceBundle rb =  ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
+
     @FXML
     private void initialize() {
 
         ClassModel c = AppState.selectedClass.get();
         if (c == null) {
-            headerController.setTitle("Class");
+            headerController.setTitle(rb.getString("class.title"));
             headerController.setBackVisible(true);
             headerController.setOnBack(() -> Navigator.go(AppState.Screen.CLASSES));
             return;
@@ -38,7 +42,7 @@ public class ClassDetailController {
 
         // Header
         headerController.setTitle(c.getClassName());
-        headerController.setMeta("Teacher: " + c.getTeacher().getFirstName() + " " + c.getTeacher().getLastName());
+        headerController.setMeta(rb.getString("class.teacher") + " " + c.getTeacher().getFirstName() + " " + c.getTeacher().getLastName());
         headerController.applyVariant(
                 AppState.currentUser.get().isTeacher()
                         ? HeaderController.Variant.TEACHER
