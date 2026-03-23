@@ -40,7 +40,7 @@
                     <Insets top="12" right="18" bottom="0" left="18"/>
                 </padding>
 
-                <Button text="Restart quiz"
+                <Button text="%quizResult.restart"
                         onAction="#restart"
                         maxWidth="Infinity"
                         HBox.hgrow="ALWAYS"
@@ -51,7 +51,7 @@
                            -fx-font-size: 14px;
                            -fx-padding: 10px 32px 10px 32px"/>
 
-                <Button text="Back to quizzes"
+                <Button text="%quizResult.backToList"
                         onAction="#backToList"
                         maxWidth="Infinity"
                         HBox.hgrow="ALWAYS"

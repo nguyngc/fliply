@@ -11,7 +11,10 @@ import model.entity.Quiz;
 import model.service.QuizService;
 import view.Navigator;
 
+import java.text.MessageFormat;
 import java.util.List;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 public class QuizResultController {
 
@@ -22,6 +25,8 @@ public class QuizResultController {
 
     @FXML
     private VBox resultBox;
+    @FXML
+    private ResourceBundle resources;
 
     private Quiz quiz;
     private List<QuizService.QuizQuestion> questions;
@@ -36,8 +41,9 @@ public class QuizResultController {
         }
 
         if (headerController != null) {
-            headerController.setTitle("Result");
-            headerController.setSubtitle("Total points: " + AppState.quizPoints.get());
+            headerController.setTitle(getMessage("quizResult.header", "Result"));
+            String subtitleTemplate = getMessage("quizResult.subtitle", "Total points: {0}");
+            headerController.setSubtitle(MessageFormat.format(subtitleTemplate, AppState.quizPoints.get()));
             headerController.setBackVisible(true);
             headerController.setOnBack(() -> Navigator.go(AppState.Screen.QUIZZES));
         }
@@ -51,6 +57,9 @@ public class QuizResultController {
         resultBox.getChildren().clear();
 
         int total = questions.size();
+        String correctLabel = getMessage("quizResult.correct", "Correct");
+        String incorrectLabel = getMessage("quizResult.incorrect", "Incorrect");
+        String notAnsweredLabel = getMessage("quizResult.notAnswered", "Not answered");
 
         for (int i = 0; i < total; i++) {
             QuizService.QuizQuestion q = questions.get(i);
@@ -72,7 +81,7 @@ public class QuizResultController {
             left.setMaxWidth(Double.MAX_VALUE);
             HBox.setHgrow(left, javafx.scene.layout.Priority.ALWAYS);
 
-            Label right = new Label(answered ? (correct ? "Correct" : "Incorrect") : "Not answered");
+            Label right = new Label(answered ? (correct ? correctLabel : incorrectLabel) : notAnsweredLabel);
             right.setStyle(correct
                     ? "-fx-font-size: 14px; -fx-font-weight: 500; -fx-text-fill: #2E7D32;"
                     : "-fx-font-size: 14px; -fx-font-weight: 500; -fx-text-fill: #C62828;"
@@ -98,5 +107,16 @@ public class QuizResultController {
     private void backToList() {
         AppState.navOverride.set(AppState.NavItem.QUIZZES);
         Navigator.go(AppState.Screen.QUIZZES);
+    }
+
+    private String getMessage(String key, String fallback) {
+        if (resources == null) {
+            return fallback;
+        }
+        try {
+            return resources.getString(key);
+        } catch (MissingResourceException ignored) {
+            return fallback;
+        }
     }
 }

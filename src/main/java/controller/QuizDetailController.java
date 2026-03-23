@@ -11,8 +11,11 @@ import model.entity.Quiz;
 import model.service.QuizService;
 import view.Navigator;
 
+import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.List;
+import java.util.MissingResourceException;
+import java.util.ResourceBundle;
 
 public class QuizDetailController {
 
@@ -44,6 +47,9 @@ public class QuizDetailController {
     @FXML
     private Button viewResultBtn;
 
+    @FXML
+    private ResourceBundle resources;
+
     private Quiz quiz;
     private List<QuizService.QuizQuestion> questions;
     private final QuizService quizService = new QuizService();
@@ -59,7 +65,8 @@ public class QuizDetailController {
         questions = quizService.buildQuizQuestions( quiz.getQuizId(), AppState.currentUser.get().getUserId() );
 
         if (headerController != null) {
-            headerController.setTitle("Quiz #" + quiz.getQuizId());
+            String titleTemplate = getMessage("quizDetail.header", "Quiz #{0}");
+            headerController.setTitle(MessageFormat.format(titleTemplate, quiz.getQuizId()));
             headerController.setBackVisible(true);
             headerController.setOnBack(() -> Navigator.go(AppState.Screen.QUIZZES));
         }
@@ -87,9 +94,7 @@ public class QuizDetailController {
 
         pageLabel.setText((idx + 1) + " / " + total);
 
-        if (headerController != null) {
-            headerController.setSubtitle("Total points: " + AppState.quizPoints.get());
-        }
+        updateSubtitle();
 
         prevBtn.setDisable(idx == 0);
 
@@ -157,9 +162,7 @@ public class QuizDetailController {
 
         setOptionsDisabled(true);
 
-        if (headerController != null) {
-            headerController.setSubtitle("Total points: " + AppState.quizPoints.get());
-        }
+        updateSubtitle();
 
         render(); // update viewResult button visibility if last question
     }
@@ -202,6 +205,14 @@ public class QuizDetailController {
         return opt1;
     }
 
+    private void updateSubtitle() {
+        if (headerController == null) {
+            return;
+        }
+        String subtitleTemplate = getMessage("quizDetail.subtitle", "Total points: {0}");
+        headerController.setSubtitle(MessageFormat.format(subtitleTemplate, AppState.quizPoints.get()));
+    }
+
     private void resetOptionStyles() {
         String base = "-fx-background-color: white; " +
                 "-fx-background-radius: 16; " +
@@ -228,5 +239,16 @@ public class QuizDetailController {
                 "-fx-border-radius: 16; " +
                 "-fx-background-radius: 16; " +
                 "-fx-font-weight: 600;";
+    }
+
+    private String getMessage(String key, String fallback) {
+        if (resources == null) {
+            return fallback;
+        }
+        try {
+            return resources.getString(key);
+        } catch (MissingResourceException ignored) {
+            return fallback;
+        }
     }
 }
