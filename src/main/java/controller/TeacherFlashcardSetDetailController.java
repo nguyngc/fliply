@@ -101,7 +101,7 @@ public class TeacherFlashcardSetDetailController {
     }
 
     private void updateHeaderTotal() {
-        headerController.setSubtitle("Total: " + set.getCards().size());
+        headerController.setSubtitle(MessageFormat.format(resources.getString("teacherFlashcardSetDetail.subtitle"), set.getCards().size()));
     }
 
     // ---------------- Rendering ----------------
