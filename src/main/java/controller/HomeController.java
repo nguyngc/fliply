@@ -14,9 +14,11 @@ import model.entity.*;
 import model.service.ClassDetailsService;
 import model.service.QuizService;
 import model.service.StudyService;
+import util.LocaleManager;
 import view.Navigator;
 
 import java.util.List;
+import java.util.ResourceBundle;
 
 import static model.AppState.isTeacher;
 
@@ -38,13 +40,15 @@ public class HomeController {
 
     @FXML
     private void initialize() {
+        ResourceBundle rb = ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
         User user = AppState.currentUser.get();
         if (user == null) return;
 
         boolean teacher = user.isTeacher();
 
         nameLabel.setText(user.getFirstName() + "!");
-        subtitleLabel.setText(teacher ? "Manage your classes" : "Let's start learning");
+        String key = teacher ? "home.subtitle.teacher" : "home.subtitle.student";
+        subtitleLabel.setText(rb.getString(key));
 
         // hide quiz section for teacher
         latestQuizSection.setVisible(!teacher);
@@ -57,6 +61,7 @@ public class HomeController {
     }
 
     private void renderLatestClass() {
+        ResourceBundle rb = ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
         latestClassHolder.getChildren().clear();
 
         User user = AppState.currentUser.get();
@@ -99,7 +104,7 @@ public class HomeController {
 
             latestClassHolder.getChildren().add(node);
         } catch (Exception ex) {
-            throw new RuntimeException("Failed to load class_card.fxml for home", ex);
+            throw new RuntimeException(rb.getString("home.error"), ex);
         }
     }
 

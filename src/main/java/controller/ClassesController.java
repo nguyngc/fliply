@@ -10,14 +10,15 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import model.AppState;
-import model.entity.ClassDetails;
 import model.entity.ClassModel;
 import model.entity.User;
 import model.service.ClassDetailsService;
 import model.service.StudyService;
+import util.LocaleManager;
 import view.Navigator;
 
 import java.util.List;
+import java.util.ResourceBundle;
 
 public class ClassesController {
 
@@ -33,13 +34,16 @@ public class ClassesController {
 
     @FXML
     private void initialize() {
+        ResourceBundle rb = ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
         //AppState.seedDemoIfNeeded();
         User user = AppState.currentUser.get();
         boolean isTeacher = user.isTeacher();
 
         // Header
-        headerController.setTitle("My Classes");
-        headerController.setSubtitle(isTeacher ? "Manage your classes" : "Your enrolled classes");
+        headerController.setTitle(rb.getString("class.title"));
+        String key = isTeacher ? "class.subtitle.teacher" : "class.subtitle.student";
+        headerController.setSubtitle(rb.getString(key));
+
         headerController.applyVariant(isTeacher
                 ? HeaderController.Variant.TEACHER
                 : HeaderController.Variant.STUDENT
@@ -64,6 +68,7 @@ public class ClassesController {
     }
 
     private Node buildClassCard(ClassModel c, boolean isTeacher) {
+        ResourceBundle rb = ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/components/class_card.fxml"));
             Node node = loader.load();
@@ -96,7 +101,7 @@ public class ClassesController {
 
             return node;
         } catch (Exception ex) {
-            throw new RuntimeException("Failed to load class_card.fxml", ex);
+            throw new RuntimeException(rb.getString("class.error"), ex);
         }
     }
 
