@@ -34,7 +34,7 @@
                         </padding>
 
                         <TextField fx:id="termField"
-                                   promptText="Term"
+                                   promptText="%teacherFlashcardSetDetail.term"
                                    style="-fx-background-color: white;
                                           -fx-background-radius: 14;
                                           -fx-border-color: rgba(31,31,57,0.20);
@@ -43,7 +43,7 @@
                                           -fx-font-size: 14px;"/>
 
                         <TextArea fx:id="definitionArea"
-                                  promptText="Definition"
+                                  promptText="%teacherFlashcardSetDetail.definition"
                                   prefRowCount="3"
                                   wrapText="true"
                                   styleClass="form-textarea"
@@ -53,7 +53,7 @@
                                          -fx-font-size: 14px;"/>
 
                         <HBox spacing="14">
-                            <Button text="Save"
+                            <Button text="%teacherFlashcardSetDetail.save"
                                     onAction="#onSave"
                                     HBox.hgrow="ALWAYS" maxWidth="Infinity"
                                     style="-fx-background-color: #3D8FEF;
@@ -64,7 +64,7 @@
                                            -fx-padding: 10px 32px 10px 32px;
                                            -fx-cursor: hand;"/>
 
-                            <Button text="Cancel"
+                            <Button text="%teacherFlashcardSetDetail.cancel"
                                     onAction="#onCancel"
                                     HBox.hgrow="ALWAYS" maxWidth="Infinity"
                                     style="-fx-background-color: white;
@@ -85,7 +85,7 @@
 
                     <!-- Add more button (bottom of list) -->
                     <Button fx:id="addMoreBtn"
-                            text="+ Add more Flashcards"
+                            text="%teacherFlashcardSetDetail.addMore"
                             onAction="#onAddMore"
                             prefHeight="60" maxWidth="Infinity"
                             style="-fx-background-color: white;
