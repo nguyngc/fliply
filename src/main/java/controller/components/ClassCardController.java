@@ -5,6 +5,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.VBox;
 import model.AppState;
+import util.LocaleManager;
+
+import java.util.ResourceBundle;
 
 public class ClassCardController {
 
@@ -32,6 +35,8 @@ public class ClassCardController {
 
     private Runnable onClick;
 
+    private final ResourceBundle rb = ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
+
     public void applyRoleVariant() {
         boolean isTeacher = AppState.isTeacher();
 
@@ -54,16 +59,15 @@ public class ClassCardController {
 
     public void setTeacherCard(String classCode, int students, int sets, double progress) {
         classNameLabel.setText(classCode);
-        if (studentsCountLabel != null) studentsCountLabel.setText(students + " students");
-        if (setsCountLabel != null) setsCountLabel.setText(sets + " set of flashcards");
+        if (studentsCountLabel != null) studentsCountLabel.setText(students + " " + rb.getString("classDetail.students"));
+        if (setsCountLabel != null) setsCountLabel.setText(sets + " " + rb.getString("classDetail.sets"));
         setProgress(progress);
         applyRoleVariant();
     }
 
     public void setProgress(double value) {
         if (progressBar != null) progressBar.setProgress(value);
-        //if (progressTextLabel != null) progressTextLabel.setText((int) (value * 100) + "% Completed");
-        progressTextLabel.setText("Progress will be implemented later");
+        if (progressTextLabel != null) progressTextLabel.setText((int) (value * 100) + "% Completed");
     }
 
     public void setOnClick(Runnable r) {
