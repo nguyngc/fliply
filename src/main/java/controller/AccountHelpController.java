@@ -4,7 +4,10 @@ import controller.components.HeaderController;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import model.AppState;
+import util.LocaleManager;
 import view.Navigator;
+
+import java.util.ResourceBundle;
 
 public class AccountHelpController {
 
@@ -15,8 +18,9 @@ public class AccountHelpController {
 
     @FXML
     private void initialize() {
+        ResourceBundle rb =  ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
         headerController.setBackVisible(true);
-        headerController.setTitle("Help");
+        headerController.setTitle(rb.getString("help.header.title"));
         headerController.setSubtitle("");
         headerController.setOnBack(() -> Navigator.go(AppState.Screen.ACCOUNT));
         headerController.applyVariant(AppState.isTeacher()

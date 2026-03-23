@@ -4,7 +4,10 @@ import controller.components.HeaderController;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import model.AppState;
+import util.LocaleManager;
 import view.Navigator;
+
+import java.util.ResourceBundle;
 
 public class AccountController {
 
@@ -15,8 +18,9 @@ public class AccountController {
 
     @FXML
     private void initialize() {
+        ResourceBundle rb =  ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
         headerController.setBackVisible(false);
-        headerController.setTitle("My Account");
+        headerController.setTitle(rb.getString("account.header.title"));
         headerController.setSubtitle("");
         headerController.applyVariant(AppState.isTeacher()
                 ? HeaderController.Variant.TEACHER

@@ -32,9 +32,10 @@ public class ClassesController {
 
     private final ClassDetailsService  classDetailsService = new  ClassDetailsService();
 
+    private ResourceBundle rb = ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
+
     @FXML
     private void initialize() {
-        ResourceBundle rb = ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
         //AppState.seedDemoIfNeeded();
         User user = AppState.currentUser.get();
         boolean isTeacher = user.isTeacher();
@@ -68,7 +69,6 @@ public class ClassesController {
     }
 
     private Node buildClassCard(ClassModel c, boolean isTeacher) {
-        ResourceBundle rb = ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/components/class_card.fxml"));
             Node node = loader.load();
@@ -115,7 +115,7 @@ public class ClassesController {
                 -fx-cursor: hand;
                 """);
 
-        Label text = new Label("+ Add more class");
+        Label text = new Label(rb.getString("class.addClass"));
         text.setStyle("-fx-text-fill: #3D8FEF; -fx-font-size: 16px; -fx-font-weight: 600;");
         tile.getChildren().add(text);
 

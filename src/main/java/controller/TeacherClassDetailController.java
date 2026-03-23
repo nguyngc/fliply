@@ -19,11 +19,13 @@ import model.entity.FlashcardSet;
 import model.entity.User;
 import model.service.ClassDetailsService;
 import model.service.UserService;
+import util.LocaleManager;
 import view.Navigator;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
 public class TeacherClassDetailController {
@@ -58,6 +60,7 @@ public class TeacherClassDetailController {
     //private static final List<AppState.StudentItem> ALL_STUDENTS = new ArrayList<>();
     private final ClassDetailsService classDetailsService =  new ClassDetailsService();
     private final UserService userService = new UserService();
+    private final ResourceBundle rb =  ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
 
     @FXML
     private void initialize() {
@@ -108,10 +111,10 @@ public class TeacherClassDetailController {
 
     private void refreshCounts() {
         if (studentsSectionLabel != null) {
-            studentsSectionLabel.setText("Students (" + c.getStudents().size() + ")");
+            studentsSectionLabel.setText(rb.getString("classDetail.students") + " (" + c.getStudents().size() + ")");
         }
         if (setsSectionLabel != null) {
-            setsSectionLabel.setText("Flashcard Sets (" + c.getFlashcardSets().size() + ")");
+            setsSectionLabel.setText(rb.getString("classDetail.sets") + " (" + c.getFlashcardSets().size() + ")");
         }
     }
 

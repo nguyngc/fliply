@@ -8,7 +8,10 @@ import model.AppState;
 import model.dao.ClassModelDao;
 import model.entity.ClassModel;
 import model.service.TeacherAddClassService;
+import util.LocaleManager;
 import view.Navigator;
+
+import java.util.ResourceBundle;
 
 public class TeacherAddClassController {
 
@@ -22,9 +25,11 @@ public class TeacherAddClassController {
 
     private final TeacherAddClassService teacherAddClass = new TeacherAddClassService();
 
+    private final ResourceBundle rb =  ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
+
     @FXML
     private void initialize() {
-        headerController.setTitle("New Class");
+        headerController.setTitle(rb.getString("addClass.new"));
         headerController.setBackVisible(true);
         headerController.setOnBack(() -> Navigator.go(AppState.Screen.CLASSES));
     }
@@ -38,7 +43,7 @@ public class TeacherAddClassController {
         teacherAddClass.createClass(code);
         Navigator.go(AppState.Screen.CLASSES);
         } catch (IllegalArgumentException e) {
-            System.out.println("Error: " + e.getMessage());}
+            System.out.println(rb.getString("addClass.error") + e.getMessage());}
     }
 
     @FXML

@@ -114,7 +114,7 @@
 
                         <HBox alignment="CENTER_RIGHT">
                             <Hyperlink fx:id="forgotLink"
-                                       text="%login.button"
+                                       text="%login.forgot"
                                        onAction="#onForgotPassword"
                                        style="-fx-text-fill: #3D8FEF;
                                               -fx-font-size: 12px;

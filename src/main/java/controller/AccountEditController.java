@@ -7,7 +7,10 @@ import javafx.scene.control.TextField;
 import model.AppState;
 import model.entity.User;
 import model.service.UserService;
+import util.LocaleManager;
 import view.Navigator;
+
+import java.util.ResourceBundle;
 
 public class AccountEditController {
 
@@ -27,8 +30,9 @@ public class AccountEditController {
 
     @FXML
     private void initialize() {
+        ResourceBundle rb =  ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
         headerController.setBackVisible(true);
-        headerController.setTitle("Edit Account");
+        headerController.setTitle(rb.getString("edit.header.title"));
         headerController.setSubtitle("");
         headerController.setOnBack(() -> Navigator.go(AppState.Screen.ACCOUNT));
         headerController.applyVariant(AppState.isTeacher()

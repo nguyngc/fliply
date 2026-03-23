@@ -10,12 +10,16 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
+import util.LocaleManager;
+
+import java.util.ResourceBundle;
 
 public class HeaderController {
+    ResourceBundle rb = ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
 
     private final ContextMenu moreMenu = new ContextMenu();
-    private final MenuItem editItem = new MenuItem("Edit");
-    private final MenuItem deleteItem = new MenuItem("Delete");
+    private final MenuItem editItem = new MenuItem(rb.getString("header.edit"));
+    private final MenuItem deleteItem = new MenuItem(rb.getString("header.delete"));
     @FXML
     private Button backButton;
     @FXML
