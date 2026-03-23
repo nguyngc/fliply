@@ -26,7 +26,7 @@
 
                     <!-- Students Section -->
                     <Label fx:id="studentsSectionLabel"
-                           text="Students (0)"
+                           text="%classDetail.students"
                            style="-fx-font-size: 20px; -fx-font-weight: 500; -fx-text-fill: #1F1F39;"/>
 
                     <VBox spacing="12"
@@ -41,7 +41,7 @@
 
                         <!-- Add more students (first load only shows this) -->
                         <Button fx:id="showSearchBtn"
-                                text="+ Add more students"
+                                text="%classDetail.addStudents"
                                 onAction="#onShowStudentSearch"
                                 style="-fx-background-color: transparent;
                                        -fx-text-fill: #3D8FEF;
@@ -54,7 +54,7 @@
 
                             <StackPane maxWidth="Infinity">
                                 <TextField fx:id="studentSearchField"
-                                           promptText="Search student..."
+                                           promptText="%classDetail.search.placeholder"
                                            style="-fx-background-color: white;
                                               -fx-background-radius: 14;
                                               -fx-border-color: rgba(31,31,57,0.20);
@@ -74,7 +74,7 @@
 
                             <VBox fx:id="searchResultsBox" spacing="10"/>
 
-                            <Button text="Close"
+                            <Button text="%classDetail.close"
                                     onAction="#onHideStudentSearch"
                                     style="-fx-background-color: transparent;
                                            -fx-text-fill: rgba(0,0,0,0.55);
@@ -86,13 +86,13 @@
 
                     <!-- Flashcard Sets -->
                     <Label fx:id="setsSectionLabel"
-                           text="Flashcard Sets (0)"
+                           text="%classDetail.sets"
                            style="-fx-font-size: 20px; -fx-font-weight: 500; -fx-text-fill: #1F1F39;"/>
 
                     <VBox fx:id="setListBox" spacing="14"/>
 
                     <!-- Add set button under list -->
-                    <Button text="+ Add more Flashcard set"
+                    <Button text="%classDetail.addSet"
                             onAction="#onAddSet"
                             prefHeight="54"
                             maxWidth="Infinity"

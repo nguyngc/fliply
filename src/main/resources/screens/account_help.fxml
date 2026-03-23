@@ -22,10 +22,10 @@
                         <Insets top="18" right="18" bottom="18" left="18"/>
                     </padding>
 
-                    <Label text="Help"
+                    <Label text="%help.title"
                            style="-fx-font-size: 20px; -fx-font-weight: 500; -fx-text-fill: #1F1F39;"/>
 
-                    <Label text="How to use this app..."
+                    <Label text="%help.description"
                            wrapText="true"
                            style="-fx-font-size: 14px; -fx-text-fill: rgba(0,0,0,0.55); -fx-font-weight: 400;"/>
                 </VBox>

@@ -21,7 +21,7 @@
             <VBox spacing="16"
                   style="-fx-background-color: transparent;">
 
-                <Button text="Edit Account"
+                <Button text="%account.edit"
                         onAction="#onEditAccount"
                         style="-fx-background-color: transparent;
                                -fx-font-size: 16px;
@@ -31,7 +31,7 @@
                                -fx-cursor: hand;"
                         maxWidth="Infinity"/>
 
-                <Button text="Change Password"
+                <Button text="%account.changePassword"
                         onAction="#onChangePassword"
                         style="-fx-background-color: transparent;
                                -fx-font-size: 16px;
@@ -41,7 +41,7 @@
                                -fx-cursor: hand;"
                         maxWidth="Infinity"/>
 
-                <Button text="Help"
+                <Button text="%account.help"
                         onAction="#onHelp"
                         style="-fx-background-color: transparent;
                                -fx-font-size: 16px;
@@ -51,7 +51,7 @@
                                -fx-cursor: hand;"
                         maxWidth="Infinity"/>
 
-                <Button text="About Us"
+                <Button text="%account.about"
                         onAction="#onAbout"
                         style="-fx-background-color: transparent;
                                -fx-font-size: 16px;
@@ -61,7 +61,7 @@
                                -fx-cursor: hand;"
                         maxWidth="Infinity"/>
 
-                <Button text="Log out"
+                <Button text="%account.logout"
                         onAction="#onLogout"
                         style="-fx-background-color: transparent;
                                -fx-font-size: 16px;

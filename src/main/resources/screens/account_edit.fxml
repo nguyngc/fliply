@@ -21,11 +21,11 @@
                         <Insets top="18" right="18" bottom="18" left="18"/>
                     </padding>
 
-                    <Label text="First Name"
+                    <Label text="%edit.firstName"
                            style="-fx-font-size: 14px; -fx-text-fill: #8C8C8C;"/>
 
                     <TextField fx:id="firstNameField"
-                               promptText="First Name"
+                               promptText="%edit.firstName"
                                style="-fx-background-color: white;
                                       -fx-background-radius: 14;
                                       -fx-border-color: rgba(31,31,57,0.20);
@@ -33,11 +33,11 @@
                                       -fx-padding: 10 14;
                                       -fx-font-size: 14px;"/>
 
-                    <Label text="Last Name"
+                    <Label text="%edit.lastName"
                            style="-fx-font-size: 14px; -fx-text-fill: #8C8C8C;"/>
 
                     <TextField fx:id="lastNameField"
-                               promptText="Last Name"
+                               promptText="%edit.lastName"
                                style="-fx-background-color: white;
                                       -fx-background-radius: 14;
                                       -fx-border-color: rgba(31,31,57,0.20);
@@ -45,7 +45,7 @@
                                       -fx-padding: 10 14;
                                       -fx-font-size: 14px;"/>
 
-                    <Label text="Email"
+                    <Label text="%edit.email"
                            style="-fx-font-size: 14px; -fx-text-fill: #8C8C8C;"/>
 
                     <TextField fx:id="emailField"
@@ -58,7 +58,7 @@
                                       -fx-font-size: 14px;"/>
 
                     <HBox spacing="14">
-                        <Button text="Save"
+                        <Button text="%edit.save"
                                 onAction="#onSave"
                                 HBox.hgrow="ALWAYS" maxWidth="Infinity"
                                 style="-fx-background-color: #3D8FEF;
@@ -69,7 +69,7 @@
                                        -fx-padding: 10px 32px 10px 32px;
                                        -fx-cursor: hand;"/>
 
-                        <Button text="Cancel"
+                        <Button text="%edit.save"
                                 onAction="#onCancel"
                                 HBox.hgrow="ALWAYS" maxWidth="Infinity"
                                 style="-fx-background-color: white;

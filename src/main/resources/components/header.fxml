@@ -34,7 +34,7 @@
         <!-- Title area -->
         <VBox spacing="10" alignment="TOP_LEFT" HBox.hgrow="ALWAYS">
             <Label fx:id="titleLabel"
-                   text="Title"
+                   text="%header.title"
                    wrapText="true"
                    maxWidth="260"
                    style="-fx-text-fill: white; -fx-font-size: 36px; -fx-font-weight: 700;"/>
