@@ -18,16 +18,16 @@
                 <Insets top="18" right="18" bottom="18" left="18"/>
             </padding>
 
-            <Label text="Subject" style="-fx-text-fill: #8C8C8C;"/>
+            <Label text="%teacherAddSet.subject" style="-fx-text-fill: #8C8C8C;"/>
 
-            <TextField fx:id="subjectField" promptText="Subject"
+            <TextField fx:id="subjectField" promptText="%teacherAddSet.subject"
                        style="-fx-background-color: white;
                               -fx-background-radius: 14;
                               -fx-border-color: rgba(31,31,57,0.20);
                               -fx-border-radius: 10;
                               -fx-padding: 10 15;"/>
 
-            <Button text="Upload file"
+            <Button text="%teacherAddSet.uploadFile"
                     onAction="#onUpload"
                     maxWidth="Infinity"
                     style="-fx-background-color: white;
@@ -43,7 +43,7 @@
                    style="-fx-text-fill: rgba(0,0,0,0.55); -fx-font-size: 13px;"/>
 
             <HBox spacing="14">
-                <Button text="Add" onAction="#onAdd"
+                <Button text="%teacherAddSet.add" onAction="#onAdd"
                         HBox.hgrow="ALWAYS" maxWidth="Infinity"
                         style="-fx-background-color: #3D8FEF;
                                 -fx-text-fill: white;
@@ -52,7 +52,7 @@
                                 -fx-font-size: 14px;
                                 -fx-padding: 10px 32px 10px 32px"/>
 
-                <Button text="Cancel" onAction="#onCancel"
+                <Button text="%teacherAddSet.cancel" onAction="#onCancel"
                         HBox.hgrow="ALWAYS" maxWidth="Infinity"
                         style="-fx-background-color: white;
                             -fx-border-color: #3D8FEF;

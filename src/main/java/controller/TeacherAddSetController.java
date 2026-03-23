@@ -18,7 +18,9 @@ import view.Navigator;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.text.MessageFormat;
 import java.util.List;
+import java.util.ResourceBundle;
 
 public class TeacherAddSetController {
 
@@ -32,12 +34,15 @@ public class TeacherAddSetController {
     @FXML
     private Label fileStatusLabel;
 
+    @FXML
+    private ResourceBundle resources;
+
     private File selectedFile;
     private int parsedCount = 0;
 
     @FXML
     private void initialize() {
-        headerController.setTitle("New Set of\nFlashcard");
+        headerController.setTitle(resources.getString("teacherAddSet.title"));
         headerController.setBackVisible(true);
         headerController.setOnBack(() -> Navigator.go(AppState.Screen.TEACHER_CLASS_DETAIL));
     }
@@ -54,10 +59,10 @@ public class TeacherAddSetController {
             List<String> lines = Files.readAllLines(selectedFile.toPath());
             parsedCount = Math.max(0, lines.size() - 1);
 
-            fileStatusLabel.setText("Loaded: " + selectedFile.getName() + " (" + parsedCount + " cards)");
+            fileStatusLabel.setText(MessageFormat.format(resources.getString("teacherAddSet.fileStatusSuccess"),selectedFile.getName(), parsedCount));
         } catch (Exception ex) {
             parsedCount = 0;
-            fileStatusLabel.setText("Cannot read file.");
+            fileStatusLabel.setText(resources.getString("teacherAddSet.fileStatusError"));
         }
     }
 
