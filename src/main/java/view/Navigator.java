@@ -3,7 +3,6 @@ package view;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import model.AppState;
 
@@ -13,7 +12,6 @@ import java.util.ResourceBundle;
 public final class Navigator {
 
     private static Stage stage;
-    private static boolean laoFontLoaded = false;
 
     private Navigator() {
     }
@@ -30,18 +28,9 @@ public final class Navigator {
             );
             Parent root = loader.load();
 
-            if (util.LocaleManager.getLocale().getLanguage().equals("lo")) {
-                if (!laoFontLoaded) {
-                    Font.loadFont(
-                            Navigator.class.getResourceAsStream("/fonts/NotoSansLao-Regular.ttf"),
-                            14
-                    );
-                    laoFontLoaded = true;
-                }
-                root.setStyle("-fx-font-family: 'Noto Sans Lao';");
-            }
-
+            // Set up the scene and stage
             Scene scene = new Scene(root, 375, 750);
+            applyLocaleFont(scene);
             stage.setScene(scene);
             stage.setTitle("Fliply");
             stage.setResizable(false);
@@ -55,6 +44,22 @@ public final class Navigator {
 
         } catch (IOException e) {
             throw new RuntimeException("Failed to load " + screen.fxml, e);
+        }
+    }
+
+    private static void applyLocaleFont(Scene scene) {
+        if (scene == null) return;
+        if (!"lo".equals(util.LocaleManager.getLocale().getLanguage())) return;
+
+        String mainCss = Navigator.class.getResource("/styles/style.css").toExternalForm();
+        if (!scene.getStylesheets().contains(mainCss)) {
+            scene.getStylesheets().add(mainCss);
+        }
+
+        Parent root = scene.getRoot();
+        if (root == null) return;
+        if (!root.getStyleClass().contains("locale-lo")) {
+            root.getStyleClass().add("locale-lo");
         }
     }
 
