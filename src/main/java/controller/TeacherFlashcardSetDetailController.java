@@ -15,10 +15,11 @@ import javafx.scene.layout.VBox;
 import model.AppState;
 import model.entity.Flashcard;
 import model.entity.FlashcardSet;
+import util.LocalizationService;
 import view.Navigator;
 
 import java.text.MessageFormat;
-import java.util.ResourceBundle;
+import java.util.Map;
 
 public class TeacherFlashcardSetDetailController {
 
@@ -39,11 +40,8 @@ public class TeacherFlashcardSetDetailController {
     @FXML
     private Button addMoreBtn;
 
-    @FXML
-    private ResourceBundle resources;
-
     private FlashcardSet set;
-
+    private Map<String, String> localizedStrings;
 
     /**
      * null = adding new, otherwise editing existing row
@@ -53,7 +51,7 @@ public class TeacherFlashcardSetDetailController {
     @FXML
     private void initialize() {
         //AppState.seedDemoIfNeeded();
-
+        localizedStrings = LocalizationService.getLocalizedStrings();
         set = AppState.selectedSet.get();
         if (set == null) {
             Navigator.go(AppState.Screen.TEACHER_CLASS_DETAIL);
@@ -63,7 +61,7 @@ public class TeacherFlashcardSetDetailController {
         // Header
         headerController.setBackVisible(true);
         headerController.setTitle(set.getSubject());
-        headerController.setSubtitle(MessageFormat.format(resources.getString("teacherFlashcardSetDetail.subtitle"), set.getCards().size()));
+        headerController.setSubtitle(MessageFormat.format(localizedStrings.get("teacherFlashcardSetDetail.subtitle"), set.getCards().size()));
         headerController.setOnBack(() -> Navigator.go(AppState.Screen.TEACHER_CLASS_DETAIL));
         headerController.applyVariant(HeaderController.Variant.TEACHER);
 
@@ -101,7 +99,7 @@ public class TeacherFlashcardSetDetailController {
     }
 
     private void updateHeaderTotal() {
-        headerController.setSubtitle(MessageFormat.format(resources.getString("teacherFlashcardSetDetail.subtitle"), set.getCards().size()));
+        headerController.setSubtitle(MessageFormat.format(localizedStrings.get("teacherFlashcardSetDetail.subtitle"), set.getCards().size()));
     }
 
     // ---------------- Rendering ----------------
