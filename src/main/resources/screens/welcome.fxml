@@ -7,10 +7,10 @@
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
-
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
+
 <VBox xmlns="http://javafx.com/javafx/24.0.1"
       xmlns:fx="http://javafx.com/fxml/1"
       fx:controller="controller.WelcomeController"
@@ -24,7 +24,6 @@
         <Insets top="24" right="24" bottom="50" left="24"/>
     </padding>
 
-    <!-- Top language bar -->
     <HBox alignment="TOP_RIGHT">
         <Region HBox.hgrow="ALWAYS"/>
         <MenuButton fx:id="languageMenuButton"
@@ -49,9 +48,12 @@
             </image>
         </ImageView>
 
-        <Label styleClass="title-label" text="%welcome.title"/>
+        <Label fx:id="titleLabel"
+               styleClass="title-label"
+               text="%welcome.title"/>
 
-        <Label styleClass="subtitle-label"
+        <Label fx:id="subtitleLabel"
+               styleClass="subtitle-label"
                text="%welcome.subtitle"
                textAlignment="CENTER"
                wrapText="true"/>
@@ -62,12 +64,14 @@
             <Insets top="18"/>
         </padding>
 
-        <Button prefWidth="140.0"
+        <Button fx:id="registerButton"
+                prefWidth="140.0"
                 text="%welcome.register"
                 mnemonicParsing="false"
                 onAction="#goRegister"/>
 
-        <Button prefWidth="140.0"
+        <Button fx:id="loginButton"
+                prefWidth="140.0"
                 text="%welcome.login"
                 mnemonicParsing="false"
                 onAction="#goLogin"/>

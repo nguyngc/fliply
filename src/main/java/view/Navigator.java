@@ -3,6 +3,7 @@ package view;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 import model.AppState;
 
@@ -12,6 +13,7 @@ import java.util.ResourceBundle;
 public final class Navigator {
 
     private static Stage stage;
+    private static boolean laoFontLoaded = false;
 
     private Navigator() {
     }
@@ -22,23 +24,35 @@ public final class Navigator {
 
     public static void go(AppState.Screen screen) {
         try {
-            // Load the screen from FXML resource
             FXMLLoader loader = new FXMLLoader(
                     Navigator.class.getResource(screen.fxml),
-                    ResourceBundle.getBundle("Messages", util.LocaleManager.getLocale()));
+                    ResourceBundle.getBundle("Messages", util.LocaleManager.getLocale())
+            );
             Parent root = loader.load();
 
-            // Set up the scene and stage
+            if (util.LocaleManager.getLocale().getLanguage().equals("lo")) {
+                if (!laoFontLoaded) {
+                    Font.loadFont(
+                            Navigator.class.getResourceAsStream("/fonts/NotoSansLao-Regular.ttf"),
+                            14
+                    );
+                    laoFontLoaded = true;
+                }
+                root.setStyle("-fx-font-family: 'Noto Sans Lao';");
+            }
+
             Scene scene = new Scene(root, 375, 750);
             stage.setScene(scene);
             stage.setTitle("Fliply");
             stage.setResizable(false);
             stage.show();
 
-            // set nav highlight (allow override)
-            AppState.NavItem nav = AppState.navOverride.get() != null ? AppState.navOverride.get() : screen.nav;
+            AppState.NavItem nav = AppState.navOverride.get() != null
+                    ? AppState.navOverride.get()
+                    : screen.nav;
             AppState.activeNav.set(nav);
-            AppState.navOverride.set(null); // clear after using
+            AppState.navOverride.set(null);
+
         } catch (IOException e) {
             throw new RuntimeException("Failed to load " + screen.fxml, e);
         }
