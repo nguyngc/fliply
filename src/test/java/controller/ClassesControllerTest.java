@@ -136,7 +136,7 @@ class ClassesControllerTest {
     void testInitialize_setsHeaderCorrectly() {
         FakeHeaderController header = (FakeHeaderController) getPrivate("headerController");
 
-        assertEquals("My Classes", header.titleLabel.getText());
+        assertEquals("My class", header.titleLabel.getText());
         assertEquals("Manage your classes", header.subtitleLabel.getText());
     }
 

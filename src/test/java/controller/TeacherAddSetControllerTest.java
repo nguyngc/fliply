@@ -12,12 +12,15 @@ import model.service.FlashcardSetService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import util.LocaleManager;
 
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -71,6 +74,8 @@ class TeacherAddSetControllerTest {
 
         setPrivate("subjectField", new TextField());
         setPrivate("fileStatusLabel", new Label());
+        ResourceBundle fakeBundle = ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
+        setPrivate("resources", fakeBundle);
 
         FakeFlashcardSetService fakeService = new FakeFlashcardSetService();
 
@@ -112,6 +117,7 @@ class TeacherAddSetControllerTest {
             m.setAccessible(true);
             m.invoke(controller);
         } catch (Exception e) {
+            e.getCause().printStackTrace();
             throw new RuntimeException(e);
         }
     }
@@ -132,7 +138,7 @@ class TeacherAddSetControllerTest {
     void testInitialize_setsHeaderCorrectly() {
         FakeHeaderController header = (FakeHeaderController) getPrivate("headerController");
 
-        assertEquals("New Set of\nFlashcard", header.titleLabel.getText());
+        assertEquals("New Set of Flashcard", header.titleLabel.getText());
         assertTrue(header.backButton.isVisible());
     }
     @Disabled
