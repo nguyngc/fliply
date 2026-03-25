@@ -98,6 +98,11 @@
     -fx-text-fill: #1F1F39;
 }
 
+.locale-lo,
+.locale-lo * {
+    -fx-font-family: "Leelawadee UI", "Poppins", "Segoe UI", sans-serif !important;
+}
+
 .lao-title {
     -fx-font-family: "Noto Sans Lao";
 }
