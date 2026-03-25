@@ -97,3 +97,19 @@
 .menu-item:hover .label {
     -fx-text-fill: #1F1F39;
 }
+
+.lao-title {
+    -fx-font-family: "Noto Sans Lao";
+}
+
+.lao-subtitle {
+    -fx-font-family: "Noto Sans Lao";
+}
+
+.lao-button {
+    -fx-font-family: "Noto Sans Lao";
+}
+
+.lao-menu {
+    -fx-font-family: "Noto Sans Lao";
+}
