@@ -14,13 +14,15 @@ import model.service.ClassDetailsService;
 import model.service.FlashcardService;
 import model.service.FlashcardSetService;
 import util.FlashcardFileParser;
+import util.LocalizationService;
 import view.Navigator;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.text.MessageFormat;
+import java.util.HashMap;
 import java.util.List;
-import java.util.ResourceBundle;
+import java.util.Map;
 
 public class TeacherAddSetController {
 
@@ -34,15 +36,14 @@ public class TeacherAddSetController {
     @FXML
     private Label fileStatusLabel;
 
-    @FXML
-    private ResourceBundle resources;
-
     private File selectedFile;
     private int parsedCount = 0;
+    private Map<String, String> localizedStrings;
 
     @FXML
     private void initialize() {
-        headerController.setTitle(resources.getString("teacherAddSet.title"));
+        localizedStrings = LocalizationService.getLocalizedStrings();
+        headerController.setTitle(localizedStrings.get("teacherAddSet.title"));
         headerController.setBackVisible(true);
         headerController.setOnBack(() -> Navigator.go(AppState.Screen.TEACHER_CLASS_DETAIL));
     }
@@ -59,10 +60,10 @@ public class TeacherAddSetController {
             List<String> lines = Files.readAllLines(selectedFile.toPath());
             parsedCount = Math.max(0, lines.size() - 1);
 
-            fileStatusLabel.setText(MessageFormat.format(resources.getString("teacherAddSet.fileStatusSuccess"),selectedFile.getName(), parsedCount));
+            fileStatusLabel.setText(MessageFormat.format(localizedStrings.get("teacherAddSet.fileStatusSuccess"), selectedFile.getName(), parsedCount));
         } catch (Exception ex) {
             parsedCount = 0;
-            fileStatusLabel.setText(resources.getString("teacherAddSet.fileStatusError"));
+            fileStatusLabel.setText(localizedStrings.get("teacherAddSet.fileStatusError"));
         }
     }
 
