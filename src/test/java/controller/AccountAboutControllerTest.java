@@ -98,7 +98,7 @@ class AccountAboutControllerTest {
     void testInitialize_setsHeaderCorrectly() {
         HeaderController header = (HeaderController) getPrivate();
 
-        assertEquals("About Us", getHeaderLabel(header, "titleLabel"));
+        assertEquals("About us", getHeaderLabel(header, "titleLabel"));
         assertEquals("", getHeaderLabel(header, "subtitleLabel"));
         boolean visible = getBoolean(header);
         assertTrue(visible);
