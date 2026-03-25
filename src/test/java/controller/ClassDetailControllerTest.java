@@ -157,7 +157,7 @@ class ClassDetailControllerTest {
         FakeHeaderController header = (FakeHeaderController) getHeader();
 
         assertEquals("Math 101", header.titleLabel.getText());
-        assertEquals("Teacher: Alice Teacher", header.metaLabel.getText());
+        assertEquals("Teacher Alice Teacher", header.metaLabel.getText());
     }
 
     @Test
