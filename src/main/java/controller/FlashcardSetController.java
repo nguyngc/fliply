@@ -11,11 +11,14 @@ import model.AppState;
 import model.entity.Flashcard;
 import model.entity.FlashcardSet;
 import model.service.FlashcardSetService;
+import util.LocalizationService;
 import view.Navigator;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class FlashcardSetController {
 
@@ -29,22 +32,24 @@ public class FlashcardSetController {
     private List<Flashcard> setCards;
 
     private final FlashcardSetService flashcardSetService = new FlashcardSetService();
+    private Map<String, String> localizedStrings;
 
     @FXML
     private void initialize() {
+        localizedStrings = LocalizationService.getLocalizedStrings();
         FlashcardSet set = flashcardSetService.getSetWithCards( AppState.selectedFlashcardSet.get().getFlashcardSetId() );
         setCards = new ArrayList<>(set.getCards());
         // Header
         if (headerController != null) {
             headerController.setTitle(set.getSubject());
-            headerController.setSubtitle("Total: " + setCards.size());
+            headerController.setSubtitle(MessageFormat.format(localizedStrings.get("flashcardSet.subtitle"), setCards.size()));
             headerController.setBackVisible(true);
             headerController.setOnBack(() -> Navigator.go(AppState.Screen.CLASS_DETAIL));
         }
 
         // For detail header
         AppState.detailHeaderTitle.set(set.getSubject());
-        AppState.detailHeaderSubtitle.set("Total: " + setCards.size());
+        AppState.detailHeaderSubtitle.set(MessageFormat.format(localizedStrings.get("flashcardSet.subtitle"), setCards.size()));
 
         renderGrid();
     }
