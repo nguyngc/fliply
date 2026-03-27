@@ -55,7 +55,7 @@
                         <MenuItem text="English" onAction="#switchToEnglish"/>
                         <MenuItem text="Finnish" onAction="#switchToFinnish"/>
                         <MenuItem text="Korean" onAction="#switchToKorean"/>
-                        <MenuItem text="Laos" onAction="#switchToLao"/>
+                        <MenuItem text="Lao" onAction="#switchToLao"/>
                         <MenuItem text="Tiếng Việt" onAction="#switchToVietnamese"/>
                     </items>
                 </MenuButton>
