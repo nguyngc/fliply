@@ -64,13 +64,13 @@ public class WelcomeController {
     }
 
     @FXML
-    private void switchToKorea() {
+    private void switchToKorean() {
         LocaleManager.setLocale("ko", "KR");
         Navigator.reloadCurrent();
     }
 
     @FXML
-    private void switchToLaos() {
+    private void switchToLao() {
         LocaleManager.setLocale("lo", "LA");
         Navigator.reloadCurrent();
     }

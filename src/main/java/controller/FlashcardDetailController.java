@@ -11,10 +11,13 @@ import model.AppState;
 import model.entity.Flashcard;
 import model.entity.FlashcardSet;
 import model.service.FlashcardService;
+import util.LocalizationService;
 import view.Navigator;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class FlashcardDetailController {
 
@@ -40,8 +43,11 @@ public class FlashcardDetailController {
     @FXML
     private Label pageLabel;
 
+    private Map<String, String> localizedStrings;
+
     @FXML
     private void initialize() {
+        localizedStrings = LocalizationService.getLocalizedStrings();
         boolean isFromFlashcardSet = AppState.isFromFlashcardSet.get();
 
         // Build cards from passed list
@@ -54,7 +60,7 @@ public class FlashcardDetailController {
         if (headerController != null) {
             headerController.setBackVisible(true);
             headerController.setTitle(AppState.detailHeaderTitle.get());
-            headerController.setSubtitle("Total: " + cards.size());
+            headerController.setSubtitle(MessageFormat.format(localizedStrings.get("flashcardSet.subtitle"), cards.size()));
 
             if (isFromFlashcardSet) {
                 headerController.setOnBack(() -> Navigator.go(AppState.Screen.FLASHCARD_SET));

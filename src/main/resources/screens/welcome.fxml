@@ -32,8 +32,8 @@
             <items>
                 <MenuItem text="English" onAction="#switchToEnglish"/>
                 <MenuItem text="Finnish" onAction="#switchToFinnish"/>
-                <MenuItem text="Korea" onAction="#switchToKorea"/>
-                <MenuItem text="Laos" onAction="#switchToLaos"/>
+                <MenuItem text="Korean" onAction="#switchToKorean"/>
+                <MenuItem text="Lao" onAction="#switchToLao"/>
                 <MenuItem text="Tiếng Việt" onAction="#switchToVietnamese"/>
             </items>
         </MenuButton>
