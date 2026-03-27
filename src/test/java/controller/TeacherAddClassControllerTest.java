@@ -112,7 +112,7 @@ class TeacherAddClassControllerTest {
     void testInitialize_setsHeaderCorrectly() {
         FakeHeaderController header = (FakeHeaderController) getPrivate("headerController");
 
-        assertEquals("New Class", header.titleLabel.getText());
+        assertEquals("New class", header.titleLabel.getText());
         assertTrue(header.backButton.isVisible());
     }
 
