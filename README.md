@@ -11,8 +11,11 @@ Fliply is an online flashcard learning application for students and teachers. Th
 - Quiz mode
 - Classroom management
 - Progress tracking
-- Statistics
+- Support multi-language (English, Finnish, Korean, Lao, Vietnamese)
 
+## Screens
+![Fliply Welcome](documents/Images/Fliply-Welcome.png)
+![Fliply Account](documents/Images/Fliply-Account.png)
 
 ## Diagrams
 ### Use Case Diagram
@@ -26,6 +29,13 @@ Fliply is an online flashcard learning application for students and teachers. Th
 ### Relational Schema
 
 ![Relational Schema](documents/Diagrams/RelationalSchema.png)
+
+### Activity Diagram
+![Activity Diagram](documents/Diagrams/ActivityDiagram-GenerateQuiz.png)
+
+### Class Schema
+![Class Diagram](documents/Diagrams/ClassDiagram.png)
+
 ## Technologies Used
 - Java 21
 - JavaFX
