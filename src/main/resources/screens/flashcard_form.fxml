@@ -23,7 +23,7 @@
                     </padding>
 
                     <ComboBox fx:id="subjectCombo"
-                              promptText="Subject"
+                              promptText="%flashcardForm.subject"
                               maxWidth="Infinity"
                               prefHeight="42"
                               style="-fx-background-color: white;
@@ -34,11 +34,11 @@
                                       -fx-font-size: 14px;"/>
 
 
-                    <Label text="Term"
+                    <Label text="%flashcardForm.term"
                            style="-fx-font-size: 14px; -fx-text-fill: #8C8C8C;"/>
 
                     <TextField fx:id="termField"
-                               promptText="Term"
+                               promptText="%flashcardForm.term"
                                style="-fx-background-color: white;
                                       -fx-background-radius: 14;
                                       -fx-border-color: rgba(31,31,57,0.20);
@@ -46,11 +46,11 @@
                                       -fx-padding: 10 15;
                                       -fx-font-size: 14px;"/>
 
-                    <Label text="Definition"
+                    <Label text="%flashcardForm.definition"
                            style="-fx-font-size: 14px; -fx-text-fill: #8C8C8C;"/>
 
                     <TextArea fx:id="definitionArea"
-                              promptText="Definition"
+                              promptText="%flashcardForm.definition"
                               prefRowCount="6"
                               wrapText="true"
                               styleClass="form-textarea"
@@ -61,7 +61,7 @@
 
 
                     <HBox spacing="14">
-                        <Button text="Save"
+                        <Button text="%flashcardForm.save"
                                 onAction="#save"
                                 HBox.hgrow="ALWAYS"
                                 maxWidth="Infinity"
@@ -72,7 +72,7 @@
                                        -fx-font-weight: 500;
                                        -fx-padding: 10px 32px 10px 32px"/>
 
-                        <Button text="Cancel"
+                        <Button text="%flashcardForm.cancel"
                                 onAction="#cancel"
                                 HBox.hgrow="ALWAYS"
                                 maxWidth="Infinity"
