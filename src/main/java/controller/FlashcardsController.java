@@ -13,10 +13,15 @@ import model.AppState;
 import model.entity.Flashcard;
 import model.entity.User;
 import model.service.FlashcardService;
+import util.LocaleManager;
+import util.LocalizationService;
 import view.Navigator;
 
 import java.io.IOException;
+import java.text.MessageFormat;
 import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
 
 public class FlashcardsController {
     @FXML
@@ -27,10 +32,13 @@ public class FlashcardsController {
     private GridPane termGrid;
 
     private final FlashcardService flashcardService = new FlashcardService();
+    //private Map<String, String> localizedStrings;
+    private final ResourceBundle rb =  ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
 
 
     @FXML
     private void initialize() {
+        // localizedStrings = LocalizationService.getLocalizedStrings();
         // Load Flashcards
         User user = AppState.currentUser.get();
         if (user != null) {
@@ -40,8 +48,10 @@ public class FlashcardsController {
 
         // Header
         if (headerController != null) {
-            headerController.setTitle("My Flashcards");
-            headerController.setSubtitle("Total: " + AppState.myFlashcards.size());
+            // headerController.setTitle(localizedStrings.get("flashcards.title"));
+            headerController.setTitle(rb.getString("flashcards.title"));
+            // headerController.setSubtitle(localizedStrings.get("flashcards.total")+ AppState.myFlashcards.size());
+            headerController.setSubtitle(rb.getString("flashcards.total")+ AppState.myFlashcards.size());
         }
 
         renderGrid();
@@ -91,7 +101,7 @@ public class FlashcardsController {
 
             return node;
         } catch (IOException ex) {
-            throw new RuntimeException("Failed to load term_tile.fxml", ex);
+            throw new RuntimeException(rb.getString("flashcards.error"), ex);
         }
     }
 
