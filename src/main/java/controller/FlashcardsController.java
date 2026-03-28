@@ -69,6 +69,7 @@ public class FlashcardsController {
 
                 AppState.isFromFlashcardSet.set(false);
                 AppState.navOverride.set(AppState.NavItem.FLASHCARDS);
+                AppState.detailHeaderTitle.set(card.getTerm());
 
                 Navigator.go(AppState.Screen.FLASHCARD_DETAIL); });
 
