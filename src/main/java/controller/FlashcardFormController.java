@@ -10,9 +10,11 @@ import model.AppState;
 import model.entity.Flashcard;
 import model.service.FlashcardService;
 import model.service.FlashcardSetService;
+import util.LocaleManager;
 import view.Navigator;
 import model.entity.FlashcardSet;
 import model.entity.User;
+import java.util.ResourceBundle;
 
 import java.util.List;
 
@@ -34,7 +36,7 @@ public class FlashcardFormController {
 
     private final FlashcardService flashcardService =  new FlashcardService();
     private final FlashcardSetService flashcardSetService =  new FlashcardSetService();
-
+    private final ResourceBundle rb =  ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
     @FXML
     private void initialize() {
         List<FlashcardSet> sets = flashcardSetService.getAllSets();
@@ -54,9 +56,10 @@ public class FlashcardFormController {
             });
 
             if (AppState.flashcardFormMode.get() == AppState.FormMode.EDIT) {
-                headerController.setTitle("Edit Flashcard");
+                // headerController.setTitle("Edit Flashcard");
+                headerController.setTitle(rb.getString("flashcardForm.title1"));
             } else {
-                headerController.setTitle("New Flashcard");
+                headerController.setTitle(rb.getString("flashcardForm.title2"));
             }
         }
 
