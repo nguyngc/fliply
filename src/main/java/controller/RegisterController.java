@@ -9,6 +9,8 @@ import model.dao.UserDao;
 import model.entity.User;
 import view.Navigator;
 
+import java.util.ResourceBundle;
+
 public class RegisterController {
 
     private final Image eyeOpen = new Image(getClass().getResourceAsStream("/images/eye_open.png"));
@@ -16,6 +18,9 @@ public class RegisterController {
 
     private boolean passwordVisible = false;
     private final UserDao userDao = new UserDao();
+
+    @FXML
+    private ResourceBundle resources;
 
     @FXML
     private TextField firstNameField;
@@ -73,39 +78,38 @@ public class RegisterController {
 
     @FXML
     public void register() {
-
-        // 1) read inputs
         String first = firstNameField.getText() == null ? "" : firstNameField.getText().trim();
         String last = lastNameField.getText() == null ? "" : lastNameField.getText().trim();
         String email = emailField.getText() == null ? "" : emailField.getText().trim();
         String pw = passwordVisible ? passwordTextField.getText() : passwordField.getText();
-        pw = (pw == null) ? "" : pw;
+        pw = (pw == null) ? "" : pw.trim();
 
         boolean isTeacher = teacherYes != null && teacherYes.isSelected();
-        int role = isTeacher ? 1 : 0; // 1 teacher, 0 student
+        int role = isTeacher ? 1 : 0;
 
-        // 2) basic validation
         if (!termsCheck.isSelected()) {
-            showWarning("Please accept terms & conditions.");
-            return;
-        }
-        if (first.isEmpty() || last.isEmpty() || email.isEmpty() || pw.isEmpty()) {
-            showWarning("Please fill in all fields.");
-            return;
-        }
-        if (!email.contains("@")) {
-            showWarning("Email is not valid.");
-            return;
-        }
-        if (pw.length() < 6) {
-            showWarning("Password must be at least 6 characters.");
+            showWarning(resources.getString("register.warning.acceptTerms"));
             return;
         }
 
-        // 3) DB check + insert
+        if (first.isEmpty() || last.isEmpty() || email.isEmpty() || pw.isEmpty()) {
+            showWarning(resources.getString("register.warning.fillAllFields"));
+            return;
+        }
+
+        if (!email.contains("@")) {
+            showWarning(resources.getString("register.warning.invalidEmail"));
+            return;
+        }
+
+        if (pw.length() < 6) {
+            showWarning(resources.getString("register.warning.passwordTooShort"));
+            return;
+        }
+
         try {
             if (userDao.existsByEmail(email)) {
-                showWarning("Email already exists.");
+                showWarning(resources.getString("register.warning.emailExists"));
                 return;
             }
 
@@ -116,9 +120,8 @@ public class RegisterController {
             user.setPassword(pw);
             user.setRole(role);
 
-            userDao.persist(user); // DB will generate userId
+            userDao.persist(user);
 
-            // 4) save to session and go home
             AppState.currentUser.set(user);
             AppState.setRole(user.isTeacher() ? AppState.Role.TEACHER : AppState.Role.STUDENT);
 
@@ -126,13 +129,13 @@ public class RegisterController {
 
         } catch (Exception e) {
             e.printStackTrace();
-            showWarning("Register failed (DB error).");
+            showWarning(resources.getString("register.warning.dbError"));
         }
     }
 
     private void showWarning(String msg) {
         Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle("Register");
+        alert.setTitle(resources.getString("register.alertTitle"));
         alert.setHeaderText(null);
         alert.setContentText(msg);
         alert.showAndWait();
