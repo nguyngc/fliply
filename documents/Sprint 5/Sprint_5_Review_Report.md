@@ -1,7 +1,12 @@
 # Sprint Review Report
 
+## Sprint Number & Dates
+**Sprint 5**  
+**Duration:** 2 weeks (18/03/2026 - 31/03/2026)  
+**Scrum Master:** Ngoc Nguyen
+
 ## Sprint Goal
-The goal of Sprint 5 was to prepare the Online Flashcard System for Study for full multilingual support by implementing UI localization, enabling language selection, and ensuring the system is ready for scalable internationalization.
+The goal of Sprint 5 is to prepare the **Online Flashcard System for Study** for full multilingual support by implementing user interface (UI) localization. This includes externalizing UI text, enabling language selection, supporting multiple languages (including non-Latin), updating backlog items, and ensuring proper documentation and system readiness for future localization scalability.
 
 ## Completed User Stories / Tasks
 - Identified and documented all translatable UI elements
@@ -20,8 +25,9 @@ The goal of Sprint 5 was to prepare the Online Flashcard System for Study for fu
 - Switching language from Account page
 - Dynamic UI updates without restarting the application
 - Display of multiple languages including non-Latin scripts
-- Example screens (Quiz, Flashcards, Account) showing localized UI
 - GitHub documentation update (README localization section with screen and new Activity/Class Diagram)
+
+![Welcome.png](images/Welcome.png) ![Login.png](images/Login.png) ![Register.png](images/Register.png) ![Account.png](images/Account.png)
 
 ## What Went Well
 - Successful implementation of dynamic language switching
