@@ -92,6 +92,11 @@ public class QuizDetailController {
         opt3.setText(opts.get(2));
         opt4.setText(opts.get(3));
 
+        opt1.setWrapText(true);
+        opt2.setWrapText(true);
+        opt3.setWrapText(true);
+        opt4.setWrapText(true);
+
         pageLabel.setText((idx + 1) + " / " + total);
 
         updateSubtitle();

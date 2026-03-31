@@ -33,23 +33,29 @@
             <!-- OPTIONS GRID -->
             <GridPane fx:id="optionsGrid" hgap="14" vgap="14">
                 <columnConstraints>
-                    <ColumnConstraints percentWidth="50"/>
-                    <ColumnConstraints percentWidth="50"/>
+                    <ColumnConstraints percentWidth="50" hgrow="ALWAYS" fillWidth="true"/>
+                    <ColumnConstraints percentWidth="50" hgrow="ALWAYS" fillWidth="true"/>
                 </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints prefHeight="80" vgrow="NEVER" fillHeight="true"/>
+                    <RowConstraints prefHeight="80" vgrow="NEVER" fillHeight="true"/>
+                </rowConstraints>
 
                 <Button fx:id="opt1" onAction="#chooseOption" GridPane.rowIndex="0" GridPane.columnIndex="0"
-                        maxWidth="Infinity" prefHeight="56"
-                        style="-fx-background-color: white; -fx-background-radius: 16; -fx-font-weight: 600; -fx-border-color: D9F4F1; -fx-border-radius: 16;"/>
+                        maxWidth="Infinity" maxHeight="Infinity" wrapText="true" alignment="TOP_LEFT" textAlignment="LEFT"
+                        style="-fx-background-color: white; -fx-background-radius: 16; -fx-font-weight: 600; -fx-border-color: D9F4F1; -fx-border-radius: 16; -fx-alignment: CENTER_LEFT; -fx-padding: 12 16 12 16;"/>
+
                 <Button fx:id="opt2" onAction="#chooseOption" GridPane.rowIndex="0" GridPane.columnIndex="1"
-                        maxWidth="Infinity" prefHeight="56"
-                        style="-fx-background-color: white; -fx-background-radius: 16; -fx-font-weight: 600; -fx-border-color: D9F4F1; -fx-border-radius: 16;"/>
+                        maxWidth="Infinity" maxHeight="Infinity" wrapText="true" alignment="TOP_LEFT" textAlignment="LEFT"
+                        style="-fx-background-color: white; -fx-background-radius: 16; -fx-font-weight: 600; -fx-border-color: D9F4F1; -fx-border-radius: 16; -fx-alignment: CENTER_LEFT; -fx-padding: 12 16 12 16;"/>
 
                 <Button fx:id="opt3" onAction="#chooseOption" GridPane.rowIndex="1" GridPane.columnIndex="0"
-                        maxWidth="Infinity" prefHeight="56"
-                        style="-fx-background-color: white; -fx-background-radius: 16; -fx-font-weight: 600; -fx-border-color: D9F4F1; -fx-border-radius: 16;"/>
+                        maxWidth="Infinity" maxHeight="Infinity" wrapText="true" alignment="TOP_LEFT" textAlignment="LEFT"
+                        style="-fx-background-color: white; -fx-background-radius: 16; -fx-font-weight: 600; -fx-border-color: D9F4F1; -fx-border-radius: 16; -fx-alignment: CENTER_LEFT; -fx-padding: 12 16 12 16;"/>
+
                 <Button fx:id="opt4" onAction="#chooseOption" GridPane.rowIndex="1" GridPane.columnIndex="1"
-                        maxWidth="Infinity" prefHeight="56"
-                        style="-fx-background-color: white; -fx-background-radius: 16; -fx-font-weight: 600; -fx-border-color: D9F4F1; -fx-border-radius: 16;"/>
+                        maxWidth="Infinity" maxHeight="Infinity" wrapText="true" alignment="TOP_LEFT" textAlignment="LEFT"
+                        style="-fx-background-color: white; -fx-background-radius: 16; -fx-font-weight: 600; -fx-border-color: D9F4F1; -fx-border-radius: 16; -fx-alignment: CENTER_LEFT; -fx-padding: 12 16 12 16;"/>
             </GridPane>
 
             <!-- NAV -->

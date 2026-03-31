@@ -2,7 +2,7 @@
 
 ## Sprint Number & Dates
 **Sprint 5**  
-**Duration:** 2 weeks (18/03/2026 - 01/04/2026)
+**Duration:** 2 weeks (18/03/2026 - 31/03/2026)
 
 ## Sprint Goal
 The goal of Sprint 5 is to prepare the **Online Flashcard System for Study** for full multilingual support by implementing user interface (UI) localization. This includes externalizing UI text, enabling language selection, supporting multiple languages (including non-Latin), updating backlog items, and ensuring proper documentation and system readiness for future localization scalability.
