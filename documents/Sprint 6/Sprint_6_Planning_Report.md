@@ -22,24 +22,16 @@ This sprint focuses on implementing multilingual database structures, performing
 
 ## Planned Tasks / Breakdown
 
-### 1. Database Localization
-Create new entities to include translation relationships
+### 1. Database Localization: Ngoc
+Create new entities to include translation relationships, Backend Model & Logic Updates
+
+- Add Arabic language (RTL)
 
 - USER_TRANSLATION
-
-- FLASHCARD_TRANSLATION
-
-- FLASHCARDSET_TRANSLATION
-
-- CLASS_TRANSLATION
-
-- LOCALIZATION_STRING
 
 - Add constraints, indexes, and language codes
 
 - Write SQL migration scripts  
-
-Backend Model & Logic Updates
 
 - Create DAO methods to fetch localized content
 
@@ -47,9 +39,8 @@ Backend Model & Logic Updates
 
 - Create LocalizationService class(load localization and fallback if missing)
 
-- Write unit tests for localization queries
 
-### 2.  Statistical Code Review
+### 2.  Statistical Code Review: Hoang
 - Run Static Analysis Tools (SonarQuib and SonarScaner): Detect errors, inefficiencies, and readability concerns.
 - Analyze Code Metrics. Record statistics for:  
    ▪ Cyclomatic complexity  
@@ -60,7 +51,7 @@ Backend Model & Logic Updates
    o Include tables, charts, or screenshots of metrics.  
    o Highlight high-priority issues and recommendations.  
 
-### 3. Code Clean-Up and Refactoring
+### 3. Code Clean-Up and Refactoring: Nhut
 - Refactor and Simplify  
     o Split complex functions into smaller units.  
     o Remove redundant or duplicate code.  
@@ -83,14 +74,14 @@ Backend Model & Logic Updates
    o Map each test to corresponding user stories or requirements.  
 
 ### 5. Architecture Design Documentation(prepare for reviewing)
-- Update system design artifacts such as ER Diagrams and UML models. 
-- Database localization plan and implementation report.
-- Documentation on chosen localization method  
-- Statistical Code Review Report containing:  
+- Ngoc: Update system design artifacts such as ER Diagrams and UML models. 
+- Ngoc: Database localization plan and implementation report.
+- Ngoc: Documentation on chosen localization method  
+- Hoang: Statistical Code Review Report containing:  
   o Summary metrics  
   o Key findings and suggested improvements  
   o Visual evidence (screenshots, charts)    
-- Formal Acceptance Test Plan Document including:
+- Thanh: Formal Acceptance Test Plan Document including:
   o Defined criteria and coverage matrix.
   o Example test cases with expected outcomes.
 
