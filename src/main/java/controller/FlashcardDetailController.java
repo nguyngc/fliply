@@ -3,10 +3,12 @@ package controller;
 import controller.components.FlashcardFlipCardController;
 import controller.components.HeaderController;
 import javafx.fxml.FXML;
+import javafx.geometry.NodeOrientation;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import model.AppState;
 import model.entity.Flashcard;
 import model.entity.FlashcardSet;
@@ -42,6 +44,8 @@ public class FlashcardDetailController {
     private Button nextButton;
     @FXML
     private Label pageLabel;
+    @FXML
+    private HBox navigationBox;
 
     private Map<String, String> localizedStrings;
 
@@ -49,6 +53,10 @@ public class FlashcardDetailController {
     private void initialize() {
         localizedStrings = LocalizationService.getLocalizedStrings();
         boolean isFromFlashcardSet = AppState.isFromFlashcardSet.get();
+
+        if (navigationBox != null) {
+            navigationBox.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
+        }
 
         // Build cards from passed list
         cards.clear();

@@ -1,15 +1,19 @@
 package view;
 
+import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.NodeOrientation;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import model.AppState;
 
 import java.io.IOException;
+import java.util.Locale;
 import java.util.ResourceBundle;
 
 public final class Navigator {
+    private static final String[] RTL_LANGUAGES = {"ar", "fa", "ur", "he"};
 
     private static Stage stage;
 
@@ -31,6 +35,7 @@ public final class Navigator {
             // Set up the scene and stage
             Scene scene = new Scene(root, 375, 750);
             applyLocaleFont(scene);
+            applyTextDirection(scene);
             stage.setScene(scene);
             stage.setTitle("Fliply");
             stage.setResizable(false);
@@ -63,7 +68,36 @@ public final class Navigator {
         }
     }
 
+    private static void applyTextDirection(Scene scene) {
+        if (scene == null) return;
+
+        Locale locale = util.LocaleManager.getLocale();
+        boolean isRtl = isRtlLanguage(locale);
+
+        Platform.runLater(() -> {
+            Parent root = scene.getRoot();
+            if (root != null) {
+                root.setNodeOrientation(
+                        isRtl ? NodeOrientation.RIGHT_TO_LEFT : NodeOrientation.LEFT_TO_RIGHT
+                );
+            }
+        });
+    }
+
+    private static boolean isRtlLanguage(Locale locale) {
+        if (locale == null) return false;
+
+        String language = locale.getLanguage();
+        for (String rtlLanguage : RTL_LANGUAGES) {
+            if (rtlLanguage.equals(language)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static void reloadCurrent() {
         go(AppState.currentScreen.get());
     }
+    
 }

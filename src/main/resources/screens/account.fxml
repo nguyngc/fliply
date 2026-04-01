@@ -53,6 +53,7 @@
                                    -fx-cursor: hand;">
                     <items>
                         <MenuItem text="English" onAction="#switchToEnglish"/>
+                        <MenuItem text="Arabic" onAction="#switchToArabic"/>
                         <MenuItem text="Finnish" onAction="#switchToFinnish"/>
                         <MenuItem text="Korean" onAction="#switchToKorean"/>
                         <MenuItem text="Lao" onAction="#switchToLao"/>

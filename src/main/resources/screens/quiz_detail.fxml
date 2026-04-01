@@ -59,7 +59,7 @@
             </GridPane>
 
             <!-- NAV -->
-            <HBox spacing="18" alignment="CENTER">
+            <HBox fx:id="navigationBox" spacing="18" alignment="CENTER">
                 <Button fx:id="prevBtn" onAction="#prev"
                         style="-fx-background-color: white;
                                        -fx-background-radius: 8;

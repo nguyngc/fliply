@@ -64,6 +64,12 @@ public class AccountController {
     }
 
     @FXML
+    private void switchToArabic() {
+        LocaleManager.setLocale("ar", "AR");
+        Navigator.reloadCurrent();
+    }
+
+    @FXML
     private void switchToFinnish() {
         LocaleManager.setLocale("fi", "FI");
         Navigator.reloadCurrent();

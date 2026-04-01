@@ -36,6 +36,8 @@ public class HeaderController {
     private Button moreButton;
     @FXML
     private ImageView moreIcon;
+    @FXML
+    private ImageView backIcon;
 
     private Runnable backAction;
     private Runnable editAction;
@@ -43,6 +45,10 @@ public class HeaderController {
 
     @FXML
     private void initialize() {
+        if (backIcon != null) {
+            backIcon.setScaleX(isRtlLocale() ? -1 : 1);
+        }
+
         // Build the menu once
         editItem.setOnAction(e -> {
             if (editAction != null) editAction.run();
@@ -140,4 +146,12 @@ public class HeaderController {
     }
 
     public enum Variant {STUDENT, TEACHER}
+
+    private boolean isRtlLocale() {
+        String language = LocaleManager.getLocale().getLanguage();
+        return "ar".equals(language)
+                || "fa".equals(language)
+                || "ur".equals(language)
+                || "he".equals(language);
+    }
 }
