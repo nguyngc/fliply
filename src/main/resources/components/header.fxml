@@ -23,7 +23,7 @@
                        -fx-padding: 5 0;
                        -fx-cursor: hand;">
             <graphic>
-                <ImageView fitWidth="30" fitHeight="40" preserveRatio="true">
+                <ImageView fx:id="backIcon" fitWidth="30" fitHeight="40" preserveRatio="true">
                     <image>
                         <Image url="@../images/back_arrow.png"/>
                     </image>

@@ -30,7 +30,7 @@
                     <fx:include fx:id="flipCard" source="../components/flashcard_flip_card.fxml"/>
 
                     <!-- Navigation row: <  1 / 20  > -->
-                    <HBox alignment="CENTER" spacing="18">
+                    <HBox fx:id="navigationBox" alignment="CENTER" spacing="18">
                         <Button fx:id="prevButton"
                                 onAction="#prev"
                                 style="-fx-background-color: white;

@@ -3,9 +3,11 @@ package controller;
 import controller.components.HeaderController;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.NodeOrientation;
 import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import model.AppState;
 import model.entity.Quiz;
 import model.service.QuizService;
@@ -42,6 +44,8 @@ public class QuizDetailController {
     private Button prevBtn;
     @FXML
     private Button nextBtn;
+    @FXML
+    private HBox navigationBox;
 
 
     @FXML
@@ -69,6 +73,10 @@ public class QuizDetailController {
             headerController.setTitle(MessageFormat.format(titleTemplate, quiz.getQuizId()));
             headerController.setBackVisible(true);
             headerController.setOnBack(() -> Navigator.go(AppState.Screen.QUIZZES));
+        }
+
+        if (navigationBox != null) {
+            navigationBox.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
         }
 
         AppState.navOverride.set(AppState.NavItem.QUIZZES);
