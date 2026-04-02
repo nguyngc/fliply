@@ -16,6 +16,7 @@ Fliply is an online flashcard learning application for students and teachers. Th
 ## Screens
 ![Fliply Welcome](documents/Images/Fliply-Welcome.png)
 ![Fliply Account](documents/Images/Fliply-Account.png)
+![Fliply Account RTL](documents/Images/Fliply-Account-RTL.png)
 
 ## Diagrams
 ### Use Case Diagram
