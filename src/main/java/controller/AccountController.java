@@ -5,12 +5,16 @@ import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.MenuButton;
 import model.AppState;
+import model.entity.User;
+import model.service.UserService;
 import util.LocaleManager;
 import view.Navigator;
 
 import java.util.ResourceBundle;
 
 public class AccountController {
+    private final UserService userService = new UserService();
+
     @FXML
     private MenuButton languageMenuButton;
 
@@ -54,42 +58,50 @@ public class AccountController {
 
     @FXML
     private void onLogout() {
+        LocaleManager.setLocaleByLanguage("en");
+        AppState.currentUser.set(null);
         Navigator.go(AppState.Screen.LOGIN);
     }
 
     @FXML
     private void switchToEnglish() {
-        LocaleManager.setLocale("en", "US");
-        Navigator.reloadCurrent();
+        saveLanguagePreference("en");
     }
 
     @FXML
     private void switchToArabic() {
-        LocaleManager.setLocale("ar", "AR");
-        Navigator.reloadCurrent();
+        saveLanguagePreference("ar");
     }
 
     @FXML
     private void switchToFinnish() {
-        LocaleManager.setLocale("fi", "FI");
-        Navigator.reloadCurrent();
+        saveLanguagePreference("fi");
     }
 
     @FXML
     private void switchToKorean() {
-        LocaleManager.setLocale("ko", "KR");
-        Navigator.reloadCurrent();
+        saveLanguagePreference("ko");
     }
 
     @FXML
     private void switchToLao() {
-        LocaleManager.setLocale("lo", "LA");
-        Navigator.reloadCurrent();
+        saveLanguagePreference("lo");
     }
 
     @FXML
     private void switchToVietnamese() {
-        LocaleManager.setLocale("vi", "VN");
+        saveLanguagePreference("vi");
+    }
+
+    private void saveLanguagePreference(String language) {
+        LocaleManager.setLocaleByLanguage(language);
+
+        User currentUser = AppState.currentUser.get();
+        if (currentUser != null) {
+            currentUser.setLanguage(language);
+            userService.update(currentUser);
+        }
+
         Navigator.reloadCurrent();
     }
 }

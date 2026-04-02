@@ -2,6 +2,7 @@ package model.service;
 
 import model.dao.UserDao;
 import model.entity.User;
+import util.LocaleManager;
 
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class UserService {
         u.setFirstName(firstName);
         u.setLastName(lastName);
         u.setRole(0); // default student 0)
+        u.setLanguage(LocaleManager.getCurrentLanguageCode());
 
         userDao.persist(u);
         return u;

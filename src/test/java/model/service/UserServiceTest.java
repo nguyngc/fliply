@@ -3,6 +3,7 @@ package model.service;
 import model.dao.UserDao;
 import model.entity.User;
 import org.junit.jupiter.api.*;
+import util.LocaleManager;
 
 import java.util.UUID;
 
@@ -25,6 +26,8 @@ class UserServiceTest {
         String email = "register+" + uid + "@test.com";
         String password = "password123";
 
+        LocaleManager.setLocale("vi", "VN");
+
         User u = userService.register(email, password, "Nhut", "Vo");
 
         assertNotNull(u);
@@ -34,9 +37,11 @@ class UserServiceTest {
         assertEquals("Nhut", u.getFirstName());
         assertEquals("Vo", u.getLastName());
         assertEquals(0, u.getRole()); // default student role
+        assertEquals("vi", u.getLanguage());
 
         // cleanup
         userDao.delete(u);
+        LocaleManager.setLocale("en", "US");
     }
 
     @Test

@@ -61,6 +61,13 @@ class UserTest {
     }
 
     @Test
+    void getLanguage() {
+        User u = new User();
+        u.setLanguage("ar");
+        assertEquals("ar", u.getLanguage());
+    }
+
+    @Test
     void setFirstName() {
         User u = new User();
         u.setFirstName("Alice");
@@ -96,6 +103,13 @@ class UserTest {
     }
 
     @Test
+    void setLanguage() {
+        User u = new User();
+        u.setLanguage("vi");
+        assertEquals("vi", u.getLanguage());
+    }
+
+    @Test
     void testToString() {
         User u = new User();
         setId(u, 5);
@@ -104,6 +118,7 @@ class UserTest {
         u.setEmail("c@d.com");
         u.setPassword("pw");
         u.setRole(1);
+        u.setLanguage("fi");
 
         String s = u.toString();
         assertTrue(s.contains("userId=5"));
@@ -112,6 +127,7 @@ class UserTest {
         assertTrue(s.contains("email='c@d.com'"));
         assertTrue(s.contains("password='pw'"));
         assertTrue(s.contains("role=1"));
+        assertTrue(s.contains("language='fi'"));
     }
 
     @Test

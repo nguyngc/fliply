@@ -9,6 +9,7 @@ CREATE TABLE `USER`
     Email     VARCHAR(255) NOT NULL,
     Password  VARCHAR(128) NOT NULL,
     Role      INT NOT NULL,
+    Language  VARCHAR(2) NULL,
     PRIMARY KEY (UserId)
 );
 
@@ -88,4 +89,3 @@ CREATE TABLE STUDY
     FOREIGN KEY (UserId) REFERENCES `USER`(UserId),
     FOREIGN KEY (FlashcardSetId) REFERENCES FLASHCARDSET(FlashcardSetId)
 );
-

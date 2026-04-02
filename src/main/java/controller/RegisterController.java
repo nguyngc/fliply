@@ -7,6 +7,7 @@ import javafx.scene.image.ImageView;
 import model.AppState;
 import model.dao.UserDao;
 import model.entity.User;
+import util.LocaleManager;
 import view.Navigator;
 
 import java.util.ResourceBundle;
@@ -119,6 +120,7 @@ public class RegisterController {
             user.setEmail(email);
             user.setPassword(pw);
             user.setRole(role);
+            user.setLanguage(LocaleManager.getCurrentLanguageCode());
 
             userDao.persist(user);
 
