@@ -75,6 +75,7 @@ public class LoginController {
         User user = userDao.findByEmailAndPassword(email, password);
         if (user != null) {
             errorLabel.setVisible(false);
+            LocaleManager.setLocaleByLanguage(user.getLanguage());
             AppState.currentUser.set(user);
             AppState.setRole(user.isTeacher() ? AppState.Role.TEACHER : AppState.Role.STUDENT);
             Navigator.go(AppState.Screen.HOME);

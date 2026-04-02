@@ -27,6 +27,9 @@ public class User {
     @Column(name = "Role", nullable = false)
     private Integer role;
 
+    @Column(name = "Language", length = 2)
+    private String language;
+
     public User() {}
 
     public Integer getUserId() { return userId; }
@@ -35,12 +38,14 @@ public class User {
     public String getEmail() { return email; }
     public String getPassword() { return password; }
     public Integer getRole() { return role; }
+    public String getLanguage() { return language; }
 
     public void setFirstName(String firstName) { this.firstName = firstName; }
     public void setLastName(String lastName) { this.lastName = lastName; }
     public void setEmail(String email) { this.email = email; }
     public void setPassword(String password) { this.password = password; }
     public void setRole(Integer role) { this.role = role; }
+    public void setLanguage(String language) { this.language = language; }
 
     @Override
     public String toString() {
@@ -51,6 +56,7 @@ public class User {
                 ", email='" + email + '\'' +
                 ", password='" + password + '\'' +
                 ", role=" + role +
+                ", language='" + language + '\'' +
                 '}';
     }
 
