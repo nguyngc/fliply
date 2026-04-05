@@ -50,6 +50,12 @@
             <artifactId>mariadb-java-client</artifactId>
             <version>3.1.2</version>
         </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>2.2.224</version>
+            <scope>test</scope>
+        </dependency>
         <!-- Unit test -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -80,6 +86,17 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.2.5</version>
+                <configuration>
+                    <argLine>@{argLine}</argLine>
+                    <systemPropertyVariables>
+                        <fliply.db.mode>h2</fliply.db.mode>
+                    </systemPropertyVariables>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.13.0</version>
                 <configuration>
@@ -89,7 +106,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.12</version>
+                <version>0.8.14</version>
                 <executions>
                     <execution>
                         <goals>
@@ -111,6 +128,12 @@
                         <exclude>sun/util/cldr/**</exclude>
                         <exclude>sun/util/resources/provider/LocaleDataProvider</exclude>
                         <exclude>sun/text/resources/cldr/ext/FormatData_fi</exclude>
+                        <exclude>app/**</exclude>
+                        <exclude>default/**</exclude>
+                        <exclude>controller/**</exclude>
+                        <exclude>controller/components/**</exclude>
+                        <exclude>view/**</exclude>
+                        <exclude>Main</exclude>
                     </excludes>
                 </configuration>
             </plugin>
@@ -134,26 +157,7 @@
                     <mainClass>Main</mainClass>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>3.4.1</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                        <configuration>
-                            <transformers>
-                                <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>Main</mainClass>
-                                </transformer>
-                            </transformers>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+            <!-- Keep a single package artifact: disable shade execution. -->
         </plugins>
     </build>
 </project>

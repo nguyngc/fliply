@@ -20,7 +20,6 @@ import java.lang.reflect.Method;
 import java.nio.file.Files;
 import java.util.List;
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -74,8 +73,6 @@ class TeacherAddSetControllerTest {
 
         setPrivate("subjectField", new TextField());
         setPrivate("fileStatusLabel", new Label());
-        ResourceBundle fakeBundle = ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
-        setPrivate("resources", fakeBundle);
 
         FakeFlashcardSetService fakeService = new FakeFlashcardSetService();
 
