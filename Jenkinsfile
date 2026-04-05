@@ -27,7 +27,7 @@ pipeline {
             steps {
                 script {
                     if (isUnix()) {
-                        sh 'mvn clean package -DskipTests'
+                        sh 'mvn clean install -DskipTests'
                     } else {
                         bat 'mvn clean install -DskipTests'
                     }
@@ -45,19 +45,20 @@ pipeline {
                                 -Dtest=*DaoTest,*ServiceTest,*RepositoryTest test
                         '''
                     } else {
-                        bat """
-                        set DB_HOST=${env.DB_HOST} && ^
-                        set DB_PORT=${env.DB_PORT} && ^
-                        set DB_NAME=${env.DB_NAME} && ^
-                        set DB_USER=${env.DB_USER} && ^
-                        set DB_PASS=${env.DB_PASS} && ^
-                        mvn -DDB_HOST=%DB_HOST% -DDB_PORT=%DB_PORT% -DDB_NAME=%DB_NAME% -DDB_USER=%DB_USER% -DDB_PASS=%DB_PASS% -Dtest=*DaoTest,*ServiceTest,*RepositoryTest test
-                                """
+                        withEnv([
+                            "DB_HOST=${env.DB_HOST}",
+                            "DB_PORT=${env.DB_PORT}",
+                            "DB_NAME=${env.DB_NAME}",
+                            "DB_USER=${env.DB_USER}",
+                            "DB_PASS=${env.DB_PASS}"
+                        ]) {
+                            bat 'mvn -DDB_HOST=%DB_HOST% -DDB_PORT=%DB_PORT% -DDB_NAME=%DB_NAME% -DDB_USER=%DB_USER% -DDB_PASS=%DB_PASS% -Dtest=*DaoTest,*ServiceTest,*RepositoryTest test'
+                        }
                     }
                 }
             }
         }
-        
+
         stage('Code Coverage') {
             steps {
                 script {
@@ -149,14 +150,12 @@ EOF
         }
     }
 
-
     post {
         always {
             script {
                 if (isUnix()) {
                     sh 'rm -f .env'
                 } else {
-                    // Cleanup container
                     bat 'docker rm -f mariadb_test 2>nul || exit 0'
                 }
             }
