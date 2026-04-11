@@ -47,10 +47,10 @@ public class MariaDbJPAConnection {
         }
 
         String host = getEnvOrDefault("DB_HOST", "localhost");
-        String port = getEnvOrDefault("DB_PORT", "3306");
+        String port = getEnvOrDefault("DB_PORT", "3307");
         String dbName = getEnvOrDefault("DB_NAME", "fliply");
-        String user = getEnvOrDefault("DB_USER", "appuser");
-        String pass = getEnvOrDefault("DB_PASS", "password");
+        String user = getEnvOrDefault("DB_USER", "root");
+        String pass = getEnvOrDefault("DB_PASS", "123456");
 
         properties.put("jakarta.persistence.jdbc.driver", "org.mariadb.jdbc.Driver");
         properties.put("jakarta.persistence.jdbc.url", "jdbc:mariadb://" + host + ":" + port + "/" + dbName);

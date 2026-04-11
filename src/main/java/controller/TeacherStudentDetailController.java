@@ -11,7 +11,6 @@ import javafx.scene.layout.VBox;
 import model.AppState;
 import model.entity.ClassModel;
 import model.entity.FlashcardSet;
-import model.entity.Study;
 import model.entity.User;
 import model.service.StudyService;
 import view.Navigator;
@@ -29,8 +28,6 @@ public class TeacherStudentDetailController {
 
     @FXML
     private void initialize() {
-//        AppState.StudentItem s = AppState.selectedStudent.get();
-//        AppState.ClassItem c = AppState.selectedClass.get();
         User s = AppState.selectedStudent.get();
         ClassModel c =  AppState.selectedClass.get();
 

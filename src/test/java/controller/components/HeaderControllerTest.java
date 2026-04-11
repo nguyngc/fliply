@@ -161,18 +161,18 @@ class HeaderControllerTest {
     }
 
     @Test
-    void testEditActionRuns() throws Exception {
+    void testEditActionRuns() {
         final boolean[] called = {false};
         controller.setOnEdit(() -> called[0] = true);
 
         ContextMenu menu = (ContextMenu) getPrivate("moreMenu");
-        menu.getItems().get(0).getOnAction().handle(new ActionEvent());
+        menu.getItems().getFirst().getOnAction().handle(new ActionEvent());
 
         assertTrue(called[0]);
     }
 
     @Test
-    void testDeleteActionRuns() throws Exception {
+    void testDeleteActionRuns() {
         final boolean[] called = {false};
         controller.setOnDelete(() -> called[0] = true);
 
@@ -187,7 +187,7 @@ class HeaderControllerTest {
         controller.setEditEnabled(false);
         ContextMenu menu = (ContextMenu) getPrivate("moreMenu");
 
-        assertTrue(menu.getItems().get(0).isDisable());
+        assertTrue(menu.getItems().getFirst().isDisable());
     }
 
     @Test

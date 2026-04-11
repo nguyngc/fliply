@@ -4,7 +4,6 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import model.datasource.MariaDbJPAConnection;
 import model.entity.ClassDetails;
-import model.entity.ClassModel;
 
 import java.util.List;
 
