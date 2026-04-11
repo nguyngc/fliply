@@ -22,7 +22,6 @@ import model.service.UserService;
 import util.LocaleManager;
 import view.Navigator;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -53,73 +52,83 @@ public class TeacherClassDetailController {
     private Label setsSectionLabel;
     @FXML
     private VBox setListBox;
-
-    //private AppState.ClassItem c;
+    
+    // The currently selected class
     private ClassModel c;
-    // Demo "directory" of all students in the system (later this comes from DB)
-    //private static final List<AppState.StudentItem> ALL_STUDENTS = new ArrayList<>();
-    private final ClassDetailsService classDetailsService =  new ClassDetailsService();
+    
+    // Service for class management operations
+    private final ClassDetailsService classDetailsService = new ClassDetailsService();
+    
+    // Service for user management operations
     private final UserService userService = new UserService();
-    private final ResourceBundle rb =  ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
+    
+    // Resource bundle for localized strings
+    private final ResourceBundle rb = ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
 
+    /**
+     * Initializes the controller when the FXML is loaded.
+     * Sets up the header, initializes the student search interface, and renders all content.
+     */
     @FXML
     private void initialize() {
-//        AppState.seedDemoIfNeeded();
-//        seedStudentDirectoryIfNeeded();
-
+        // ========== Get Selected Class ==========
+        // Retrieve the class selected from the previous screen
         c = AppState.selectedClass.get();
         if (c == null) {
+            // Navigate back to classes list if no class is selected
             Navigator.go(AppState.Screen.CLASSES);
             return;
         }
 
-        // Header
+        // ========== Configure Header ==========
         if (headerController != null) {
+            // Show back button to return to classes list
             headerController.setBackVisible(true);
+            // Set header title to the class name
             headerController.setTitle(c.getClassName());
+            // Set back navigation
             headerController.setOnBack(() -> Navigator.go(AppState.Screen.CLASSES));
+            // Apply teacher variant styling
             headerController.applyVariant(HeaderController.Variant.TEACHER);
         }
 
-        // Initial state: only show "+ Add more students"
+        // ========== Configure Student Search ==========
+        // Initially hide the student search interface
         studentSearchBox.setVisible(false);
         studentSearchBox.setManaged(false);
 
-        // Search listener
+        // ========== Setup Search Listener ==========
+        // Listen for text changes in the search field and update results in real-time
         studentSearchField.textProperty().addListener((obs, o, n) -> renderSearchResults());
 
-        // Render
+        // ========== Render Initial Content ==========
+        // Update student and set counts
         refreshCounts();
+        // Display enrolled students
         renderEnrolledStudents();
+        // Display flashcard sets
         renderSets();
     }
 
-//    private void seedStudentDirectoryIfNeeded() {
-//        if (!ALL_STUDENTS.isEmpty()) return;
-//
-//        // Demo students pool (later: DB)
-//        ALL_STUDENTS.add(new AppState.StudentItem("Student 1", "student1@email.com"));
-//        ALL_STUDENTS.add(new AppState.StudentItem("Student 2", "student2@email.com"));
-//        ALL_STUDENTS.add(new AppState.StudentItem("Student 3", "student3@email.com"));
-//        ALL_STUDENTS.add(new AppState.StudentItem("Student 4", "student4@email.com"));
-//        ALL_STUDENTS.add(new AppState.StudentItem("Student 5", "student5@email.com"));
-//        ALL_STUDENTS.add(new AppState.StudentItem("Student 6", "student6@email.com"));
-//        ALL_STUDENTS.add(new AppState.StudentItem("Anna Nguyen", "anna.nguyen@email.com"));
-//        ALL_STUDENTS.add(new AppState.StudentItem("Minh Tran", "minh.tran@email.com"));
-//        ALL_STUDENTS.add(new AppState.StudentItem("Linh Pham", "linh.pham@email.com"));
-//    }
-
+    /**
+     * Updates the labels displaying student and flashcard set counts.
+     */
     private void refreshCounts() {
+        // Update students section label with current count
         if (studentsSectionLabel != null) {
             studentsSectionLabel.setText(rb.getString("classDetail.students") + " (" + c.getStudents().size() + ")");
         }
+        // Update sets section label with current count
         if (setsSectionLabel != null) {
             setsSectionLabel.setText(rb.getString("classDetail.sets") + " (" + c.getFlashcardSets().size() + ")");
         }
     }
 
-    // ---------------- Students: Enrolled list ----------------
+    // ========== STUDENTS SECTION: Enrolled List ==========
 
+    /**
+     * Renders the list of enrolled students in the class.
+     */
     private void renderEnrolledStudents() {
         enrolledStudentsBox.getChildren().clear();
 
@@ -132,6 +141,15 @@ public class TeacherClassDetailController {
         refreshCounts();
     }
 
+    /**
+     * Builds a student row component with name and remove button.
+     * Clicking the name navigates to student detail view.
+     * The remove button removes the student from the class.
+     *
+     * @param student The student user entity
+     * @param cd The class-student enrollment relationship
+     * @return A Node containing the formatted student row
+     */
     private Node buildEnrolledStudentRow(User student, ClassDetails cd) {
         HBox row = new HBox(10);
         row.setStyle("""
@@ -175,24 +193,43 @@ public class TeacherClassDetailController {
         return row;
     }
 
-    // ---------------- Students: Search/Add ----------------
+    // ========== STUDENTS SECTION: Search/Add ==========
 
+    /**
+     * Handles the show student search button click event.
+     * Displays the search interface and focuses the input field.
+     */
     @FXML
     private void onShowStudentSearch() {
+        // Show the search interface
         studentSearchBox.setVisible(true);
         studentSearchBox.setManaged(true);
+        // Focus the search input field
         studentSearchField.requestFocus();
+        // Render initial search results (empty list since field is empty)
         renderSearchResults();
     }
 
+    /**
+     * Handles the hide student search button click event.
+     * Hides the search interface and clears the search field.
+     */
     @FXML
     private void onHideStudentSearch() {
+        // Hide the search interface
         studentSearchBox.setVisible(false);
         studentSearchBox.setManaged(false);
+        // Clear the search field
         studentSearchField.clear();
+        // Clear search results
         searchResultsBox.getChildren().clear();
     }
 
+    /**
+     * Renders the student search results based on the current search query.
+     * Filters available students (not already enrolled) matching the search text.
+     * Updates in real-time as the user types.
+     */
     private void renderSearchResults() {
         if (!studentSearchBox.isVisible()) return;
 
@@ -227,6 +264,13 @@ public class TeacherClassDetailController {
         }
     }
 
+    /**
+     * Builds a search result row component with student info and add button.
+     * Clicking the add button enrolls the student in the class.
+     *
+     * @param student The student user entity to display
+     * @return A Node containing the formatted search result row
+     */
     private Node buildSearchResultRow(User student) {
         HBox row = new HBox(10);
         row.setStyle("""
@@ -266,13 +310,18 @@ public class TeacherClassDetailController {
         return row;
     }
 
-    // ---------------- Flashcard sets ----------------
+    // ========== FLASHCARD SETS SECTION ==========
 
+    /**
+     * Renders the list of flashcard sets in the class.
+     */
     private void renderSets() {
+        // Clear any previously displayed sets
         setListBox.getChildren().clear();
 
         for (FlashcardSet set : c.getFlashcardSets()) {
             try {
+                // Load the flashcard set card component from FXML
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/components/flashcard_set_card.fxml"));
                 Node node = loader.load();
 
@@ -283,6 +332,7 @@ public class TeacherClassDetailController {
                 // Teacher mode: hide progress
                 ctrl.setShowProgress(false);
 
+                // Handle card click to navigate to set detail
                 node.setOnMouseClicked(e -> {
                     AppState.selectedSet.set(set);
                     Navigator.go(AppState.Screen.TEACHER_FLASHCARD_SET_DETAIL);
@@ -291,23 +341,21 @@ public class TeacherClassDetailController {
                 setListBox.getChildren().add(node);
 
             } catch (Exception ex) {
-                throw new RuntimeException("Failed to load flashcard_set_card.fxml", ex);
+                throw new IllegalArgumentException("Failed to load flashcard_set_card.fxml", ex);
             }
         }
 
+        // Update set count display
         refreshCounts();
     }
 
+    /**
+     * Handles the add set button click event.
+     * Navigates to the teacher add flashcard set screen.
+     */
     @FXML
     private void onAddSet() {
         Navigator.go(AppState.Screen.TEACHER_ADD_SET);
     }
-
-//    public ClassDetailsService getClassDetailsService() {
-//        return classDetailsService;
-//    }
-//
-//    public void setClassDetailsService(ClassDetailsService classDetailsService) {
-//        this.classDetailsService = classDetailsService;
-//    }
+    
 }

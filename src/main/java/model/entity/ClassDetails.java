@@ -11,10 +11,6 @@ public class ClassDetails {
     @Column(name = "ClassDetailsId")
     private Integer classDetailsId;
 
-//    @ManyToOne(fetch = FetchType.EAGER)
-//    @JoinColumn(name = "UserId", referencedColumnName = "UserId", nullable = false)
-//    private User user;
-
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "ClassId", referencedColumnName = "ClassId", nullable = false)
     private ClassModel classModel;

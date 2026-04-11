@@ -1,14 +1,12 @@
 package model.entity;
 
 import jakarta.persistence.*;
-
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "CLASS")
-//public class ClassModel extends AppState.ClassItem {
+
 public class ClassModel {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

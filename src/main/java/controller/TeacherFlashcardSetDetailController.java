@@ -21,89 +21,149 @@ import view.Navigator;
 import java.text.MessageFormat;
 import java.util.Map;
 
+/**
+ * Controller for the teacher flashcard set detail screen.
+ * Displays all flashcards in a set and allows teachers to add, edit, and delete cards.
+ * Provides an inline editor for managing flashcard term and definition.
+ */
 public class TeacherFlashcardSetDetailController {
 
+    // ========== Header Components ==========
     @FXML
     private Parent header;
     @FXML
     private HeaderController headerController;
 
+    // ========== Editor Components ==========
+    // Container for the inline flashcard editor (add/edit mode)
     @FXML
     private VBox editorBox;
+    
+    // Text field for entering the flashcard term/question
     @FXML
     private TextField termField;
+    
+    // Text area for entering the flashcard definition/answer
     @FXML
     private TextArea definitionArea;
 
+    // ========== List Display Components ==========
+    // Container for displaying the list of flashcards
     @FXML
     private VBox cardsBox;
+    
+    // Button to add a new flashcard
     @FXML
     private Button addMoreBtn;
 
+    // ========== Data and Resources ==========
+    // The currently selected flashcard set
     private FlashcardSet set;
+    
+    // Map for localized strings from resource bundle
     private Map<String, String> localizedStrings;
 
-    /**
-     * null = adding new, otherwise editing existing row
-     */
+    // The flashcard currently being edited (null if adding new)
     private Flashcard editingRow = null;
 
+    /**
+     * Initializes the controller when the FXML is loaded.
+     * Loads the flashcard set, sets up the header, and renders all flashcards.
+     */
     @FXML
     private void initialize() {
-        //AppState.seedDemoIfNeeded();
+        // ========== Load Localized Strings ==========
         localizedStrings = LocalizationService.getLocalizedStrings();
+        
+        // ========== Get Selected Flashcard Set ==========
+        // Retrieve the flashcard set selected from the previous screen
         set = AppState.selectedSet.get();
         if (set == null) {
+            // Navigate back if no set is selected
             Navigator.go(AppState.Screen.TEACHER_CLASS_DETAIL);
             return;
         }
 
-        // Header
+        // ========== Configure Header ==========
         headerController.setBackVisible(true);
         headerController.setTitle(set.getSubject());
         headerController.setSubtitle(MessageFormat.format(localizedStrings.get("teacherFlashcardSetDetail.subtitle"), set.getCards().size()));
         headerController.setOnBack(() -> Navigator.go(AppState.Screen.TEACHER_CLASS_DETAIL));
         headerController.applyVariant(HeaderController.Variant.TEACHER);
 
+        // Set the active navigation item
         AppState.navOverride.set(AppState.NavItem.CLASSES);
 
+        // ========== Initialize UI ==========
+        // Hide the editor initially
         hideEditor();
+        // Display all flashcards
         renderList();
+        // Update the header with card count
         updateHeaderTotal();
     }
 
-    // ---------------- UI state ----------------
+    // ========== UI STATE MANAGEMENT ==========
 
+    /**
+     * Shows the editor in add mode.
+     * Clears the input fields and focuses on the term field.
+     */
     private void showEditorForAdd() {
+        // Set to null to indicate adding new card
         editingRow = null;
+        // Clear input fields
         termField.clear();
         definitionArea.clear();
+        // Show the editor
         editorBox.setVisible(true);
         editorBox.setManaged(true);
+        // Focus on term field
         termField.requestFocus();
     }
 
+    /**
+     * Shows the editor in edit mode with the specified flashcard data.
+     * Pre-fills the input fields with the card's current term and definition.
+     *
+     * @param row The flashcard to edit
+     */
     private void showEditorForEdit(Flashcard row) {
+        // Set the row being edited
         editingRow = row;
+        // Pre-fill the fields with current data
         termField.setText(row.getTerm());
         definitionArea.setText(row.getDefinition());
+        // Show the editor
         editorBox.setVisible(true);
         editorBox.setManaged(true);
+        // Focus on term field
         termField.requestFocus();
     }
 
+    /**
+     * Hides the editor and resets the editing state.
+     */
     private void hideEditor() {
+        // Hide the editor
         editorBox.setVisible(false);
         editorBox.setManaged(false);
+        // Reset the editing reference
         editingRow = null;
     }
 
+    /**
+     * Updates the header subtitle with the current flashcard count.
+     */
     private void updateHeaderTotal() {
         headerController.setSubtitle(MessageFormat.format(localizedStrings.get("teacherFlashcardSetDetail.subtitle"), set.getCards().size()));
     }
 
-    // ---------------- Rendering ----------------
+    // ========== RENDERING ==========
 
+    /**
+     * Renders the list of all flashcards in the set.
+     */
     private void renderList() {
         cardsBox.getChildren().clear();
 
@@ -112,7 +172,14 @@ public class TeacherFlashcardSetDetailController {
         }
     }
 
+    /**
+     * Builds a flashcard row component with term, definition, edit and delete buttons.
+     *
+     * @param row The flashcard entity to display
+     * @return A VBox containing the formatted flashcard row
+     */
     private VBox buildRowCard(Flashcard row) {
+        // Create the card container
         VBox card = new VBox(6);
         card.setStyle("""
                     -fx-background-color: white;
@@ -125,6 +192,7 @@ public class TeacherFlashcardSetDetailController {
         VBox left = new VBox(4);
         HBox.setHgrow(left, Priority.ALWAYS);
 
+        // ========== Left Side: Term and Definition ==========
         Label term = new Label(row.getTerm());
         term.setStyle("-fx-font-size: 16px; -fx-font-weight: 500; -fx-text-fill: #1F1F39;");
 
@@ -133,6 +201,7 @@ public class TeacherFlashcardSetDetailController {
 
         left.getChildren().addAll(term, def);
 
+        // ========== Right Side: Edit Button ==========
         ImageView editIcon = new ImageView(
                 new Image(getClass().getResourceAsStream("/images/edit_btn.png"))
         );
@@ -147,9 +216,9 @@ public class TeacherFlashcardSetDetailController {
                     -fx-padding: 6;
                     -fx-cursor: hand;
                 """);
-
         editBtn.setOnAction(e -> showEditorForEdit(row));
 
+        // ========== Right Side: Delete Button ==========
         ImageView deleteIcon = new ImageView(
                 new Image(getClass().getResourceAsStream("/images/delete_btn.png"))
         );
@@ -165,9 +234,13 @@ public class TeacherFlashcardSetDetailController {
                     -fx-cursor: hand;
                 """);
         deleteBtn.setOnAction(e -> {
+            // Remove the flashcard from the set
             set.getCards().remove(row);
+            // Hide the editor if open
             hideEditor();
+            // Re-render the list
             renderList();
+            // Update the header count
             updateHeaderTotal();
         });
 
@@ -177,39 +250,62 @@ public class TeacherFlashcardSetDetailController {
         return card;
     }
 
-    // ---------------- Actions ----------------
+    // ========== ACTION HANDLERS ==========
 
+    /**
+     * Handles the add more button click event.
+     * Shows the editor in add mode for creating a new flashcard.
+     */
     @FXML
     private void onAddMore() {
         showEditorForAdd();
     }
 
+    /**
+     * Handles the cancel button click event.
+     * Closes the editor without saving.
+     */
     @FXML
     private void onCancel() {
         hideEditor();
     }
 
+    /**
+     * Handles the save button click event.
+     * Validates inputs and saves the flashcard (add or edit).
+     */
     @FXML
     private void onSave() {
+        // Get and trim input values
         String term = termField.getText() == null ? "" : termField.getText().trim();
         String def = definitionArea.getText() == null ? "" : definitionArea.getText().trim();
+        
+        // Validate that both fields are not empty
         if (term.isBlank() || def.isBlank()) return;
 
+        // ========== Add or Edit ==========
         if (editingRow == null) {
-            // add new
+            // ========== ADD MODE ==========
+            // Create a new flashcard
             Flashcard newCard = new Flashcard();
             newCard.setTerm(term);
             newCard.setDefinition(def);
             newCard.setFlashcardSet(set);
+            // Add to the set
             set.getCards().add(newCard);
         } else {
-            // update existing
+            // ========== EDIT MODE ==========
+            // Update the existing card
             editingRow.setTerm(term);
             editingRow.setDefinition(def);
         }
 
+        // ========== Refresh UI ==========
+        // Hide the editor
         hideEditor();
+        // Re-render the list
         renderList();
+        // Update the header count
         updateHeaderTotal();
     }
 }
