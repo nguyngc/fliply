@@ -1,10 +1,10 @@
 package controller;
 
+import controller.components.AccountHeaderSupport;
 import controller.components.HeaderController;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import model.AppState;
-import util.LocaleManager;
 import view.Navigator;
 
 import java.util.ResourceBundle;
@@ -20,6 +20,8 @@ public class AccountAboutController {
     private Parent header;
     @FXML
     private HeaderController headerController;
+    @FXML
+    private ResourceBundle resources;
 
     /**
      * Initializes the controller when the FXML is loaded.
@@ -27,19 +29,7 @@ public class AccountAboutController {
      */
     @FXML
     private void initialize() {
-        // Get localized string resources
-        ResourceBundle rb = ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
-        
-        // Configure back button
-        headerController.setBackVisible(true);
-        headerController.setTitle(rb.getString("about.header.title"));
-        headerController.setSubtitle("");
-        headerController.setOnBack(() -> Navigator.go(AppState.Screen.ACCOUNT));
-        
-        // Apply styling variant based on whether the user is a teacher or student
-        headerController.applyVariant(AppState.isTeacher()
-                ? HeaderController.Variant.TEACHER
-                : HeaderController.Variant.STUDENT);
+        AccountHeaderSupport.configure(headerController, resources, "about.header.title", () -> Navigator.go(AppState.Screen.ACCOUNT));
 
         // Set the active navigation item to ACCOUNT
         AppState.navOverride.set(AppState.NavItem.ACCOUNT);

@@ -2,8 +2,6 @@ package model.entity;
 
 import jakarta.persistence.*;
 
-import java.util.List;
-
 @Entity
 @Table(name = "QUIZ")
 public class Quiz {
@@ -36,7 +34,7 @@ public class Quiz {
 
     @Override
     public String toString() {
-        return null;
+        return "";
     }
 
 

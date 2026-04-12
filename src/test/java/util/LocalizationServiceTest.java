@@ -3,6 +3,8 @@ package util;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Locale;
 import java.util.Map;
 
@@ -18,10 +20,19 @@ class LocalizationServiceTest {
     }
 
     @Test
+    void utilityConstructorThrows() throws Exception {
+        Constructor<LocalizationService> ctor = LocalizationService.class.getDeclaredConstructor();
+        ctor.setAccessible(true);
+
+        InvocationTargetException ex = assertThrows(InvocationTargetException.class, ctor::newInstance);
+        assertInstanceOf(UnsupportedOperationException.class, ex.getCause());
+    }
+
+    @Test
     void localeManagerStoresAndReturnsLocale() {
         LocaleManager.setLocale("fi", "FI");
 
-        assertEquals(new Locale("fi", "FI"), LocaleManager.getLocale());
+        assertEquals(Locale.of("fi", "FI"), LocaleManager.getLocale());
     }
 
     @Test

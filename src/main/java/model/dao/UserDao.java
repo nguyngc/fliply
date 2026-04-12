@@ -9,6 +9,8 @@ import java.util.List;
 
 public class UserDao {
 
+    private static final String EMAIL_PARAM = "email";
+
     /**
      * Persist a new User entity into the database.
      */
@@ -85,7 +87,7 @@ public class UserDao {
             List<User> results = em.createQuery(
                     "SELECT u FROM User u WHERE u.email = :email",
                     User.class
-            ).setParameter("email", email).getResultList();
+            ).setParameter(EMAIL_PARAM, email).getResultList();
 
             return results.isEmpty() ? null : results.get(0);
         }
@@ -99,7 +101,7 @@ public class UserDao {
             Long count = em.createQuery(
                     "SELECT COUNT(u) FROM User u WHERE u.email = :email",
                     Long.class
-            ).setParameter("email", email).getSingleResult();
+            ).setParameter(EMAIL_PARAM, email).getSingleResult();
 
             return count != null && count > 0;
         }
@@ -113,7 +115,7 @@ public class UserDao {
             List<User> results = em.createQuery(
                             "SELECT u FROM User u WHERE u.email = :email AND u.password = :pw",
                             User.class
-                    ).setParameter("email", email)
+                    ).setParameter(EMAIL_PARAM, email)
                     .setParameter("pw", password)
                     .getResultList();
 

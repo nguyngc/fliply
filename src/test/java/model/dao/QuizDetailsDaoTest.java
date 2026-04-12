@@ -203,11 +203,11 @@ class QuizDetailsDaoTest {
     void cleanupTestData() {
 
         QuizDetailsDao qdDao = new QuizDetailsDao();
-        QuizDao quizDao = new QuizDao();
+        QuizDao localQuizDao = new QuizDao();
         FlashcardDao fDao = new FlashcardDao();
         FlashcardSetDao fsDao = new FlashcardSetDao();
-        ClassModelDao classDao = new ClassModelDao();
-        UserDao userDao = new UserDao();
+        ClassModelDao classModelDao = new ClassModelDao();
+        UserDao localUserDao = new UserDao();
 
         // 1) Delete quiz_details created by test
         for (QuizDetails qd : qdDao.findAll()) {
@@ -217,9 +217,9 @@ class QuizDetailsDaoTest {
         }
 
         // 2) Delete quiz created by test
-        for (Quiz q : quizDao.findAll()) {
+        for (Quiz q : localQuizDao.findAll()) {
             if (q.getUser().getEmail().startsWith("quiz+")) {
-                quizDao.delete(q);
+                localQuizDao.delete(q);
             }
         }
 
@@ -238,14 +238,14 @@ class QuizDetailsDaoTest {
         }
 
         // 5) Delete classmodel created by test
-        for (ClassModel c : classDao.findAll()) {
+        for (ClassModel c : classModelDao.findAll()) {
             if (c.getClassName().startsWith("Class-")) {
-                classDao.delete(c);
+                classModelDao.delete(c);
             }
         }
 
         // 6) Delete test users only
-        for (User u : userDao.findAll()) {
+        for (User u : localUserDao.findAll()) {
             String email = u.getEmail();
             if (email.startsWith("teacher+") ||
                     email.startsWith("cardcreator+") ||
@@ -253,7 +253,7 @@ class QuizDetailsDaoTest {
                     email.startsWith("student+") ||
                     email.startsWith("set+") ||
                     email.startsWith("study+")) {
-                userDao.delete(u);
+                localUserDao.delete(u);
             }
         }
     }

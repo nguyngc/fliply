@@ -32,8 +32,8 @@ class QuizFormControllerTest {
     private static class FakeHeaderController extends HeaderController {
         String title;
         @Override public void setTitle(String titleText) { this.title = titleText; }
-        @Override public void setBackVisible(boolean visible) {}
-        @Override public void setOnBack(Runnable action) {}
+        @Override public void setBackVisible(boolean visible) { /* no-op for test double */ }
+        @Override public void setOnBack(Runnable action) { /* no-op for test double */ }
     }
 
     @BeforeEach

@@ -19,6 +19,7 @@ import view.Navigator;
 
 import java.util.List;
 import java.util.ResourceBundle;
+import java.io.IOException;
 
 import static model.AppState.isTeacher;
 
@@ -160,8 +161,8 @@ public class HomeController {
 
             // Add the card to the display
             latestClassHolder.getChildren().add(node);
-        } catch (Exception ex) {
-            throw new RuntimeException(rb.getString("home.error"), ex);
+        } catch (IOException ex) {
+            throw new IllegalStateException(rb.getString("home.error"), ex);
         }
     }
 

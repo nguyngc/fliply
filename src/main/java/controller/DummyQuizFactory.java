@@ -4,9 +4,15 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import model.AppState;
 
-import java.util.Random;
+import java.security.SecureRandom;
 
-public class DummyQuizFactory {
+public final class DummyQuizFactory {
+
+    private static final SecureRandom RANDOM = new SecureRandom();
+
+    private DummyQuizFactory() {
+        throw new UnsupportedOperationException("Utility class");
+    }
 
     public static AppState.QuizItem quiz1() {
         return new AppState.QuizItem("Quiz 1", 10, 90, buildQuestions(10));
@@ -22,7 +28,6 @@ public class DummyQuizFactory {
 
     private static ObservableList<AppState.QuizQuestion> buildQuestions(int n) {
         ObservableList<AppState.QuizQuestion> list = FXCollections.observableArrayList();
-        Random r = new Random();
 
         String[] defs = {"Definition 1", "Definition 2", "Definition 3", "Definition 4"};
 
@@ -30,7 +35,7 @@ public class DummyQuizFactory {
             String term = "Term " + i;
 
             // choose correct option
-            int correctIdx = r.nextInt(4);
+            int correctIdx = RANDOM.nextInt(4);
             String correct = defs[correctIdx];
 
             // options copy

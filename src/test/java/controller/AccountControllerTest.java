@@ -4,7 +4,6 @@ import controller.components.HeaderController;
 import javafx.scene.Parent;
 import model.AppState;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -55,38 +54,4 @@ class AccountControllerTest {
         assertEquals(AppState.NavItem.ACCOUNT, AppState.navOverride.get());
     }
 
-    @Disabled("Cannot test UI navigation in unit test environment")
-    @Test
-    void testOnEditAccount() {
-        callPrivate("onEditAccount");
-        assertEquals(AppState.Screen.ACCOUNT_EDIT, AppState.navOverride.get());
-    }
-
-    @Disabled("Cannot test UI navigation in unit test environment")
-    @Test
-    void testOnChangePassword() {
-        callPrivate("onChangePassword");
-        assertEquals(AppState.Screen.ACCOUNT_PASSWORD, AppState.navOverride.get());
-    }
-
-    @Disabled("Cannot test UI navigation in unit test environment")
-    @Test
-    void testOnHelp() {
-        callPrivate("onHelp");
-        assertEquals(AppState.Screen.ACCOUNT_HELP, AppState.navOverride.get());
-    }
-
-    @Disabled("Cannot test UI navigation in unit test environment")
-    @Test
-    void testOnAbout() {
-        callPrivate("onAbout");
-        assertEquals(AppState.Screen.ACCOUNT_ABOUT, AppState.navOverride.get());
-    }
-
-    @Disabled("Cannot test UI navigation in unit test environment")
-    @Test
-    void testOnLogout() {
-        callPrivate("onLogout");
-        assertEquals(AppState.Screen.LOGIN, AppState.navOverride.get());
-    }
 }

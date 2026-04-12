@@ -48,7 +48,7 @@ public final class Navigator {
             AppState.navOverride.set(null);
             AppState.currentScreen.set(screen);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to load " + screen.fxml, e);
+            throw new IllegalStateException("Failed to load " + screen.fxml, e);
         }
     }
 

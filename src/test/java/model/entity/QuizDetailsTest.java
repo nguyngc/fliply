@@ -42,21 +42,6 @@ class QuizDetailsTest {
         assertEquals(f, qd.getFlashcard());
     }
 
-    @Test
-    void setQuiz() {
-        Quiz quiz = new Quiz();
-        QuizDetails qd = new QuizDetails();
-        qd.setQuiz(quiz);
-        assertEquals(quiz, qd.getQuiz());
-    }
-
-    @Test
-    void setFlashcard() {
-        Flashcard f = new Flashcard();
-        QuizDetails qd = new QuizDetails();
-        qd.setFlashcard(f);
-        assertEquals(f, qd.getFlashcard());
-    }
 
     @Test
     void testToString() {

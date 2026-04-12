@@ -4,6 +4,9 @@ import model.AppState;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class DummyQuizFactoryTest {
@@ -11,6 +14,15 @@ class DummyQuizFactoryTest {
     @AfterEach
     void tearDown() {
         AppState.myQuizzes.clear();
+    }
+
+    @Test
+    void constructorThrowsForUtilityClass() throws Exception {
+        Constructor<DummyQuizFactory> ctor = DummyQuizFactory.class.getDeclaredConstructor();
+        ctor.setAccessible(true);
+
+        InvocationTargetException ex = assertThrows(InvocationTargetException.class, ctor::newInstance);
+        assertInstanceOf(UnsupportedOperationException.class, ex.getCause());
     }
 
     @Test

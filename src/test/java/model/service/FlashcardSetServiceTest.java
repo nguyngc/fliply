@@ -69,5 +69,31 @@ class FlashcardSetServiceTest {
         classDao.delete(clazz);
         userDao.delete(teacher);
     }
+
+    @Test
+    void saveAndDeleteBranchesAreHandled() {
+        User teacher = newTeacher();
+        userDao.persist(teacher);
+
+        ClassModel clazz = newClass(teacher);
+        classDao.persist(clazz);
+
+        FlashcardSet fs = setService.createSet("Original", clazz);
+        fs.setSubject("Updated");
+        setService.save(fs);
+
+        FlashcardSet reloaded = setDao.find(fs.getFlashcardSetId());
+        assertNotNull(reloaded);
+        assertEquals("Updated", reloaded.getSubject());
+
+        setService.deleteSet(null);
+        FlashcardSet transientSet = new FlashcardSet();
+        transientSet.setSubject("Transient");
+        setService.deleteSet(transientSet);
+
+        setDao.delete(reloaded);
+        classDao.delete(clazz);
+        userDao.delete(teacher);
+    }
 }
 

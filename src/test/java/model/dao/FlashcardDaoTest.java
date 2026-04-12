@@ -242,8 +242,8 @@ class FlashcardDaoTest {
         StudyDao studyDao = new StudyDao();
         FlashcardSetDao fsDao = new FlashcardSetDao();
         ClassDetailsDao cdDao = new ClassDetailsDao();
-        ClassModelDao classDao = new ClassModelDao();
-        UserDao userDao = new UserDao();
+        ClassModelDao classModelDao = new ClassModelDao();
+        UserDao localUserDao = new UserDao();
 
         // 1) Delete quiz_details created by test
         for (QuizDetails qd : qdDao.findAll()) {
@@ -304,14 +304,14 @@ class FlashcardDaoTest {
         }
 
         // 7) Delete classmodel created by test
-        for (ClassModel c : classDao.findAll()) {
+        for (ClassModel c : classModelDao.findAll()) {
             if (c.getClassName().startsWith("Class-")) {
-                classDao.delete(c);
+                classModelDao.delete(c);
             }
         }
 
         // 8) Delete ONLY test users
-        for (User u : userDao.findAll()) {
+        for (User u : localUserDao.findAll()) {
             String email = u.getEmail();
             if (email.startsWith("teacher+") ||
                     email.startsWith("cardcreator+") ||
@@ -321,7 +321,7 @@ class FlashcardDaoTest {
                     email.startsWith("quiz+") ||
                     email.startsWith("flashcard+") ||
                     email.startsWith("test+")) {
-                userDao.delete(u);
+                localUserDao.delete(u);
             }
         }
     }

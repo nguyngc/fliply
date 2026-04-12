@@ -140,4 +140,28 @@ class QuizServiceTest {
 
         userDao.delete(user);
     }
+
+    @Test
+    void generateQuiz_invalidInputsReturnNull() {
+        assertNull(quizService.generateQuiz(null, 3));
+
+        User user = newUser("Empty");
+        userDao.persist(user);
+
+        assertNull(quizService.generateQuiz(user, 0));
+        assertNull(quizService.generateQuiz(user, -1));
+
+        userDao.delete(user);
+    }
+
+    @Test
+    void buildQuizQuestions_missingQuizDetailsReturnsEmptyList() {
+        User user = newUser("Reader");
+        userDao.persist(user);
+
+        assertTrue(quizService.buildQuizQuestions(123456, user.getUserId()).isEmpty());
+        assertTrue(quizService.getQuizzesByUser(null).isEmpty());
+
+        userDao.delete(user);
+    }
 }

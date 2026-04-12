@@ -163,8 +163,6 @@ public class TeacherClassDetailController {
         VBox left = new VBox(4);
         Label name = new Label(student.getFirstName() + " " + student.getLastName());
         name.setStyle("-fx-font-size: 14px; -fx-font-weight: 400; -fx-text-fill: #1F1F39;");
-//        Label progress = new Label("80% Completed"); // demo
-//        progress.setStyle("-fx-text-fill: #3D8FEF; -fx-font-weight: 400; -fx-font-size: 12px;");
         left.getChildren().addAll(name);
         HBox.setHgrow(left, Priority.ALWAYS);
 

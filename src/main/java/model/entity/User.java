@@ -30,6 +30,7 @@ public class User {
     @Column(name = "Language", length = 2)
     private String language;
 
+    // Required by JPA for entity instantiation via reflection.
     public User() {}
 
     public Integer getUserId() { return userId; }

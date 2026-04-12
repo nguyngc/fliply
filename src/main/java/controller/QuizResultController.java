@@ -2,18 +2,16 @@ package controller;
 
 import controller.components.HeaderController;
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import model.AppState;
 import model.entity.Quiz;
 import model.service.QuizService;
+import util.I18n;
 import view.Navigator;
 
-import java.text.MessageFormat;
 import java.util.List;
-import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 /**
@@ -26,8 +24,6 @@ public class QuizResultController {
 
     // ========== Header Components ==========
     @FXML
-    private Parent header;
-    @FXML
     private HeaderController headerController;
 
     // ========== Content Components ==========
@@ -39,9 +35,6 @@ public class QuizResultController {
     @FXML
     private ResourceBundle resources;
 
-    // The quiz that was taken
-    private Quiz quiz;
-    
     // List of quiz questions
     private List<QuizService.QuizQuestion> questions;
     
@@ -56,7 +49,7 @@ public class QuizResultController {
     private void initialize() {
         // ========== Get Selected Quiz ==========
         // Retrieve the quiz that was just completed
-        quiz = AppState.selectedQuiz.get();
+        Quiz quiz = AppState.selectedQuiz.get();
         if (quiz == null) {
             // Navigate back to quizzes list if no quiz is selected
             Navigator.go(AppState.Screen.QUIZZES);
@@ -66,11 +59,10 @@ public class QuizResultController {
         // ========== Configure Header ==========
         if (headerController != null) {
             // Set the header title
-            headerController.setTitle(getMessage("quizResult.header", "Result"));
+            headerController.setTitle(I18n.message(resources, "quizResult.header", "Result"));
             
             // Set subtitle showing the total points earned
-            String subtitleTemplate = getMessage("quizResult.subtitle", "Total points: {0}");
-            headerController.setSubtitle(MessageFormat.format(subtitleTemplate, AppState.quizPoints.get()));
+            headerController.setSubtitle(I18n.format(resources, "quizResult.subtitle", "Total points: {0}", AppState.quizPoints.get()));
             
             // Show back button to return to quizzes list
             headerController.setBackVisible(true);
@@ -101,9 +93,9 @@ public class QuizResultController {
         int total = questions.size();
         
         // Get localized labels for answer statuses
-        String correctLabel = getMessage("quizResult.correct", "Correct");
-        String incorrectLabel = getMessage("quizResult.incorrect", "Incorrect");
-        String notAnsweredLabel = getMessage("quizResult.notAnswered", "Not answered");
+        String correctLabel = I18n.message(resources, "quizResult.correct", "Correct");
+        String incorrectLabel = I18n.message(resources, "quizResult.incorrect", "Incorrect");
+        String notAnsweredLabel = I18n.message(resources, "quizResult.notAnswered", "Not answered");
 
         // ========== Render Each Question ==========
         // Create a row for each question showing the result
@@ -121,12 +113,13 @@ public class QuizResultController {
             // Create a horizontal box to display the question and result
             HBox row = new HBox();
             row.setSpacing(10);
-            row.setStyle("""
+            String rowStyle = """
                     -fx-background-color: white;
                     -fx-background-radius: 14;
                     -fx-padding: 12 14;
                     -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.06), 14, 0.2, 0, 6);
-                    """);
+                    """;
+            row.setStyle(rowStyle);
 
             // ========== Left Side: Question Prompt ==========
             // Display the question number and text
@@ -137,11 +130,18 @@ public class QuizResultController {
 
             // ========== Right Side: Answer Status ==========
             // Display the result status (Correct, Incorrect, or Not answered)
-            Label right = new Label(answered ? (correct ? correctLabel : incorrectLabel) : notAnsweredLabel);
-            right.setStyle(correct
-                    ? "-fx-font-size: 14px; -fx-font-weight: 500; -fx-text-fill: #2E7D32;"  // Green for correct
-                    : "-fx-font-size: 14px; -fx-font-weight: 500; -fx-text-fill: #C62828;"  // Red for incorrect/unanswered
-            );
+            String statusText;
+            if (!answered) {
+                statusText = notAnsweredLabel;
+            } else if (correct) {
+                statusText = correctLabel;
+            } else {
+                statusText = incorrectLabel;
+            }
+
+            Label right = new Label(statusText);
+            String statusStyle = "-fx-font-size: 14px; -fx-font-weight: 500; -fx-text-fill: ";
+            right.setStyle(statusStyle + (correct ? "#2E7D32;" : "#C62828;"));
 
             // Add both labels to the row
             row.getChildren().addAll(left, right);
@@ -186,24 +186,5 @@ public class QuizResultController {
     private void backToList() {
         AppState.navOverride.set(AppState.NavItem.QUIZZES);
         Navigator.go(AppState.Screen.QUIZZES);
-    }
-
-    /**
-     * Retrieves a localized message from the resource bundle.
-     * Provides a fallback message if the key is not found.
-     *
-     * @param key The resource bundle key
-     * @param fallback The fallback message if key is not found
-     * @return The localized message or the fallback
-     */
-    private String getMessage(String key, String fallback) {
-        if (resources == null) {
-            return fallback;
-        }
-        try {
-            return resources.getString(key);
-        } catch (MissingResourceException ignored) {
-            return fallback;
-        }
     }
 }

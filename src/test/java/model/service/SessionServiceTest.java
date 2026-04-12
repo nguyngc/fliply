@@ -4,6 +4,9 @@ import model.UserRole;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class SessionServiceTest {
@@ -12,6 +15,15 @@ class SessionServiceTest {
     void reset() {
         // Reset static state
         SessionService.setRole(null);
+    }
+
+    @Test
+    void utilityConstructorThrows() throws Exception {
+        Constructor<SessionService> ctor = SessionService.class.getDeclaredConstructor();
+        ctor.setAccessible(true);
+
+        InvocationTargetException ex = assertThrows(InvocationTargetException.class, ctor::newInstance);
+        assertInstanceOf(UnsupportedOperationException.class, ex.getCause());
     }
 
     @Test

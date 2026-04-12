@@ -1,5 +1,6 @@
 package controller;
 
+import controller.components.PasswordVisibilitySupport;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
@@ -7,10 +8,13 @@ import javafx.scene.image.ImageView;
 import model.AppState;
 import model.dao.UserDao;
 import model.entity.User;
+import util.Dialogs;
 import util.LocaleManager;
 import view.Navigator;
 
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Controller for the registration screen.
@@ -19,6 +23,7 @@ import java.util.ResourceBundle;
  * Validates email format, password strength, and checks for existing accounts.
  */
 public class RegisterController {
+    private static final Logger LOGGER = Logger.getLogger(RegisterController.class.getName());
 
     // ========== Password Visibility Images ==========
     // Image for the "eye open" icon (password visible)
@@ -85,8 +90,7 @@ public class RegisterController {
     @FXML
     private void initialize() {
         // Hide the password text field initially (password field is shown instead)
-        passwordTextField.setVisible(false);
-        passwordTextField.setManaged(false);
+        PasswordVisibilitySupport.initializeHidden(passwordTextField, eyeIcon, eyeClosed);
         
         // Set the eye icon to show "closed" state (password is hidden)
         eyeIcon.setImage(eyeClosed);
@@ -101,38 +105,7 @@ public class RegisterController {
     private void togglePassword() {
         // Toggle the visibility flag
         passwordVisible = !passwordVisible;
-
-        if (passwordVisible) {
-            // ========== Show Password ==========
-            // Copy the password from the masked field to the visible text field
-            passwordTextField.setText(passwordField.getText());
-            
-            // Show the text field containing visible password
-            passwordTextField.setVisible(true);
-            passwordTextField.setManaged(true);
-
-            // Hide the masked password field
-            passwordField.setVisible(false);
-            passwordField.setManaged(false);
-
-            // Update icon to "eye open" to indicate password is visible
-            eyeIcon.setImage(eyeOpen);
-        } else {
-            // ========== Hide Password ==========
-            // Copy the password from the visible field to the masked field
-            passwordField.setText(passwordTextField.getText());
-            
-            // Show the masked password field
-            passwordField.setVisible(true);
-            passwordField.setManaged(true);
-
-            // Hide the text field with visible password
-            passwordTextField.setVisible(false);
-            passwordTextField.setManaged(false);
-
-            // Update icon to "eye closed" to indicate password is hidden
-            eyeIcon.setImage(eyeClosed);
-        }
+        PasswordVisibilitySupport.apply(passwordVisible, passwordField, passwordTextField, eyeIcon, eyeOpen, eyeClosed);
     }
 
     /**
@@ -222,8 +195,7 @@ public class RegisterController {
             Navigator.go(AppState.Screen.HOME);
 
         } catch (Exception e) {
-            // Log the exception for debugging
-            e.printStackTrace();
+            LOGGER.log(Level.WARNING, "Registration failed due to persistence error", e);
             // Show database error message
             showWarning(resources.getString("register.warning.dbError"));
         }
@@ -237,12 +209,7 @@ public class RegisterController {
      */
     private void showWarning(String msg) {
         // Create a warning alert
-        Alert alert = new Alert(Alert.AlertType.WARNING);
-        alert.setTitle(resources.getString("register.alertTitle"));
-        alert.setHeaderText(null);
-        alert.setContentText(msg);
-        // Show the alert and wait for user to dismiss it
-        alert.showAndWait();
+        Dialogs.show(Alert.AlertType.WARNING, resources.getString("register.alertTitle"), msg);
     }
 
     /**

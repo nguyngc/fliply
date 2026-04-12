@@ -22,7 +22,7 @@ public class FlashcardSet {
     @OneToMany(mappedBy = "flashcardSet", fetch = FetchType.LAZY)
     private Collection<Flashcard> cards;
 
-    public Collection<Flashcard> getCards() { return cards; }
+    public Collection<Flashcard> getCards() { return getTotalCards(); }
 
     public FlashcardSet() {}
 

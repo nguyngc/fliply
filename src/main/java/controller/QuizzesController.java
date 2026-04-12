@@ -152,7 +152,7 @@ public class QuizzesController {
 
             return node;
         } catch (IOException ex) {
-            throw new RuntimeException("Failed to load quiz_card.fxml", ex);
+            throw new IllegalStateException("Failed to load quiz_card.fxml", ex);
         }
     }
 
