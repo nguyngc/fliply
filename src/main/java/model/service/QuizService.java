@@ -8,9 +8,12 @@ import model.entity.Quiz;
 import model.entity.QuizDetails;
 import model.entity.User;
 
+import java.security.SecureRandom;
 import java.util.*;
 
 public class QuizService {
+
+    private static final Random RANDOM = new SecureRandom();
 
     private final QuizDao quizDao = new QuizDao();
     private final QuizDetailsDao quizDetailsDao = new QuizDetailsDao();
@@ -34,7 +37,7 @@ public class QuizService {
         int n = Math.min(noOfQuestions, pool.size());
 
         // random pick
-        Collections.shuffle(pool);
+        Collections.shuffle(pool, RANDOM);
 
         // create QUIZ
         Quiz quiz = new Quiz();
@@ -68,7 +71,6 @@ public class QuizService {
         List<Flashcard> pool = flashcardDao.findAvailableForUser(userId);
         if (pool == null) pool = new ArrayList<>();
 
-        Random rnd = new Random();
         List<QuizQuestion> out = new ArrayList<>();
 
         for (QuizDetails d : details) {
@@ -84,7 +86,7 @@ public class QuizService {
 
             int guard = 0;
             while (optionsSet.size() < 4 && guard < 300 && !pool.isEmpty()) {
-                Flashcard pick = pool.get(rnd.nextInt(pool.size()));
+                Flashcard pick = pool.get(RANDOM.nextInt(pool.size()));
                 if (pick == null) { guard++; continue; }
 
                 String wrong = pick.getDefinition();
@@ -95,7 +97,7 @@ public class QuizService {
             }
 
             List<String> options = new ArrayList<>(optionsSet);
-            Collections.shuffle(options);
+            Collections.shuffle(options, RANDOM);
 
             out.add(new QuizQuestion(q.getFlashcardId(), prompt, correct, options));
         }

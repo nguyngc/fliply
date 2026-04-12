@@ -2,16 +2,15 @@ package controller;
 
 import controller.components.HeaderController;
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
 import javafx.scene.control.TextField;
 import model.AppState;
-import model.dao.ClassModelDao;
-import model.entity.ClassModel;
 import model.service.TeacherAddClassService;
 import util.LocaleManager;
 import view.Navigator;
 
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Controller for the teacher add/create class screen.
@@ -19,10 +18,9 @@ import java.util.ResourceBundle;
  * Validates input and handles class creation through the service layer.
  */
 public class TeacherAddClassController {
+    private static final Logger LOGGER = Logger.getLogger(TeacherAddClassController.class.getName());
 
     // ========== Header Components ==========
-    @FXML
-    private Parent header;
     @FXML
     private HeaderController headerController;
 
@@ -77,7 +75,7 @@ public class TeacherAddClassController {
             Navigator.go(AppState.Screen.CLASSES);
         } catch (IllegalArgumentException e) {
             // Display error message if class creation fails (e.g., duplicate code)
-            System.out.println(rb.getString("addClass.error") + e.getMessage());
+            LOGGER.log(Level.WARNING, e, () -> rb.getString("addClass.error") + e.getMessage());
         }
     }
 

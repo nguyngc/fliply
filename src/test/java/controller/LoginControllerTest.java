@@ -9,7 +9,6 @@ import model.AppState;
 import model.dao.UserDao;
 import model.entity.User;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -124,29 +123,6 @@ class LoginControllerTest {
         assertTrue(pf.isManaged());
         assertFalse(tf.isVisible());
         assertFalse(tf.isManaged());
-    }
-    @Disabled
-    @Test
-    void testLogin_success_setsUserAndRole() {
-        FakeUserDao fake = (FakeUserDao) getPrivate("userDao");
-
-        User u = new User();
-        u.setEmail("a@b.com");
-        u.setPassword("123");
-        u.setRole(1); // teacher
-        fake.expectedUser = u;
-
-        TextField email = (TextField) getPrivate("emailField");
-        PasswordField pass = (PasswordField) getPrivate("passwordField");
-
-        email.setText("a@b.com");
-        pass.setText("123");
-
-        // test logic
-        callPrivate("login");
-
-        assertEquals(u, AppState.currentUser.get());
-        assertEquals(AppState.Role.TEACHER, AppState.role.get());
     }
 
     @Test

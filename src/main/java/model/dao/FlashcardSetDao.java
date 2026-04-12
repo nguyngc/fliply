@@ -7,6 +7,9 @@ import model.entity.FlashcardSet;
 
 import java.util.List;
 
+/**
+ * Data access layer for FlashcardSet with explicit transaction boundaries for write operations.
+ */
 public class FlashcardSetDao {
 
     public void persist(FlashcardSet flashcardSet) {
@@ -54,6 +57,7 @@ public class FlashcardSetDao {
         try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
             em.getTransaction().begin();
             try {
+                // Merge first when entity was loaded in another persistence context.
                 if (!em.contains(flashcardSet)) {
                     flashcardSet = em.merge(flashcardSet);
                 }
@@ -91,12 +95,16 @@ public class FlashcardSetDao {
         }
     }
 
-public FlashcardSet findWithCards(int id) {
-    try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
-        return em.createQuery(
-                "SELECT s FROM FlashcardSet s LEFT JOIN FETCH s.cards WHERE s.flashcardSetId = :id",
-                FlashcardSet.class
-        ).setParameter("id", id).getSingleResult();
+    /**
+     * Loads a set and eagerly fetches cards in one query to avoid lazy-loading issues in controller code.
+     */
+    public FlashcardSet findWithCards(int id) {
+        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+            return em.createQuery(
+                    "SELECT s FROM FlashcardSet s LEFT JOIN FETCH s.cards WHERE s.flashcardSetId = :id",
+                    FlashcardSet.class
+            ).setParameter("id", id).getSingleResult();
+        }
     }
 }
-}
+

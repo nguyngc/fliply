@@ -9,6 +9,8 @@ import util.LocaleManager;
 import view.Navigator;
 
 public class WelcomeController {
+    private static final String LAO_FONT_STYLE = "-fx-font-family: 'Noto Sans Lao';";
+
     @FXML
     private MenuButton languageMenuButton;
 
@@ -31,13 +33,13 @@ public class WelcomeController {
                     "-fx-background-color: white; " +
                             "-fx-background-radius: 12; " +
                             "-fx-cursor: hand; " +
-                            "-fx-font-family: 'Noto Sans Lao';"
+                            LAO_FONT_STYLE
             );
 
-            titleLabel.setStyle("-fx-font-family: 'Noto Sans Lao';");
-            subtitleLabel.setStyle("-fx-font-family: 'Noto Sans Lao';");
-            registerButton.setStyle("-fx-font-family: 'Noto Sans Lao';");
-            loginButton.setStyle("-fx-font-family: 'Noto Sans Lao';");
+            titleLabel.setStyle(LAO_FONT_STYLE);
+            subtitleLabel.setStyle(LAO_FONT_STYLE);
+            registerButton.setStyle(LAO_FONT_STYLE);
+            loginButton.setStyle(LAO_FONT_STYLE);
         }
     }
 

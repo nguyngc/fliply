@@ -7,11 +7,21 @@ import jakarta.persistence.Persistence;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MariaDbJPAConnection {
+/**
+ * Central JPA bootstrap for production (MariaDB) and test (H2) modes.
+ */
+public final class MariaDbJPAConnection {
+
+    private MariaDbJPAConnection() {
+        throw new UnsupportedOperationException("Utility class");
+    }
 
     private static EntityManagerFactory emf =
             Persistence.createEntityManagerFactory("FliplyDbUnit", buildDbProperties());
 
+    /**
+     * Returns a fresh EntityManager and recreates the factory when tests have previously shut it down.
+     */
     public static EntityManager createEntityManager() {
         // Recreate EMF if it's closed (for test scenarios)
         if (emf == null || !emf.isOpen()) {
@@ -20,10 +30,6 @@ public class MariaDbJPAConnection {
         return emf.createEntityManager();
     }
 
-    @Deprecated
-    public static EntityManager getInstance() {
-        return createEntityManager();
-    }
 
     public static void shutdown() {
         if (emf != null && emf.isOpen()) {
@@ -31,10 +37,13 @@ public class MariaDbJPAConnection {
         }
     }
 
+    /**
+     * Builds persistence properties from runtime mode so the same codebase works locally and in CI tests.
+     */
     private static Map<String, Object> buildDbProperties() {
         Map<String, Object> properties = new HashMap<>();
 
-        String mode = getConfigOrDefault("fliply.db.mode", "mariadb");
+        String mode = getDbMode();
         if ("h2".equalsIgnoreCase(mode) || "test".equalsIgnoreCase(mode)) {
             properties.put("jakarta.persistence.jdbc.driver", "org.h2.Driver");
             properties.put("jakarta.persistence.jdbc.url", "jdbc:h2:mem:fliply;MODE=MariaDB;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false;NON_KEYWORDS=USER,CLASS");
@@ -70,14 +79,12 @@ public class MariaDbJPAConnection {
         return value;
     }
 
-    private static String getConfigOrDefault(String key, String defaultValue) {
-        String value = System.getProperty(key);
+    private static String getDbMode() {
+        String value = System.getProperty("fliply.db.mode");
         if (value == null || value.isBlank()) {
-            value = System.getenv(key.toUpperCase().replace('.', '_'));
+            // Environment fallback keeps Docker/CI configuration simple.
+            value = System.getenv("FLIPLY_DB_MODE");
         }
-        if (value == null || value.isBlank()) {
-            return defaultValue;
-        }
-        return value;
+        return (value == null || value.isBlank()) ? "mariadb" : value;
     }
 }

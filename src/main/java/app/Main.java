@@ -3,7 +3,12 @@ package app;
 import model.dao.*;
 import model.entity.*;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 public class Main {
+    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
+
     public static void main(String[] args) {
         UserDao userDao = new UserDao();
         ClassModelDao classDao = new ClassModelDao();
@@ -21,8 +26,8 @@ public class Main {
         c.setTeacher(u);
         classDao.persist(c);
 
-        System.out.println("Teacher email = " + c.getTeacher().getEmail());
-        System.out.println("Classes count = " + classDao.findByTeacherId(u.getUserId()).size());
+        LOGGER.log(Level.INFO, () -> "Teacher email = " + c.getTeacher().getEmail());
+        LOGGER.log(Level.INFO, () -> "Classes count = " + classDao.findByTeacherId(u.getUserId()).size());
 
         FlashcardSetDao setDao = new FlashcardSetDao();
 
@@ -32,9 +37,9 @@ public class Main {
 
         setDao.persist(fs);
 
-        System.out.println("Set: " + fs);
-        System.out.println("Teacher email from set: " + fs.getClassModel().getTeacher().getEmail());
-        System.out.println("Sets in class: " + setDao.findByClassId(c.getClassId()).size());
+        LOGGER.log(Level.INFO, () -> "Set: " + fs);
+        LOGGER.log(Level.INFO, () -> "Teacher email from set: " + fs.getClassModel().getTeacher().getEmail());
+        LOGGER.log(Level.INFO, () -> "Sets in class: " + setDao.findByClassId(c.getClassId()).size());
 
         FlashcardDao flashDao = new FlashcardDao();
 
@@ -46,9 +51,9 @@ public class Main {
 
         flashDao.persist(f);
 
-        System.out.println("Flashcards in set: " + flashDao.findByFlashcardSetId(fs.getFlashcardSetId()).size());
-        System.out.println("Flashcards by user: " + flashDao.findByUserId(u.getUserId()).size());
-        System.out.println("Exists term BFS in set? " + flashDao.existsByTermInSet("BFS", fs.getFlashcardSetId()));
+        LOGGER.log(Level.INFO, () -> "Flashcards in set: " + flashDao.findByFlashcardSetId(fs.getFlashcardSetId()).size());
+        LOGGER.log(Level.INFO, () -> "Flashcards by user: " + flashDao.findByUserId(u.getUserId()).size());
+        LOGGER.log(Level.INFO, () -> "Exists term BFS in set? " + flashDao.existsByTermInSet("BFS", fs.getFlashcardSetId()));
 
         QuizDao quizDao = new QuizDao();
 
@@ -57,9 +62,9 @@ public class Main {
         q.setUser(u);
         quizDao.persist(q);
 
-        System.out.println("Quiz: " + q);
-        System.out.println("Quizzes by user: " + quizDao.findByUserId(u.getUserId()).size());
-        System.out.println("Exists same quiz? " + quizDao.existsByUserAndQuestionCount(u.getUserId(), 2));
+        LOGGER.log(Level.INFO, () -> "Quiz: " + q);
+        LOGGER.log(Level.INFO, () -> "Quizzes by user: " + quizDao.findByUserId(u.getUserId()).size());
+        LOGGER.log(Level.INFO, () -> "Exists same quiz? " + quizDao.existsByUserAndQuestionCount(u.getUserId(), 2));
 
 
         QuizDetailsDao qdDao = new QuizDetailsDao();
@@ -67,9 +72,9 @@ public class Main {
         QuizDetails qd = new QuizDetails(q, f);
         qdDao.persist(qd);
 
-        System.out.println("QuizDetails: " + qd);
-        System.out.println("Details in quiz: " + qdDao.findByQuizId(q.getQuizId()).size());
-        System.out.println("Exists pair? " + qdDao.exists(q.getQuizId(), f.getFlashcardId()));
+        LOGGER.log(Level.INFO, () -> "QuizDetails: " + qd);
+        LOGGER.log(Level.INFO, () -> "Details in quiz: " + qdDao.findByQuizId(q.getQuizId()).size());
+        LOGGER.log(Level.INFO, () -> "Exists pair? " + qdDao.exists(q.getQuizId(), f.getFlashcardId()));
         ClassDetailsDao cdDao = new ClassDetailsDao();
 
         ClassDetails cd = new ClassDetails();
@@ -77,10 +82,10 @@ public class Main {
         cd.setClassModel(c);
         cdDao.persist(cd);
 
-        System.out.println("ClassDetails: " + cd);
-        System.out.println("Students in class: " + cdDao.findByClassId(c.getClassId()).size());
-        System.out.println("Classes joined by user: " + cdDao.findByStudentId(u.getUserId()).size());
-        System.out.println("Exists enrollment? " + cdDao.existsByUserAndClass(u.getUserId(), c.getClassId()));
+        LOGGER.log(Level.INFO, () -> "ClassDetails: " + cd);
+        LOGGER.log(Level.INFO, () -> "Students in class: " + cdDao.findByClassId(c.getClassId()).size());
+        LOGGER.log(Level.INFO, () -> "Classes joined by user: " + cdDao.findByStudentId(u.getUserId()).size());
+        LOGGER.log(Level.INFO, () -> "Exists enrollment? " + cdDao.existsByUserAndClass(u.getUserId(), c.getClassId()));
 
 
         StudyDao studyDao = new StudyDao();
@@ -91,9 +96,9 @@ public class Main {
         s.setFlashcardSet(fs);
         studyDao.persist(s);
 
-        System.out.println("Study: " + s);
-        System.out.println("Study by user: " + studyDao.findByUserId(u.getUserId()).size());
-        System.out.println("Study by set: " + studyDao.findByFlashcardSetId(fs.getFlashcardSetId()).size());
-        System.out.println("Exists study record? " + studyDao.existsByUserAndSet(u.getUserId(), fs.getFlashcardSetId()));
+        LOGGER.log(Level.INFO, () -> "Study: " + s);
+        LOGGER.log(Level.INFO, () -> "Study by user: " + studyDao.findByUserId(u.getUserId()).size());
+        LOGGER.log(Level.INFO, () -> "Study by set: " + studyDao.findByFlashcardSetId(fs.getFlashcardSetId()).size());
+        LOGGER.log(Level.INFO, () -> "Exists study record? " + studyDao.existsByUserAndSet(u.getUserId(), fs.getFlashcardSetId()));
     }
 }

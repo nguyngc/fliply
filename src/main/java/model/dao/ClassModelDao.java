@@ -91,20 +91,21 @@ public class ClassModelDao {
 
 
     public List<ClassModel> findClassesOfUser(int userId) {
-        EntityManager em = MariaDbJPAConnection.createEntityManager();
-        return em.createQuery("""
-        SELECT DISTINCT c FROM ClassModel c
-        LEFT JOIN FETCH c.students
-        LEFT JOIN FETCH c.flashcardSets
-        WHERE c.teacher.userId = :uid
-           OR c.classId IN (
-                SELECT cd.classModel.classId
-                FROM ClassDetails cd
-                WHERE cd.student.userId = :uid
-           )
-    """, ClassModel.class)
-                .setParameter("uid", userId)
-                .getResultList();
+        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+            return em.createQuery("""
+            SELECT DISTINCT c FROM ClassModel c
+            LEFT JOIN FETCH c.students
+            LEFT JOIN FETCH c.flashcardSets
+            WHERE c.teacher.userId = :uid
+               OR c.classId IN (
+                    SELECT cd.classModel.classId
+                    FROM ClassDetails cd
+                    WHERE cd.student.userId = :uid
+               )
+        """, ClassModel.class)
+                    .setParameter("uid", userId)
+                    .getResultList();
+        }
     }
 
     public ClassModel findByIdWithRelations(int classId) {

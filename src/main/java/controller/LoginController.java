@@ -1,5 +1,6 @@
 package controller;
 
+import controller.components.PasswordVisibilitySupport;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
@@ -10,6 +11,7 @@ import javafx.scene.image.ImageView;
 import model.AppState;
 import model.dao.UserDao;
 import model.entity.User;
+import util.Dialogs;
 import util.LocaleManager;
 import view.Navigator;
 
@@ -31,7 +33,8 @@ public class LoginController {
     
     // ========== Error Display ==========
     // Label for displaying login error messages
-    public Label errorLabel;
+    @FXML
+    private Label errorLabel;
     
     // Flag to track whether password is currently visible
     private boolean passwordVisible = false;
@@ -68,8 +71,7 @@ public class LoginController {
     private void initialize() {
         // ========== Hide Password Text Field Initially ==========
         // The password text field is hidden by default (password field is shown instead)
-        passwordTextField.setManaged(false);
-        passwordTextField.setVisible(false);
+        PasswordVisibilitySupport.initializeHidden(passwordTextField, eyeIcon, eyeClosed);
         
         // ========== Error Label Auto-Hide ==========
         // Listen for changes in email field and hide error label when user types
@@ -91,38 +93,7 @@ public class LoginController {
     private void togglePassword() {
         // Toggle the visibility flag
         passwordVisible = !passwordVisible;
-
-        if (passwordVisible) {
-            // ========== Show Password ==========
-            // Copy the password from the masked field to the visible text field
-            passwordTextField.setText(passwordField.getText());
-            
-            // Show the text field containing visible password
-            passwordTextField.setVisible(true);
-            passwordTextField.setManaged(true);
-
-            // Hide the masked password field
-            passwordField.setVisible(false);
-            passwordField.setManaged(false);
-
-            // Update icon to "eye open" to indicate password is visible
-            eyeIcon.setImage(eyeOpen);
-        } else {
-            // ========== Hide Password ==========
-            // Copy the password from the visible field to the masked field
-            passwordField.setText(passwordTextField.getText());
-            
-            // Show the masked password field
-            passwordField.setVisible(true);
-            passwordField.setManaged(true);
-
-            // Hide the text field with visible password
-            passwordTextField.setVisible(false);
-            passwordTextField.setManaged(false);
-
-            // Update icon to "eye closed" to indicate password is hidden
-            eyeIcon.setImage(eyeClosed);
-        }
+        PasswordVisibilitySupport.apply(passwordVisible, passwordField, passwordTextField, eyeIcon, eyeOpen, eyeClosed);
     }
 
     /**
@@ -165,7 +136,6 @@ public class LoginController {
             // Display error message with localized string
             errorLabel.setText(rb.getString("login.error"));
             errorLabel.setVisible(true);
-            System.out.println("Invalid email or password");
         }
     }
 
@@ -189,10 +159,6 @@ public class LoginController {
         String message = rb.getString("login.forgot");
 
         // Create and display an information alert
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+        Dialogs.show(Alert.AlertType.INFORMATION, title, message);
     }
 }

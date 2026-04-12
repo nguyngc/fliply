@@ -2,8 +2,6 @@ package controller;
 
 import controller.components.HeaderController;
 import javafx.embed.swing.JFXPanel;
-import javafx.event.ActionEvent;
-import javafx.scene.Parent;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
@@ -12,7 +10,6 @@ import model.AppState;
 import model.entity.ClassModel;
 import model.entity.User;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -140,16 +137,6 @@ class ClassDetailControllerTest {
         }
     }
 
-    private void callOpenFlashcardSet(ActionEvent e) {
-        try {
-            Method m = ClassDetailController.class.getDeclaredMethod("openFlashcardSet", ActionEvent.class);
-            m.setAccessible(true);
-            m.invoke(controller, e);
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
-    }
-
     // ---------- Tests ----------
 
     @Test
@@ -166,15 +153,4 @@ class ClassDetailControllerTest {
         assertTrue(header.backButton.isVisible());
     }
 
-    @Disabled
-    @Test
-    void testOpenFlashcardSet_defaultName() {
-        Button btn = new Button();
-        ActionEvent event = new ActionEvent(btn, null);
-
-        callOpenFlashcardSet(event);
-
-        assertEquals("Flashcard Set", AppState.selectedFlashcardSetName.get());
-        assertEquals(AppState.Screen.FLASHCARD_SET, AppState.navOverride.get());
-    }
 }

@@ -7,6 +7,9 @@ import model.entity.ClassDetails;
 
 import java.util.List;
 
+/**
+ * DAO for class enrollment records (ClassDetails).
+ */
 public class ClassDetailsDao {
 
     public void persist(ClassDetails classDetails) {
@@ -70,6 +73,7 @@ public class ClassDetailsDao {
         try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
             em.getTransaction().begin();
             try {
+                // Bulk delete is used here to avoid loading all enrollment rows into memory.
                 em.createQuery("DELETE FROM ClassDetails cd WHERE cd.classModel.classId = :cid")
                         .setParameter("cid", classId)
                         .executeUpdate();
@@ -115,6 +119,7 @@ public class ClassDetailsDao {
             query.setParameter("uid", userId);
             query.setParameter("cid", classId);
 
+            // COUNT query is the cheapest way to guard duplicate enrollment creation.
             Long count = query.getSingleResult();
             return count != null && count > 0;
         }

@@ -88,5 +88,48 @@ class FlashcardServiceTest {
         userDao.delete(creator);
         userDao.delete(teacher);
     }
+
+    @Test
+    void update_delete_save_and_getByUser() {
+        User teacher = newUser("Teacher");
+        userDao.persist(teacher);
+
+        ClassModel clazz = newClass(teacher);
+        classDao.persist(clazz);
+
+        FlashcardSet fs = newSet(clazz);
+        setDao.persist(fs);
+
+        User creator = newUser("Creator");
+        userDao.persist(creator);
+
+        Flashcard card = flashcardService.createFlashcard("Term-A", "Def-A", fs, creator);
+        assertNotNull(card);
+
+        card.setDefinition("Def-Updated");
+        flashcardService.update(card);
+
+        Flashcard reloaded = flashcardDao.find(card.getFlashcardId());
+        assertEquals("Def-Updated", reloaded.getDefinition());
+
+        List<Flashcard> byUser = flashcardService.getFlashcardsByUser(creator.getUserId());
+        assertTrue(byUser.stream().anyMatch(x -> x.getFlashcardId().equals(card.getFlashcardId())));
+
+        Flashcard saved = new Flashcard();
+        saved.setTerm("Saved-Term");
+        saved.setDefinition("Saved-Def");
+        saved.setFlashcardSet(fs);
+        saved.setUser(creator);
+        flashcardService.save(saved);
+        assertNotNull(saved.getFlashcardId());
+
+        flashcardService.delete(saved);
+        flashcardService.delete(reloaded);
+
+        setDao.delete(fs);
+        classDao.delete(clazz);
+        userDao.delete(creator);
+        userDao.delete(teacher);
+    }
 }
 

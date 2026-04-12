@@ -7,7 +7,6 @@ import javafx.scene.control.TextField;
 import model.AppState;
 import model.entity.User;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -95,37 +94,4 @@ class AccountEditControllerTest {
         assertEquals("john@example.com", email.getText());
     }
 
-    @Disabled("Cannot test UI navigation in unit test environment")
-    @Test
-    void testInitialize_setsNavOverride() {
-        assertEquals(AppState.NavItem.ACCOUNT, AppState.navOverride.get());
-    }
-
-    @Disabled("Cannot test UI navigation in unit test environment")
-    @Test
-    void testOnSave_updatesUserAndNavigates() {
-        TextField first = (TextField) getPrivate("firstNameField");
-        TextField last = (TextField) getPrivate("lastNameField");
-        TextField email = (TextField) getPrivate("emailField");
-
-        first.setText("Alice");
-        last.setText("Smith");
-        email.setText("alice@example.com");
-
-        callPrivate("onSave");
-
-        User u = AppState.currentUser.get();
-        assertEquals("Alice", u.getFirstName());
-        assertEquals("Smith", u.getLastName());
-        assertEquals("alice@example.com", u.getEmail());
-
-        assertEquals(AppState.Screen.ACCOUNT, AppState.navOverride.get());
-    }
-
-    @Disabled("Cannot test UI navigation in unit test environment")
-    @Test
-    void testOnCancel_navigatesBack() {
-        callPrivate("onCancel");
-        assertEquals(AppState.Screen.ACCOUNT, AppState.navOverride.get());
-    }
 }

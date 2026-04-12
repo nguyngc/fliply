@@ -3,9 +3,18 @@ package util;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.MissingResourceException;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-public class LocalizationService {
+public final class LocalizationService {
+    private static final Logger LOGGER = Logger.getLogger(LocalizationService.class.getName());
+
+    private LocalizationService() {
+        throw new UnsupportedOperationException("Utility class");
+    }
+
     /**
      * Get localized strings for a specific locale
      */
@@ -20,19 +29,19 @@ public class LocalizationService {
             for (String key : bundle.keySet()) {
                 strings.put(key, bundle.getString(key));
             }
-        } catch (Exception e) {
-            System.err.println("Failed to load resource bundle for locale: " + locale);
+        } catch (MissingResourceException e) {
+            LOGGER.log(Level.WARNING, "Failed to load resource bundle for locale: {0}", locale);
             // Fallback to English
             try {
                 ResourceBundle fallback = ResourceBundle.getBundle(
                         "Messages",
-                        new Locale("en", "US")
+                        Locale.of("en", "US")
                 );
                 for (String key : fallback.keySet()) {
                     strings.put(key, fallback.getString(key));
                 }
-            } catch (Exception ex) {
-                System.out.println(ex.getMessage());
+            } catch (MissingResourceException ex) {
+                LOGGER.log(Level.SEVERE, "Failed to load fallback bundle", ex);
             }
         }
 

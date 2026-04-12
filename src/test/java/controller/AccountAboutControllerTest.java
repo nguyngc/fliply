@@ -96,11 +96,11 @@ class AccountAboutControllerTest {
 
     @Test
     void testInitialize_setsHeaderCorrectly() {
-        HeaderController header = (HeaderController) getPrivate();
+        HeaderController headerController = (HeaderController) getPrivate();
 
-        assertEquals("About us", getHeaderLabel(header, "titleLabel"));
-        assertEquals("", getHeaderLabel(header, "subtitleLabel"));
-        boolean visible = getBoolean(header);
+        assertEquals("About us", getHeaderLabel(headerController, "titleLabel"));
+        assertEquals("", getHeaderLabel(headerController, "subtitleLabel"));
+        boolean visible = getBoolean(headerController);
         assertTrue(visible);
         
     }

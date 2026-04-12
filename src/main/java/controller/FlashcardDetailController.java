@@ -87,7 +87,8 @@ public class FlashcardDetailController {
         if (!AppState.currentDetailList.isEmpty()) {
             cards.addAll(AppState.currentDetailList);
             // Restore the current index, clamped to valid range
-            index = clamp(AppState.currentDetailIndex.get(), 0, cards.size() - 1);
+            int maxIndex = cards.size() - 1;
+            index = maxIndex < 0 ? 0 : Math.clamp(AppState.currentDetailIndex.get(), 0, maxIndex);
         }
 
         // ========== Configure Header ==========
@@ -173,7 +174,8 @@ public class FlashcardDetailController {
                     }
 
                     // Clamp index to valid range and update
-                    index = clamp(idx, 0, cards.size() - 1);
+                    int maxIndex = cards.size() - 1;
+                    index = maxIndex < 0 ? 0 : Math.clamp(idx, 0, maxIndex);
                     AppState.currentDetailIndex.set(index);
 
                     // Re-render the UI
@@ -258,18 +260,4 @@ public class FlashcardDetailController {
         }
     }
 
-    /**
-     * Clamps a value to be within the specified range.
-     * If max is less than min, returns min.
-     * Useful for ensuring the index stays within valid bounds.
-     *
-     * @param v The value to clamp
-     * @param min The minimum allowed value
-     * @param max The maximum allowed value
-     * @return The clamped value
-     */
-    private int clamp(int v, int min, int max) {
-        if (max < min) return min;
-        return Math.max(min, Math.min(max, v));
-    }
 }

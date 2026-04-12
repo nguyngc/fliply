@@ -144,7 +144,8 @@ public class QuizDetailController {
         int total = questions.size();
 
         // Clamp index to valid range
-        idx = clamp(idx, 0, total - 1);
+        int maxIndex = total - 1;
+        idx = maxIndex < 0 ? 0 : Math.clamp(idx, 0, maxIndex);
         AppState.quizQuestionIndex.set(idx);
 
         // ========== Get Question Data ==========
@@ -327,19 +328,6 @@ public class QuizDetailController {
         opt4.setDisable(disabled);
     }
 
-    /**
-     * Clamps a value to be within the specified range.
-     * If max is less than min, returns min.
-     *
-     * @param v The value to clamp
-     * @param min The minimum allowed value
-     * @param max The maximum allowed value
-     * @return The clamped value
-     */
-    private int clamp(int v, int min, int max) {
-        if (max < min) return min;
-        return Math.max(min, Math.min(max, v));
-    }
 
     /**
      * Finds and returns the button with the given text.

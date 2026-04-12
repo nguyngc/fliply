@@ -109,4 +109,27 @@ class UserServiceTest {
         // cleanup
         userDao.delete(registered);
     }
+
+    @Test
+    void getAllStudents_and_update() {
+        String studentUid = UUID.randomUUID().toString().substring(0, 8);
+        String teacherUid = UUID.randomUUID().toString().substring(0, 8);
+
+        User student = userService.register("student+" + studentUid + "@test.com", "password123", "Stu", "Dent");
+        User teacher = userService.register("teacher+" + teacherUid + "@test.com", "password123", "Teach", "Er");
+        teacher.setRole(1);
+        userService.update(teacher);
+
+        assertTrue(userService.getAllStudents().stream().anyMatch(u -> u.getUserId().equals(student.getUserId())));
+        assertFalse(userService.getAllStudents().stream().anyMatch(u -> u.getUserId().equals(teacher.getUserId())));
+
+        student.setFirstName("Updated");
+        userService.update(student);
+
+        User reloaded = userDao.findByEmailAndPassword(student.getEmail(), student.getPassword());
+        assertEquals("Updated", reloaded.getFirstName());
+
+        userDao.delete(student);
+        userDao.delete(teacher);
+    }
 }

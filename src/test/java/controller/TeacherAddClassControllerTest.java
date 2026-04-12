@@ -5,11 +5,9 @@ import javafx.embed.swing.JFXPanel;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.StackPane;
 import model.AppState;
 import model.service.TeacherAddClassService;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
@@ -65,7 +63,6 @@ class TeacherAddClassControllerTest {
 
         // Inject fake header
         FakeHeaderController fakeHeader = new FakeHeaderController();
-        setPrivate("header", new StackPane());
         setPrivate("headerController", fakeHeader);
 
         // Inject UI field
@@ -128,18 +125,6 @@ class TeacherAddClassControllerTest {
         assertNull(AppState.navOverride.get());
     }
 
-    @Disabled
-    @Test
-    void testOnAdd_validCode_createsClassAndNavigates() {
-        TextField field = (TextField) getPrivate("classCodeField");
-        field.setText("MATH101");
-
-        callPrivate("onAdd");
-
-        FakeTeacherAddClassService fake = (FakeTeacherAddClassService) getPrivate("teacherAddClass");
-        assertEquals("MATH101", fake.lastCreatedCode);
-        assertEquals(AppState.Screen.CLASSES, AppState.navOverride.get());
-    }
 
     @Test
     void testOnAdd_serviceThrowsError_doesNotNavigate() {

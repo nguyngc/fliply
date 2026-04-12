@@ -22,6 +22,8 @@ import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Controller for the teacher add flashcard set screen.
@@ -29,6 +31,7 @@ import java.util.Map;
  * Handles file selection, parsing, and bulk flashcard creation.
  */
 public class TeacherAddSetController {
+    private static final Logger LOGGER = Logger.getLogger(TeacherAddSetController.class.getName());
 
     // ========== Header Components ==========
     @FXML
@@ -164,9 +167,7 @@ public class TeacherAddSetController {
             // Navigate back to the teacher class detail screen
             Navigator.go(AppState.Screen.TEACHER_CLASS_DETAIL);
         } catch (Exception ex) {
-            // Log exception for debugging
-            ex.printStackTrace();
-            System.err.println("Error: " + ex.getMessage());
+            LOGGER.log(Level.WARNING, "Error while adding flashcard set", ex);
         }
     }
 

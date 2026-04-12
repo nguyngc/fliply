@@ -1,9 +1,8 @@
 package controller;
 
 import controller.components.HeaderController;
-import controller.components.TermTileController;
+import controller.components.TermTileLoader;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.control.Label;
@@ -14,13 +13,9 @@ import model.entity.Flashcard;
 import model.entity.User;
 import model.service.FlashcardService;
 import util.LocaleManager;
-import util.LocalizationService;
 import view.Navigator;
 
-import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 /**
@@ -94,7 +89,7 @@ public class FlashcardsController {
             int index = i;
             
             // Create a tile with the flashcard's term
-            Node tile = loadTile(card.getTerm(), false, () -> {
+            Node tile = loadTile(card.getTerm(), () -> {
                 // When tile is clicked, set up state for viewing the card detail
                 AppState.currentDetailList.setAll(AppState.myFlashcards);
                 AppState.currentDetailIndex.set(index);
@@ -126,39 +121,16 @@ public class FlashcardsController {
 
     /**
      * Loads a flashcard tile from the FXML template.
-     * Configures the tile with the given term text, state, and click handler.
+     * Configures the tile with the given term text and click handler.
      *
      * @param term The term/question text to display on the tile
-     * @param read Whether the tile should display as read (true) or unread (false)
      * @param onSelected Callback to invoke when the tile is clicked
      * @return A Node containing the configured flashcard tile
      */
-    private Node loadTile(String term, boolean read, Runnable onSelected) {
-        try {
-            // Load the term tile FXML template
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/components/term_tile.fxml"));
-            Node node = loader.load();
-            TermTileController ctrl = loader.getController();
-
-            // Set the term text
-            ctrl.setText(term);
-            
-            // Set the initial state (read or unread)
-            ctrl.setState(read ? TermTileController.State.READ : TermTileController.State.UNREAD);
-
-            // Configure click handler
-            ctrl.setOnSelected(() -> {
-                // Mark the tile as read when clicked
-                ctrl.setState(TermTileController.State.READ);
-                // Invoke the callback to navigate or perform other actions
-                onSelected.run();
-            });
-
-            return node;
-        } catch (IOException ex) {
-            throw new RuntimeException(rb.getString("flashcards.error"), ex);
-        }
+    private Node loadTile(String term, Runnable onSelected) {
+        return TermTileLoader.load(getClass(), term, onSelected);
     }
+
 
     /**
      * Builds a clickable "Add Flashcard" tile with a plus (+) symbol.

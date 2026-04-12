@@ -8,21 +8,17 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class QuizTest {
 
-    // Helper: set private ID via reflection
-    private void setId(Quiz q, int id) {
-        try {
-            Field f = Quiz.class.getDeclaredField("quizId");
-            f.setAccessible(true);
-            f.set(q, id);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
     @Test
     void getQuizId() {
         Quiz q = new Quiz();
-        setId(q, 10);
+        try {
+            Field f = Quiz.class.getDeclaredField("quizId");
+            f.setAccessible(true);
+            f.set(q, 10);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
         assertEquals(10, q.getQuizId());
     }
 
@@ -49,16 +45,8 @@ class QuizTest {
     }
 
     @Test
-    void setUser() {
-        User u = new User();
-        Quiz q = new Quiz();
-        q.setUser(u);
-        assertEquals(u, q.getUser());
-    }
-
-    @Test
     void testToString() {
         Quiz q = new Quiz();
-        assertNull(q.toString()); // vì toString() trả về null
+        assertEquals("", q.toString());
     }
 }

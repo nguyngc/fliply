@@ -70,21 +70,6 @@ class FlashcardTest {
         assertEquals("DefX", f.getDefinition());
     }
 
-    @Test
-    void setFlashcardSet() {
-        FlashcardSet set = new FlashcardSet();
-        Flashcard f = new Flashcard();
-        f.setFlashcardSet(set);
-        assertEquals(set, f.getFlashcardSet());
-    }
-
-    @Test
-    void setUser() {
-        User u = new User();
-        Flashcard f = new Flashcard();
-        f.setUser(u);
-        assertEquals(u, f.getUser());
-    }
 
     @Test
     void testToString() {

@@ -4,23 +4,25 @@ import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.control.*;
 import javafx.scene.image.ImageView;
-import javafx.stage.Stage;
 import model.AppState;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.MethodOrderer;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestMethodOrder;
 import util.LocaleManager;
-import view.Navigator;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ResourceBundle;
-import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class RegisterControllerTest {
 
     static { new JFXPanel(); }
@@ -40,11 +42,16 @@ class RegisterControllerTest {
         setPrivate("teacherNo", new RadioButton());
         setPrivate("termsCheck", new CheckBox());
         setPrivate("eyeIcon", new ImageView());
-        runOnFxThread(() -> Navigator.init(new Stage()));
         runOnFxThread(() -> callPrivate("initialize"));
     }
 
+    @AfterEach
+    void tearDown() {
+        resetDialogsFactory();
+    }
+
     @Test
+    @Order(1)
     void initialize_hidesVisiblePasswordField() {
         assertFalse(((TextField) getPrivate("passwordTextField")).isVisible());
         assertFalse(((TextField) getPrivate("passwordTextField")).isManaged());
@@ -52,7 +59,8 @@ class RegisterControllerTest {
     }
 
     @Test
-    void togglePassword_switchesBetweenMaskedAndVisible() throws Exception {
+    @Order(2)
+    void togglePassword_switchesBetweenMaskedAndVisible() {
         PasswordField passwordField = (PasswordField) getPrivate("passwordField");
         TextField passwordTextField = (TextField) getPrivate("passwordTextField");
         passwordField.setText("secret123");
@@ -67,6 +75,43 @@ class RegisterControllerTest {
         assertTrue(passwordField.isVisible());
         assertEquals("changed", passwordField.getText());
         assertFalse(passwordTextField.isVisible());
+    }
+
+    @Test
+    @Order(3)
+    void register_withoutTermsShowsWarning() {
+        AtomicReference<Alert> alertRef = new AtomicReference<>();
+        CountDownLatch created = new CountDownLatch(1);
+        CountDownLatch finished = new CountDownLatch(1);
+
+        setDialogsFactory(type -> {
+            Alert alert = new Alert(type);
+            alertRef.set(alert);
+            created.countDown();
+            return alert;
+        });
+
+        ((TextField) getPrivate("firstNameField")).setText("John");
+        ((TextField) getPrivate("lastNameField")).setText("Doe");
+        ((TextField) getPrivate("emailField")).setText("john@example.com");
+        ((PasswordField) getPrivate("passwordField")).setText("secret12");
+        ((CheckBox) getPrivate("termsCheck")).setSelected(false);
+
+        Platform.runLater(() -> {
+            callPrivate("register");
+            finished.countDown();
+        });
+
+        await(created);
+        Platform.runLater(() -> {
+            Alert alert = alertRef.get();
+            if (alert != null) {
+                alert.hide();
+            }
+        });
+        await(finished);
+
+        assertNull(AppState.currentUser.get());
     }
 
     private void runOnFxThread(Runnable action) {
@@ -130,7 +175,36 @@ class RegisterControllerTest {
             throw new RuntimeException(e);
         }
     }
+
+    private void setDialogsFactory(java.util.function.Function<Alert.AlertType, Alert> factory) {
+        try {
+            Class<?> dialogs = Class.forName("util.Dialogs");
+            Method m = dialogs.getDeclaredMethod("setAlertFactory", java.util.function.Function.class);
+            m.setAccessible(true);
+            m.invoke(null, factory);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void resetDialogsFactory() {
+        try {
+            Class<?> dialogs = Class.forName("util.Dialogs");
+            Method m = dialogs.getDeclaredMethod("resetAlertFactory");
+            m.setAccessible(true);
+            m.invoke(null);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void await(CountDownLatch latch) {
+        try {
+            assertTrue(latch.await(10, TimeUnit.SECONDS), "Timed out waiting for JavaFX task");
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        }
+    }
 }
-
-
 

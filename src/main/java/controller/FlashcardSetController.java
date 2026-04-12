@@ -1,9 +1,8 @@
 package controller;
 
 import controller.components.HeaderController;
-import controller.components.TermTileController;
+import controller.components.TermTileLoader;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.layout.GridPane;
@@ -14,11 +13,9 @@ import model.service.FlashcardSetService;
 import util.LocalizationService;
 import view.Navigator;
 
-import java.io.IOException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Controller for displaying all flashcards in a selected flashcard set.
@@ -44,9 +41,6 @@ public class FlashcardSetController {
     // Service for flashcard set database operations
     private final FlashcardSetService flashcardSetService = new FlashcardSetService();
     
-    // Map for localized strings from resource bundle
-    private Map<String, String> localizedStrings;
-
     /**
      * Initializes the controller when the FXML is loaded.
      * Loads the selected flashcard set with all its cards from the database,
@@ -55,7 +49,7 @@ public class FlashcardSetController {
     @FXML
     private void initialize() {
         // ========== Load Localized Strings ==========
-        localizedStrings = LocalizationService.getLocalizedStrings();
+        var localizedStrings = LocalizationService.getLocalizedStrings();
         
         // ========== Load Flashcard Set and Cards ==========
         // Get the flashcard set that was selected from the previous screen
@@ -100,7 +94,7 @@ public class FlashcardSetController {
             Flashcard item = setCards.get(i);
 
             // Create a tile with the flashcard's term
-            Node tile = loadTile(item.getTerm(), false, () -> {
+            Node tile = loadTile(item.getTerm(), () -> {
                 // When tile is clicked, set up state for viewing the card detail
                 AppState.currentDetailList.setAll(setCards);
                 AppState.currentDetailIndex.set(index);
@@ -130,30 +124,7 @@ public class FlashcardSetController {
      * @param onSelected Callback to invoke when the tile is clicked
      * @return A Node containing the configured flashcard tile
      */
-    private Node loadTile(String term, boolean read, Runnable onSelected) {
-        try {
-            // Load the term tile FXML template
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/components/term_tile.fxml"));
-            Node node = loader.load();
-            TermTileController ctrl = loader.getController();
-
-            // Set the term text
-            ctrl.setText(term);
-            
-            // Set the initial state (read or unread)
-            ctrl.setState(read ? TermTileController.State.READ : TermTileController.State.UNREAD);
-
-            // Configure click handler
-            ctrl.setOnSelected(() -> {
-                // Mark the tile as read when clicked
-                ctrl.setState(TermTileController.State.READ);
-                // Invoke the callback to navigate or perform other actions
-                onSelected.run();
-            });
-
-            return node;
-        } catch (IOException ex) {
-            throw new RuntimeException("Failed to load term_tile.fxml", ex);
-        }
+    private Node loadTile(String term, Runnable onSelected) {
+        return TermTileLoader.load(getClass(), term, onSelected);
     }
 }

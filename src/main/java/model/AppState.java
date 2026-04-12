@@ -19,11 +19,6 @@ public final class AppState {
     //save real user after login
     public static final ObjectProperty<User> currentUser = new SimpleObjectProperty<>();
 
-//    //demo
-//    public static final SimpleStringProperty currentFirstName = new SimpleStringProperty("Student");
-//    public static final SimpleStringProperty currentLastName = new SimpleStringProperty("User");
-//    public static final SimpleStringProperty currentEmail = new SimpleStringProperty("student@email.com");
-//    public static final SimpleStringProperty demoPassword = new SimpleStringProperty("123456");
 
     // ---------- Navigation / session ----------
     public static final ObjectProperty<Screen> currentScreen = new SimpleObjectProperty<>(Screen.WELCOME);
@@ -59,12 +54,9 @@ public final class AppState {
     public static final ObjectProperty<Role> role = new SimpleObjectProperty<>(Role.STUDENT);
     public static final ObservableList<ClassItem> demoClasses = FXCollections.observableArrayList();
     public static final StringProperty selectedClassCode = new SimpleStringProperty("");
-    //public static final ObjectProperty<ClassItem> selectedClass = new SimpleObjectProperty<>(null);
     public static final ObjectProperty<ClassModel> selectedClass = new SimpleObjectProperty<>(null);
-    //public static final ObjectProperty<StudentItem> selectedStudent = new SimpleObjectProperty<>(null);
     public static final ObjectProperty<User> selectedStudent = new SimpleObjectProperty<>(null);
     public static final StringProperty selectedTeacherName = new SimpleStringProperty("");
-    //public static final ObjectProperty<FlashcardSetItem> selectedSet = new SimpleObjectProperty<>(null);
     public static final ObjectProperty<FlashcardSet> selectedSet = new SimpleObjectProperty<>(null);
     public static final ObjectProperty<FlashcardSet> selectedFlashcardSet = new SimpleObjectProperty<>();
 

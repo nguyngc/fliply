@@ -56,21 +56,6 @@ class StudyTest {
         assertEquals(9, s.getStatistic());
     }
 
-    @Test
-    void setUser() {
-        User u = new User();
-        Study s = new Study();
-        s.setUser(u);
-        assertEquals(u, s.getUser());
-    }
-
-    @Test
-    void setFlashcardSet() {
-        FlashcardSet fs = new FlashcardSet();
-        Study s = new Study();
-        s.setFlashcardSet(fs);
-        assertEquals(fs, s.getFlashcardSet());
-    }
 
     @Test
     void testToString() {

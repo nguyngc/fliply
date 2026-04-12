@@ -6,11 +6,12 @@ import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.VBox;
 import model.AppState;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import util.LocaleManager;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ResourceBundle;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -101,54 +102,6 @@ class ClassCardControllerTest {
         assertTrue(studentBox.isVisible());
         assertTrue(studentBox.isManaged());
     }
-    @Disabled("Progress not implemented yet")
-    @Test
-    void testSetStudentCard() {
-        AppState.setRole(AppState.Role.STUDENT);
-
-        controller.setStudentCard("MATH101", "Mr. John", 0.75);
-
-        Label className = (Label) getPrivate("classNameLabel");
-        Label teacherName = (Label) getPrivate("teacherNameLabel");
-        Label progressText = (Label) getPrivate("progressTextLabel");
-        ProgressBar bar = (ProgressBar) getPrivate("progressBar");
-
-        assertEquals("MATH101", className.getText());
-        assertEquals("Mr. John", teacherName.getText());
-        //assertEquals("75% Completed", progressText.getText());
-        assertEquals(0.75, bar.getProgress());
-    }
-    @Disabled("Progress not implemented yet")
-    @Test
-    void testSetTeacherCard() {
-        AppState.setRole(AppState.Role.TEACHER);
-
-        controller.setTeacherCard("SCIENCE", 12, 3, 0.5);
-
-        Label className = (Label) getPrivate("classNameLabel");
-        Label students = (Label) getPrivate("studentsCountLabel");
-        Label sets = (Label) getPrivate("setsCountLabel");
-        Label progressText = (Label) getPrivate("progressTextLabel");
-        ProgressBar bar = (ProgressBar) getPrivate("progressBar");
-
-        assertEquals("SCIENCE", className.getText());
-        assertEquals("12 students", students.getText());
-        assertEquals("3 set of flashcards", sets.getText());
-        //assertEquals("50% Completed", progressText.getText());
-        assertEquals(0.5, bar.getProgress());
-    }
-
-    @Disabled("Progress not implemented yet")
-    @Test
-    void testSetProgress() {
-        controller.setProgress(0.33);
-
-        Label progressText = (Label) getPrivate("progressTextLabel");
-        ProgressBar bar = (ProgressBar) getPrivate("progressBar");
-
-        //assertEquals("33% Completed", progressText.getText());
-        assertEquals(0.33, bar.getProgress());
-    }
 
     @Test
     void testOnClick() {
@@ -159,5 +112,31 @@ class ClassCardControllerTest {
         controller.fire();
 
         assertTrue(clicked[0]);
+    }
+
+    @Test
+    void testSetStudentCard_andProgress() {
+        AppState.setRole(AppState.Role.STUDENT);
+
+        controller.setStudentCard("CLS-101", "Teacher Name", 0.42);
+
+        assertEquals("CLS-101", ((Label) getPrivate("classNameLabel")).getText());
+        assertEquals("Teacher Name", ((Label) getPrivate("teacherNameLabel")).getText());
+        assertEquals(0.42, ((ProgressBar) getPrivate("progressBar")).getProgress(), 0.0001);
+        assertEquals("42% Completed", ((Label) getPrivate("progressTextLabel")).getText());
+    }
+
+    @Test
+    void testSetTeacherCard_andProgress() {
+        AppState.setRole(AppState.Role.TEACHER);
+        ResourceBundle rb = ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
+
+        controller.setTeacherCard("CLS-202", 12, 3, 0.75);
+
+        assertEquals("CLS-202", ((Label) getPrivate("classNameLabel")).getText());
+        assertEquals("12 " + rb.getString("classDetail.students"), ((Label) getPrivate("studentsCountLabel")).getText());
+        assertEquals("3 " + rb.getString("classDetail.sets"), ((Label) getPrivate("setsCountLabel")).getText());
+        assertEquals(0.75, ((ProgressBar) getPrivate("progressBar")).getProgress(), 0.0001);
+        assertEquals("75% Completed", ((Label) getPrivate("progressTextLabel")).getText());
     }
 }
