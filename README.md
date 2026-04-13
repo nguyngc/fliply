@@ -163,3 +163,126 @@ The project uses the Maven Shade Plugin and the main class is `Main`.
 
 ### Important
 Because Fliply is a JavaFX desktop application, running it in Docker may require an X server or GUI forwarding on your machine.
+
+## Localization System
+<details>
+
+### 1. Language Management
+
+Fliply uses a dedicated `Language` table to store all supported languages.  
+Each language is identified by a unique language code (e.g., `en`, `vi`, `fi`), which is used for:
+
+- Displaying available languages in the UI
+- Selecting translations at runtime
+- Referencing translations in other tables
+
+#### **Language Table Structure**
+
+| Column       | Description                                      |
+|--------------|--------------------------------------------------|
+| `id`         | Primary key                                      |
+| `code`       | Language code (e.g., `"en"`)                     |
+| `name`       | Human‑readable language name                     |
+| `is_default` | Indicates the system fallback language           |
+
+The language code is used both in the language menu and as a reference key for retrieving translations across the system.
+
+---
+
+### 2. Static UI Text Localization
+
+Static UI text (e.g., button labels, menu items, system messages) is stored in the `LocalizationString` table.  
+Each entry is identified by a unique key such as:
+
+- `button.save`
+- `ui.welcome`
+- `error.notfound`
+
+#### Excel‑Based Translation Import
+
+All static translations are maintained in an Excel file located in the project’s `resources` directory.  
+A Java `ImportService` reads this file and inserts or updates translations in the database.
+
+This allows translators or non‑technical team members to update UI text without modifying code.
+
+#### **LocalizationString Table Structure**
+
+| Column        | Description                          |
+|---------------|--------------------------------------|
+| `id`          | Primary key                          |
+| `key`         | Identifier for the UI text           |
+| `language_id` | References `Language.id`             |
+| `text`        | Translated text                      |
+
+A unique constraint on `(key, language_id)` ensures that each key has only one translation per language.
+
+---
+
+### 3. Dynamic Content Localization
+
+Dynamic content—such as class names, flashcard terms, and flashcard definitions—requires separate translation tables because these values vary per record.
+
+Examples of translation tables:
+
+- `Class_Translation`
+- `FlashcardSet_Translation`
+- `Flashcard_Translation`
+
+#### **Translation Table Structure (General Pattern)**
+
+| Column            | Description                                      |
+|-------------------|--------------------------------------------------|
+| `id`              | Primary key                                      |
+| `<entity>_id`     | References the base table (e.g., `ClassId`)      |
+| `language_id`     | References `Language.id`                         |
+| `translated_value`| The translated text                              |
+
+This structure allows the system to store translations for any number of languages without altering the base tables.
+
+---
+
+### 4. Runtime Localization Behavior
+
+The system determines the active language and retrieves the appropriate translations at runtime.  
+Localization behavior is divided into three components:  
+
+|Content Type |	Storage	Retrieval |Method |	Fallback |
+|-------------|-------------------|-------|-----------|
+|Static UI Text |	LocalizationString|	Lookup by key + language|	Default language|
+|Dynamic Content|	*_Translation tables|	Join base + translation table|	Base table value|
+|Language Selection|	User profile or UI menu|	Determines active language|	System default|
+
+#### 4.1 Language Selection
+
+| Source            | Description |
+|-------------------|-------------|
+| **User Profile**  | Each user has a preferred language stored in the `USER` table. |
+| **Language Menu** | Users may manually select a language in the UI. |
+| **Default Language** | If a translation is missing, the system uses the language marked as `is_default = TRUE`. |
+
+#### 4.2 Static Text Lookup
+
+Static UI text is retrieved from the `LocalizationString` table using the text key and the active language code.
+
+#### **SQL Query**
+
+```
+SELECT ls.text FROM LocalizationString ls
+JOIN Language l ON l.id = ls.language_id
+WHERE ls.key = :key AND l.code = :lang;
+```
+#### 4.3 Dynamic Content Lookup
+Dynamic content is retrieved by joining the base table with its corresponding translation table.  
+#### **SQL Query**
+Example: Class Name Localization
+```
+SELECT c.ClassId, COALESCE(ct.name, c.ClassName) AS ClassName
+FROM CLASS c
+LEFT JOIN Class_Translation ct
+ON ct.class_id = c.ClassId
+AND ct.language_id = :langId;
+```
+</details>
+
+
+
