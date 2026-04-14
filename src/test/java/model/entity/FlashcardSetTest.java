@@ -86,6 +86,15 @@ class FlashcardSetTest {
         assertEquals("Science", fs.getSubject());
     }
 
+    @Test
+    void constructorAssignsFields() {
+        ClassModel classModel = new ClassModel();
+
+        FlashcardSet fs = new FlashcardSet("Biology", classModel);
+
+        assertEquals("Biology", fs.getSubject());
+        assertSame(classModel, fs.getClassModel());
+    }
 
     @Test
     void testToString() {

@@ -145,4 +145,16 @@ class UserTest {
         assertTrue(u.isStudent());
         assertFalse(u.isTeacher());
     }
+
+    @Test
+    void roleChecksReturnFalseForNullAndUnexpectedRole() {
+        User u = new User();
+
+        assertFalse(u.isTeacher());
+        assertFalse(u.isStudent());
+
+        u.setRole(2);
+        assertFalse(u.isTeacher());
+        assertFalse(u.isStudent());
+    }
 }

@@ -137,4 +137,63 @@ class UserDaoTest {
         userDao.delete(student);
     }
 
+    @Test
+    void queryMethods_returnNullOrFalseWhenUserDoesNotExist() {
+        assertNull(userDao.findByEmail("missing@example.com"));
+        assertFalse(userDao.existsByEmail("missing@example.com"));
+        assertNull(userDao.findByEmailAndPassword("missing@example.com", "nope"));
+    }
+
+    @Test
+    void persist_duplicateEmailRollsBackAndThrows() {
+        User first = newUser();
+        userDao.persist(first);
+
+        User duplicate = new User();
+        duplicate.setFirstName("Dup");
+        duplicate.setLastName("User");
+        duplicate.setEmail(first.getEmail());
+        duplicate.setPassword("password123");
+        duplicate.setRole(1);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> userDao.persist(duplicate));
+        assertNotNull(exception);
+
+        List<User> matches = userDao.findAll().stream()
+                .filter(user -> first.getEmail().equals(user.getEmail()))
+                .toList();
+        assertEquals(1, matches.size());
+
+        userDao.delete(first);
+    }
+
+    @Test
+    void update_invalidUserRollsBackAndThrows() {
+        User user = newUser();
+        userDao.persist(user);
+        String originalEmail = user.getEmail();
+
+        user.setEmail(null);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> userDao.update(user));
+        assertNotNull(exception);
+
+        User reloaded = userDao.findByEmailAndPassword(originalEmail, "password123");
+        assertNotNull(reloaded);
+
+        User stored = userDao.find(user.getUserId());
+        assertNotNull(stored);
+        assertNotNull(stored.getEmail());
+
+        userDao.delete(stored);
+    }
+
+    @Test
+    void delete_invalidTransientUserRollsBackAndThrows() {
+        User invalid = new User();
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> userDao.delete(invalid));
+        assertNotNull(exception);
+    }
+
 }

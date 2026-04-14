@@ -45,6 +45,16 @@ class QuizTest {
     }
 
     @Test
+    void constructorAssignsFields() {
+        User u = new User();
+
+        Quiz q = new Quiz(12, u);
+
+        assertEquals(12, q.getNoOfQuestions());
+        assertSame(u, q.getUser());
+    }
+
+    @Test
     void testToString() {
         Quiz q = new Quiz();
         assertEquals("", q.toString());

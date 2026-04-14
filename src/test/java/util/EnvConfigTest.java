@@ -41,6 +41,39 @@ class EnvConfigTest {
         }
     }
 
+    @Test
+    void get_readsQuotedValuesAndIgnoresCommentsAndInvalidLines() throws Exception {
+        Path envFile = Files.createTempFile("fliply-test", ".env");
+        try {
+            Files.writeString(envFile, """
+                    # comment
+                    INVALID_LINE
+                    DB_NAME="fliply"
+                    DB_USER='teacher'
+                    BLANK_VALUE=
+                    """);
+            System.setProperty("fliply.env.file", envFile.toString());
+
+            EnvConfig.reload();
+
+            assertEquals("fliply", EnvConfig.get("DB_NAME", "fallback"));
+            assertEquals("teacher", EnvConfig.get("DB_USER", "fallback"));
+            assertEquals("fallback", EnvConfig.get("BLANK_VALUE", "fallback"));
+            assertEquals("fallback", EnvConfig.get("INVALID_LINE", "fallback"));
+        } finally {
+            Files.deleteIfExists(envFile);
+        }
+    }
+
+    @Test
+    void get_returnsDefaultWhenConfiguredEnvFileDoesNotExist() {
+        System.setProperty("fliply.env.file", "target/does-not-exist.env");
+
+        EnvConfig.reload();
+
+        assertEquals("3307", EnvConfig.get("DB_PORT", "3307"));
+    }
+
     @AfterEach
     void clearProperties() {
         System.clearProperty("DB_PORT");

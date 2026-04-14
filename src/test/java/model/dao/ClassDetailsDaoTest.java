@@ -268,6 +268,21 @@ class ClassDetailsDaoTest {
         userDao.delete(student);
         userDao.delete(teacher);
     }
+
+    @Test
+    void emptyQueriesReturnNoMatches() {
+        assertTrue(classDetailsDao.findByClassId(999999).isEmpty());
+        assertTrue(classDetailsDao.findByStudentId(999999).isEmpty());
+        assertFalse(classDetailsDao.existsByUserAndClass(999999, 999999));
+    }
+
+    @Test
+    void delete_invalidTransientClassDetailsRollsBackAndThrows() {
+        ClassDetails invalid = new ClassDetails();
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> classDetailsDao.delete(invalid));
+        assertNotNull(exception);
+    }
     @AfterEach
     void cleanupTestData() {
 
@@ -307,4 +322,3 @@ class ClassDetailsDaoTest {
     }
 
 }
-

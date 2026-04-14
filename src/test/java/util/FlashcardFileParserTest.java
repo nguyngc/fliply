@@ -57,5 +57,37 @@ class FlashcardFileParserTest {
         assertEquals("API", pipeCards.get(0).term());
         assertEquals("Application Programming Interface", pipeCards.get(0).definition());
     }
-}
 
+    @Test
+    void parsePsvAndUnknownExtension_skipBlankValuesAndUseFirstTwoColumns() throws Exception {
+        Path psv = Files.createTempFile("flashcards", ".psv");
+        Files.write(psv, List.of(
+                "term|definition",
+                "CLI|Command Line Interface|ignored"
+        ), StandardCharsets.UTF_8);
+
+        Path txt = Files.createTempFile("flashcards", ".txt");
+        Files.write(txt, List.of(
+                "Question,Answer",
+                "Term,Definition",
+                "Valid,Entry",
+                ",missing term",
+                "missing definition,   "
+        ), StandardCharsets.UTF_8);
+
+        List<FlashcardFileParser.ParsedCard> psvCards = FlashcardFileParser.parse(psv.toFile());
+        List<FlashcardFileParser.ParsedCard> txtCards = FlashcardFileParser.parse(txt.toFile());
+
+        assertEquals(1, psvCards.size());
+        assertEquals("CLI", psvCards.get(0).term());
+        assertEquals("Command Line Interface|ignored", psvCards.get(0).definition());
+
+        assertEquals(3, txtCards.size());
+        assertEquals("Question", txtCards.get(0).term());
+        assertEquals("Answer", txtCards.get(0).definition());
+        assertEquals("Term", txtCards.get(1).term());
+        assertEquals("Definition", txtCards.get(1).definition());
+        assertEquals("Valid", txtCards.get(2).term());
+        assertEquals("Entry", txtCards.get(2).definition());
+    }
+}

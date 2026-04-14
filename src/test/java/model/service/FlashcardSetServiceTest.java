@@ -101,6 +101,31 @@ class FlashcardSetServiceTest {
     }
 
     @Test
+    void save_persistsTransientSet_andDeleteSet_removesPersistedSet() {
+        User teacher = newTeacher();
+        userDao.persist(teacher);
+
+        ClassModel clazz = newClass(teacher);
+        classDao.persist(clazz);
+
+        FlashcardSet transientSet = new FlashcardSet();
+        transientSet.setSubject("Transient");
+        transientSet.setClassModel(clazz);
+
+        setService.save(transientSet);
+
+        assertNotNull(transientSet.getFlashcardSetId());
+        assertNotNull(setDao.find(transientSet.getFlashcardSetId()));
+
+        setService.deleteSet(transientSet);
+
+        assertNull(setDao.find(transientSet.getFlashcardSetId()));
+
+        classDao.delete(clazz);
+        userDao.delete(teacher);
+    }
+
+    @Test
     void getSetWithCards_andGetAllSets_returnPersistedData() {
         User teacher = newTeacher();
         userDao.persist(teacher);
