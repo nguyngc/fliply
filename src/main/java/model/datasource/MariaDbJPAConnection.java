@@ -3,6 +3,7 @@ package model.datasource;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.Persistence;
+import util.EnvConfig;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -55,11 +56,11 @@ public final class MariaDbJPAConnection {
             return properties;
         }
 
-        String host = getEnvOrDefault("DB_HOST", "localhost");
-        String port = getEnvOrDefault("DB_PORT", "3307");
-        String dbName = getEnvOrDefault("DB_NAME", "fliply");
-        String user = getEnvOrDefault("DB_USER", "root");
-        String pass = getEnvOrDefault("DB_PASS", "123456");
+        String host = EnvConfig.get("DB_HOST", "localhost");
+        String port = EnvConfig.get("DB_PORT", "3307");
+        String dbName = EnvConfig.get("DB_NAME", "fliply");
+        String user = EnvConfig.get("DB_USER", "root");
+        String pass = EnvConfig.get("DB_PASS", "123456");
 
         properties.put("jakarta.persistence.jdbc.driver", "org.mariadb.jdbc.Driver");
         properties.put("jakarta.persistence.jdbc.url", "jdbc:mariadb://" + host + ":" + port + "/" + dbName);
@@ -71,19 +72,11 @@ public final class MariaDbJPAConnection {
         return properties;
     }
 
-    private static String getEnvOrDefault(String key, String defaultValue) {
-        String value = System.getenv(key);
-        if (value == null || value.isBlank()) {
-            return defaultValue;
-        }
-        return value;
-    }
-
     private static String getDbMode() {
         String value = System.getProperty("fliply.db.mode");
         if (value == null || value.isBlank()) {
             // Environment fallback keeps Docker/CI configuration simple.
-            value = System.getenv("FLIPLY_DB_MODE");
+            value = EnvConfig.get("FLIPLY_DB_MODE", null);
         }
         return (value == null || value.isBlank()) ? "mariadb" : value;
     }

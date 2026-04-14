@@ -15,6 +15,7 @@ import javafx.scene.layout.VBox;
 import model.AppState;
 import model.entity.Flashcard;
 import model.entity.FlashcardSet;
+import model.service.FlashcardSetService;
 import util.LocalizationService;
 import view.Navigator;
 
@@ -65,6 +66,7 @@ public class TeacherFlashcardSetDetailController {
 
     // The flashcard currently being edited (null if adding new)
     private Flashcard editingRow = null;
+    private final FlashcardSetService flashcardSetService = new FlashcardSetService();
 
     /**
      * Initializes the controller when the FXML is loaded.
@@ -83,6 +85,12 @@ public class TeacherFlashcardSetDetailController {
             Navigator.go(AppState.Screen.TEACHER_CLASS_DETAIL);
             return;
         }
+        if (set.getFlashcardSetId() == null) {
+            Navigator.go(AppState.Screen.TEACHER_CLASS_DETAIL);
+            return;
+        }
+        set = flashcardSetService.getSetWithCards(set.getFlashcardSetId());
+        AppState.selectedSet.set(set);
 
         // ========== Configure Header ==========
         headerController.setBackVisible(true);

@@ -117,7 +117,13 @@ public class HomeController {
 
         // Get the latest class (by ID, most recent)
         classes.sort((a, b) -> b.getClassId() - a.getClassId());
-        ClassModel cd = classes.getFirst();
+        ClassModel latestClass = classes.getFirst();
+        if (latestClass.getClassId() == null) return;
+
+        // Reload the selected class with the relations needed for the home card
+        // so rendering does not depend on lazy collections after the DAO closes.
+        ClassModel cd = classDetailsService.reloadClass(latestClass.getClassId());
+        if (cd == null) return;
 
         try {
             // ========== Load Class Card Component ==========

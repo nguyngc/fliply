@@ -67,8 +67,7 @@ src/
 │  │  ├─ model/
 │  │  ├─ view/
 │  │  ├─ controller/
-│  │  ├─ util/
-│  │  └─ Main.java
+│  │  └─ util/
 │  ├─ resources/
 │  │  └─ META-INF/
 │  │     └─ persistence.xml
@@ -134,7 +133,7 @@ Run with JavaFX Maven plugin:
 
 ``` mvn javafx:run```
 
-Or run the `Main` class directly from your IDE.
+Or run the `view.Main` class directly from your IDE.
 
 ## Run Tests
 ``` mvn test```
@@ -142,7 +141,7 @@ Or run the `Main` class directly from your IDE.
 ## Package Executable JAR
 ```mvn clean package```
 
-The project uses the Maven Shade Plugin and the main class is `Main`.
+The project uses the Maven Shade Plugin and the main class is `view.Main`.
 
 ## Run with Docker
 

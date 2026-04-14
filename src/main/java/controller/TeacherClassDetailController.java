@@ -27,6 +27,13 @@ import java.util.Locale;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
+/**
+ * Controller for the teacher class detail screen.
+ * Displays information about a specific class, including enrolled students and flashcard sets.
+ * Allows teachers to manage students (view details, add/remove) and view/add flashcard sets associated with the class.
+ * Provides navigation to student and flashcard set detail screens.
+ * Utilizes services for class and user management operations, and a header component for consistent UI.
+ */
 public class TeacherClassDetailController {
 
     @FXML
@@ -79,6 +86,12 @@ public class TeacherClassDetailController {
             Navigator.go(AppState.Screen.CLASSES);
             return;
         }
+        if (c.getClassId() == null) {
+            Navigator.go(AppState.Screen.CLASSES);
+            return;
+        }
+        c = classDetailsService.reloadClass(c.getClassId());
+        AppState.selectedClass.set(c);
 
         // ========== Configure Header ==========
         if (headerController != null) {
