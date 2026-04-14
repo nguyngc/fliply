@@ -85,16 +85,12 @@ public class ClassesController {
         
         // Create a card for each class and add to the list
         for (ClassModel c : classes) {
-            if (c.getClassId() == null) {
-                continue;
+            if (c.getClassId() != null) {
+                ClassModel loadedClass = classDetailsService.reloadClass(c.getClassId());
+                if (loadedClass != null) {
+                    classListBox.getChildren().add(buildClassCard(loadedClass, isTeacher));
+                }
             }
-
-            ClassModel loadedClass = classDetailsService.reloadClass(c.getClassId());
-            if (loadedClass == null) {
-                continue;
-            }
-
-            classListBox.getChildren().add(buildClassCard(loadedClass, isTeacher));
         }
         
         // Teachers have the option to create additional classes
