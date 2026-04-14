@@ -42,6 +42,17 @@ class QuizDetailsTest {
         assertEquals(f, qd.getFlashcard());
     }
 
+    @Test
+    void constructorAssignsFields() {
+        Quiz quiz = new Quiz();
+        Flashcard flashcard = new Flashcard();
+
+        QuizDetails qd = new QuizDetails(quiz, flashcard);
+
+        assertSame(quiz, qd.getQuiz());
+        assertSame(flashcard, qd.getFlashcard());
+    }
+
 
     @Test
     void testToString() {
@@ -62,5 +73,16 @@ class QuizDetailsTest {
         assertTrue(s.contains("quizDetailsId=7"));
         assertTrue(s.contains("quizId=3"));
         assertTrue(s.contains("flashcardId=15"));
+    }
+
+    @Test
+    void toString_handlesNullAssociations() {
+        QuizDetails qd = new QuizDetails();
+        setId(qd, "quizDetailsId", 9);
+
+        String s = qd.toString();
+
+        assertTrue(s.contains("quizId=null"));
+        assertTrue(s.contains("flashcardId=null"));
     }
 }

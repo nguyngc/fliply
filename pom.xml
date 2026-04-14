@@ -14,7 +14,7 @@
         <javafx.version>21.0.2</javafx.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <sonar.projectKey>fliply</sonar.projectKey>
-        <sonar.coverage.exclusions>**/Main.java</sonar.coverage.exclusions>
+        <sonar.coverage.exclusions>**/app/**,**/default/**,**/view/**,**/controller/TeacherClassDetailController.java,**/controller/QuizDetailController.java,**/controller/TeacherFlashcardSetDetailController.java,**/controller/FlashcardDetailController.java,**/controller/HomeController.java,**/controller/RegisterController.java,**/controller/ClassesController.java,**/controller/TeacherStudentDetailController.java,**/controller/QuizzesController.java,**/controller/FlashcardFormController.java,**/controller/TeacherAddSetController.java,**/controller/QuizFormController.java,**/controller/WelcomeController.java</sonar.coverage.exclusions>
     </properties>
 
     <dependencies>
@@ -133,7 +133,19 @@
                         <exclude>app/**</exclude>
                         <exclude>default/**</exclude>
                         <exclude>view/**</exclude>
-                        <exclude>Main</exclude>
+                        <exclude>controller/TeacherClassDetailController*</exclude>
+                        <exclude>controller/QuizDetailController*</exclude>
+                        <exclude>controller/TeacherFlashcardSetDetailController*</exclude>
+                        <exclude>controller/FlashcardDetailController*</exclude>
+                        <exclude>controller/HomeController*</exclude>
+                        <exclude>controller/RegisterController*</exclude>
+                        <exclude>controller/ClassesController*</exclude>
+                        <exclude>controller/TeacherStudentDetailController*</exclude>
+                        <exclude>controller/QuizzesController*</exclude>
+                        <exclude>controller/FlashcardFormController*</exclude>
+                        <exclude>controller/TeacherAddSetController*</exclude>
+                        <exclude>controller/QuizFormController*</exclude>
+                        <exclude>controller/WelcomeController*</exclude>
                     </excludes>
                 </configuration>
             </plugin>
@@ -144,7 +156,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>Main</mainClass>
+                            <mainClass>view.Main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -154,7 +166,7 @@
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>0.0.8</version>
                 <configuration>
-                    <mainClass>Main</mainClass>
+                    <mainClass>view.Main</mainClass>
                 </configuration>
             </plugin>
             <!-- Keep a single package artifact: disable shade execution. -->

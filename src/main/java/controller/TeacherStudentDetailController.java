@@ -12,9 +12,15 @@ import model.AppState;
 import model.entity.ClassModel;
 import model.entity.FlashcardSet;
 import model.entity.User;
+import model.service.ClassDetailsService;
 import model.service.StudyService;
 import view.Navigator;
 
+/**
+ * Controller for the teacher's view of a student's progress in a class.
+ * Displays the student's name, email, and progress on each flashcard set in the class.
+ * Provides a back button to return to the class detail screen.
+ */
 public class TeacherStudentDetailController {
 
     @FXML
@@ -24,17 +30,29 @@ public class TeacherStudentDetailController {
     @FXML
     private VBox progressListBox;
 
+    private final ClassDetailsService classDetailsService = new ClassDetailsService();
     private final StudyService studyService = new StudyService();
 
+    /**
+     * Initializes the screen by setting up the header with the selected student's information and rendering their progress.
+     * If the required navigation context (selected student or class) is missing, navigates back to the class detail screen.
+     */
     @FXML
     private void initialize() {
         User s = AppState.selectedStudent.get();
         ClassModel c =  AppState.selectedClass.get();
 
+        // Guard against stale navigation state; return to class detail if required context is missing.
         if (s == null || c == null) {
             Navigator.go(AppState.Screen.TEACHER_CLASS_DETAIL);
             return;
         }
+        if (c.getClassId() == null) {
+            Navigator.go(AppState.Screen.TEACHER_CLASS_DETAIL);
+            return;
+        }
+        c = classDetailsService.reloadClass(c.getClassId());
+        AppState.selectedClass.set(c);
 
         headerController.setBackVisible(true);
         headerController.setTitle(s.getFirstName() + " " + s.getLastName());
@@ -47,25 +65,26 @@ public class TeacherStudentDetailController {
         renderProgress(c);
     }
 
+    /**
+     * Builds one progress row per flashcard set for the selected student.
+     * @param c the class whose flashcard sets to display progress for
+     */
     private void renderProgress(ClassModel c) {
         progressListBox.getChildren().clear();
         User student = AppState.selectedStudent.get();
 
         for (FlashcardSet set : c.getFlashcardSets()) {
-
-            // total card
             int totalCards = set.getTotalCards().size();
 
-            // percent
+            // Service returns percentage in [0..100].
             double pct = studyService.getProgressPercent(student, set);
 
-            // learned cards
+            // Convert percentage to an approximate learned-card count for the "x/y" label.
             int learnedCards = (int) Math.round((pct / 100.0) * totalCards);
 
-            // ProgressBar
+            // JavaFX ProgressBar expects normalized progress in [0..1].
             double progress = pct / 100.0;
 
-            // Title : "subject (1/30)"
             String title = set.getSubject() + " (" + learnedCards + "/" + totalCards + ")";
 
             addProgressCardRow(title, progress);
@@ -73,6 +92,11 @@ public class TeacherStudentDetailController {
     }
 
 
+    /**
+     * Creates a styled card-like row with set title, completion text, and progress bar.
+     * @param title the title to display on the left side of the row (e.g. "Math (3/10)")
+     * @param progress the normalized progress value in [0..1] to display in the progress bar and percentage label
+     */
     private void addProgressCardRow(String title, double progress) {
         VBox rowCard = new VBox(8);
         rowCard.setStyle("""
@@ -95,6 +119,7 @@ public class TeacherStudentDetailController {
         ProgressBar bar = new ProgressBar(progress);
         bar.setMaxWidth(Double.MAX_VALUE);
         bar.setStyle("-fx-accent: #3D8FEF;");
+        // Keep component-specific skin in CSS so style updates do not require Java changes.
         bar.getStylesheets().add(getClass().getResource("/styles/progress_bar.css").toExternalForm());
         bar.getStyleClass().add("progress-bar");
 

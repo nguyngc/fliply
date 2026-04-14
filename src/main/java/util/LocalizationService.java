@@ -8,6 +8,11 @@ import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+/**
+ * Service for managing localization and retrieving localized strings.
+ * Provides a method to get all localized strings for the current locale.
+ * Handles missing resource bundles with logging and fallback support.
+ */
 public final class LocalizationService {
     private static final Logger LOGGER = Logger.getLogger(LocalizationService.class.getName());
 
@@ -17,6 +22,7 @@ public final class LocalizationService {
 
     /**
      * Get localized strings for a specific locale
+     * @return a map of localized strings for the current locale, with keys corresponding to resource bundle keys
      */
     public static Map<String, String> getLocalizedStrings() {
         Map<String, String> strings = new HashMap<>();

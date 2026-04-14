@@ -119,6 +119,30 @@ class StudyDaoTest {
         assertFalse(studyDao.existsByUserAndSet(u.getUserId(), fs.getFlashcardSetId()));
     }
 
+    @Test
+    void findByStudentAndSet_returnsMatchingStudyOrNull() {
+        User u = newUser();
+        userDao.persist(u);
+
+        ClassModel c = newClass(u);
+        classDao.persist(c);
+
+        FlashcardSet fs = newSet(c);
+        setDao.persist(fs);
+
+        Study s = newStudy(u, fs, 7);
+        studyDao.persist(s);
+
+        Study found = studyDao.findByStudentAndSet(u.getUserId(), fs.getFlashcardSetId());
+        assertNotNull(found);
+        assertEquals(s.getStudyId(), found.getStudyId());
+        assertEquals(7, found.getStatistic());
+
+        assertNull(studyDao.findByStudentAndSet(u.getUserId(), 999999));
+
+        studyDao.delete(s);
+    }
+
     @AfterEach
     void cleanupTestData() {
 

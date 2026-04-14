@@ -1,9 +1,11 @@
 package model.service;
 
 import model.dao.ClassModelDao;
+import model.dao.FlashcardDao;
 import model.dao.FlashcardSetDao;
 import model.dao.UserDao;
 import model.entity.ClassModel;
+import model.entity.Flashcard;
 import model.entity.FlashcardSet;
 import model.entity.User;
 import org.junit.jupiter.api.*;
@@ -19,6 +21,7 @@ class FlashcardSetServiceTest {
     private UserDao userDao;
     private ClassModelDao classDao;
     private FlashcardSetDao setDao;
+    private FlashcardDao flashcardDao;
 
     @BeforeEach
     void setUp() {
@@ -26,6 +29,7 @@ class FlashcardSetServiceTest {
         userDao = new UserDao();
         classDao = new ClassModelDao();
         setDao = new FlashcardSetDao();
+        flashcardDao = new FlashcardDao();
     }
 
     private User newTeacher() {
@@ -95,5 +99,60 @@ class FlashcardSetServiceTest {
         classDao.delete(clazz);
         userDao.delete(teacher);
     }
-}
 
+    @Test
+    void save_persistsTransientSet_andDeleteSet_removesPersistedSet() {
+        User teacher = newTeacher();
+        userDao.persist(teacher);
+
+        ClassModel clazz = newClass(teacher);
+        classDao.persist(clazz);
+
+        FlashcardSet transientSet = new FlashcardSet();
+        transientSet.setSubject("Transient");
+        transientSet.setClassModel(clazz);
+
+        setService.save(transientSet);
+
+        assertNotNull(transientSet.getFlashcardSetId());
+        assertNotNull(setDao.find(transientSet.getFlashcardSetId()));
+
+        setService.deleteSet(transientSet);
+
+        assertNull(setDao.find(transientSet.getFlashcardSetId()));
+
+        classDao.delete(clazz);
+        userDao.delete(teacher);
+    }
+
+    @Test
+    void getSetWithCards_andGetAllSets_returnPersistedData() {
+        User teacher = newTeacher();
+        userDao.persist(teacher);
+
+        ClassModel clazz = newClass(teacher);
+        classDao.persist(clazz);
+
+        FlashcardSet fs = setService.createSet("Algorithms", clazz);
+
+        Flashcard card = new Flashcard();
+        card.setTerm("BFS");
+        card.setDefinition("Breadth-first search");
+        card.setFlashcardSet(fs);
+        card.setUser(teacher);
+        flashcardDao.persist(card);
+
+        FlashcardSet loaded = setService.getSetWithCards(fs.getFlashcardSetId());
+        assertNotNull(loaded);
+        assertEquals(fs.getFlashcardSetId(), loaded.getFlashcardSetId());
+        assertEquals(1, loaded.getCards().size());
+
+        assertTrue(setService.getAllSets().stream()
+                .anyMatch(set -> set.getFlashcardSetId().equals(fs.getFlashcardSetId())));
+
+        flashcardDao.delete(card);
+        setDao.delete(fs);
+        classDao.delete(clazz);
+        userDao.delete(teacher);
+    }
+}

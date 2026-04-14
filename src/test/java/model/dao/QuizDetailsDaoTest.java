@@ -199,6 +199,28 @@ class QuizDetailsDaoTest {
         userDao.delete(teacher);
     }
 
+    @Test
+    void emptyQueriesReturnNoMatches() {
+        assertTrue(quizDetailsDao.findByQuizId(999999).isEmpty());
+        assertFalse(quizDetailsDao.exists(999999, 999999));
+    }
+
+    @Test
+    void persist_invalidQuizDetailsRollsBackAndThrows() {
+        QuizDetails invalid = new QuizDetails();
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> quizDetailsDao.persist(invalid));
+        assertNotNull(exception);
+    }
+
+    @Test
+    void delete_invalidTransientQuizDetailsRollsBackAndThrows() {
+        QuizDetails invalid = new QuizDetails();
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> quizDetailsDao.delete(invalid));
+        assertNotNull(exception);
+    }
+
     @AfterEach
     void cleanupTestData() {
 
@@ -259,4 +281,3 @@ class QuizDetailsDaoTest {
     }
 
 }
-

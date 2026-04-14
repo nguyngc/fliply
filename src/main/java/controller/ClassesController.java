@@ -77,6 +77,7 @@ public class ClassesController {
         
         // Get current user and check if they are a teacher
         User user = AppState.currentUser.get();
+        if (user == null || user.getUserId() == null) return;
         boolean isTeacher = user.isTeacher();
 
         // Load all classes from database that the user belongs to
@@ -84,7 +85,16 @@ public class ClassesController {
         
         // Create a card for each class and add to the list
         for (ClassModel c : classes) {
-            classListBox.getChildren().add(buildClassCard(c, isTeacher));
+            if (c.getClassId() == null) {
+                continue;
+            }
+
+            ClassModel loadedClass = classDetailsService.reloadClass(c.getClassId());
+            if (loadedClass == null) {
+                continue;
+            }
+
+            classListBox.getChildren().add(buildClassCard(loadedClass, isTeacher));
         }
         
         // Teachers have the option to create additional classes

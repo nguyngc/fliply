@@ -70,6 +70,18 @@ class FlashcardTest {
         assertEquals("DefX", f.getDefinition());
     }
 
+    @Test
+    void constructorAssignsFields() {
+        FlashcardSet set = new FlashcardSet();
+        User user = new User();
+
+        Flashcard f = new Flashcard("Term", "Definition", set, user);
+
+        assertEquals("Term", f.getTerm());
+        assertEquals("Definition", f.getDefinition());
+        assertSame(set, f.getFlashcardSet());
+        assertSame(user, f.getUser());
+    }
 
     @Test
     void testToString() {
@@ -93,5 +105,17 @@ class FlashcardTest {
         assertTrue(s.contains("definition='B'"));
         assertTrue(s.contains("flashcardSetId=20"));
         assertTrue(s.contains("userId=5"));
+    }
+
+    @Test
+    void toString_handlesNullAssociations() {
+        Flashcard f = new Flashcard();
+        f.setTerm("Only");
+        f.setDefinition("Text");
+
+        String s = f.toString();
+
+        assertTrue(s.contains("flashcardSetId=null"));
+        assertTrue(s.contains("userId=null"));
     }
 }

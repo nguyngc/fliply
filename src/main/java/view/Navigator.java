@@ -12,7 +12,11 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+/**
+ * Centralized navigation helper for loading screens and applying locale-specific UI setup.
+ */
 public final class Navigator {
+    // Languages that should render right-to-left.
     private static final String[] RTL_LANGUAGES = {"ar", "fa", "ur", "he"};
 
     private static Stage stage;
@@ -20,10 +24,21 @@ public final class Navigator {
     private Navigator() {
     }
 
+    /**
+     * Stores the primary stage used for all screen navigation.
+     *
+     * @param primaryStage application primary stage
+     */
     public static void init(Stage primaryStage) {
         stage = primaryStage;
     }
 
+    /**
+     * Loads and displays the target screen, then updates navigation state.
+     *
+     * @param screen target screen to load
+     * @throws IllegalStateException if the FXML cannot be loaded
+     */
     public static void go(AppState.Screen screen) {
         try {
             FXMLLoader loader = new FXMLLoader(
@@ -41,6 +56,7 @@ public final class Navigator {
             stage.setResizable(false);
             stage.show();
 
+            // Apply one-time nav override when present; otherwise use the screen default.
             AppState.NavItem nav = AppState.navOverride.get() != null
                     ? AppState.navOverride.get()
                     : screen.nav;
@@ -52,8 +68,14 @@ public final class Navigator {
         }
     }
 
+    /**
+     * Applies Lao-specific styling hooks when the active locale is Lao.
+     *
+     * @param scene scene to update
+     */
     private static void applyLocaleFont(Scene scene) {
         if (scene == null) return;
+        // Lao uses a dedicated style hook for consistent glyph rendering.
         if (!"lo".equals(util.LocaleManager.getLocale().getLanguage())) return;
 
         String mainCss = Navigator.class.getResource("/styles/style.css").toExternalForm();
@@ -68,12 +90,18 @@ public final class Navigator {
         }
     }
 
+    /**
+     * Applies RTL/LTR orientation based on the active locale.
+     *
+     * @param scene scene to update
+     */
     private static void applyTextDirection(Scene scene) {
         if (scene == null) return;
 
         Locale locale = util.LocaleManager.getLocale();
         boolean isRtl = isRtlLanguage(locale);
 
+        // Apply after root attachment to avoid orientation timing issues.
         Platform.runLater(() -> {
             Parent root = scene.getRoot();
             if (root != null) {
@@ -84,6 +112,12 @@ public final class Navigator {
         });
     }
 
+    /**
+     * Checks whether a locale should be displayed right-to-left.
+     *
+     * @param locale locale to evaluate
+     * @return true if the locale language is configured as RTL
+     */
     private static boolean isRtlLanguage(Locale locale) {
         if (locale == null) return false;
 
@@ -96,8 +130,12 @@ public final class Navigator {
         return false;
     }
 
+    /**
+     * Reloads the currently active screen using current locale/resources.
+     */
     public static void reloadCurrent() {
+        // Recreate the active screen using the current locale/resources.
         go(AppState.currentScreen.get());
     }
-    
+
 }

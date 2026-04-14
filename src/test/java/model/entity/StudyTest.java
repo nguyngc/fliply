@@ -56,6 +56,18 @@ class StudyTest {
         assertEquals(9, s.getStatistic());
     }
 
+    @Test
+    void constructorAssignsFields() {
+        User user = new User();
+        FlashcardSet set = new FlashcardSet();
+
+        Study study = new Study(4, user, set);
+
+        assertEquals(4, study.getStatistic());
+        assertSame(user, study.getUser());
+        assertSame(set, study.getFlashcardSet());
+    }
+
 
     @Test
     void testToString() {
@@ -77,5 +89,17 @@ class StudyTest {
         assertTrue(str.contains("statistic=12"));
         assertTrue(str.contains("userId=3"));
         assertTrue(str.contains("flashcardSetId=15"));
+    }
+
+    @Test
+    void toString_handlesNullAssociations() {
+        Study s = new Study();
+        setId(s, "studyId", 11);
+        s.setStatistic(2);
+
+        String str = s.toString();
+
+        assertTrue(str.contains("userId=null"));
+        assertTrue(str.contains("flashcardSetId=null"));
     }
 }
