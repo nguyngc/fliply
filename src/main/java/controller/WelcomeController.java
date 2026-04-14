@@ -68,7 +68,7 @@ public class WelcomeController {
     /** Switches the application locale to English and reloads the current view to apply changes. */
     @FXML
     private void switchToEnglish() {
-        LocaleManager.setLocale("en", "US");
+        updateLocale("en", "US");
         // Reload to re-resolve localized strings for the current view.
         Navigator.reloadCurrent();
     }
@@ -76,35 +76,39 @@ public class WelcomeController {
     /** Switches the application locale to Arabic and reloads the current view to apply changes. */
     @FXML
     private void switchToArabic() {
-        LocaleManager.setLocale("ar", "AR");
+        updateLocale("ar", "AR");
         Navigator.reloadCurrent();
     }
 
     /** Switches the application locale to Finnish and reloads the current view to apply changes. */
     @FXML
     private void switchToFinnish() {
-        LocaleManager.setLocale("fi", "FI");
+        updateLocale("fi", "FI");
         Navigator.reloadCurrent();
     }
 
     /** Switches the application locale to Korean and reloads the current view to apply changes. */
     @FXML
     private void switchToKorean() {
-        LocaleManager.setLocale("ko", "KR");
+        updateLocale("ko", "KR");
         Navigator.reloadCurrent();
     }
 
     /** Switches the application locale to Lao and reloads the current view to apply changes. */
     @FXML
     private void switchToLao() {
-        LocaleManager.setLocale("lo", "LA");
+        updateLocale("lo", "LA");
         Navigator.reloadCurrent();
     }
 
     /** Switches the application locale to Vietnamese and reloads the current view to apply changes. */
     @FXML
     private void switchToVietnamese() {
-        LocaleManager.setLocale("vi", "VN");
+        updateLocale("vi", "VN");
         Navigator.reloadCurrent();
+    }
+
+    void updateLocale(String language, String country) {
+        LocaleManager.setLocale(language, country);
     }
 }

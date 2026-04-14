@@ -2,9 +2,13 @@ package model.service;
 
 import model.dao.ClassDetailsDao;
 import model.dao.ClassModelDao;
+import model.dao.FlashcardDao;
+import model.dao.FlashcardSetDao;
 import model.dao.UserDao;
 import model.entity.ClassDetails;
 import model.entity.ClassModel;
+import model.entity.Flashcard;
+import model.entity.FlashcardSet;
 import model.entity.User;
 import org.junit.jupiter.api.*;
 
@@ -18,6 +22,8 @@ class ClassDetailsServiceTest {
     private UserDao userDao;
     private ClassModelDao classDao;
     private ClassDetailsDao classDetailsDao;
+    private FlashcardSetDao flashcardSetDao;
+    private FlashcardDao flashcardDao;
     private ClassDetailsService service;
 
     @BeforeEach
@@ -25,6 +31,8 @@ class ClassDetailsServiceTest {
         userDao = new UserDao();
         classDao = new ClassModelDao();
         classDetailsDao = new ClassDetailsDao();
+        flashcardSetDao = new FlashcardSetDao();
+        flashcardDao = new FlashcardDao();
         service = new ClassDetailsService();
     }
 
@@ -196,6 +204,37 @@ class ClassDetailsServiceTest {
         classDetailsDao.delete(cd);
         classDao.delete(c);
         userDao.delete(student);
+        userDao.delete(teacher);
+    }
+
+    @Test
+    void reloadClass_fetchesFlashcardSetsAndCards() {
+        User teacher = newUser("Teacher");
+        userDao.persist(teacher);
+
+        ClassModel c = newClass(teacher);
+        classDao.persist(c);
+
+        FlashcardSet set = new FlashcardSet();
+        set.setSubject("Data Structures");
+        set.setClassModel(c);
+        flashcardSetDao.persist(set);
+
+        Flashcard card = new Flashcard();
+        card.setTerm("Stack");
+        card.setDefinition("LIFO");
+        card.setFlashcardSet(set);
+        card.setUser(teacher);
+        flashcardDao.persist(card);
+
+        ClassModel loaded = service.reloadClass(c.getClassId());
+        assertNotNull(loaded);
+        assertEquals(1, loaded.getFlashcardSets().size());
+        assertEquals(1, loaded.getFlashcardSets().iterator().next().getCards().size());
+
+        flashcardDao.delete(card);
+        flashcardSetDao.delete(set);
+        classDao.delete(c);
         userDao.delete(teacher);
     }
 }
