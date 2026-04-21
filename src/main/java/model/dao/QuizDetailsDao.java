@@ -62,6 +62,32 @@ public class QuizDetailsDao {
         }
     }
 
+    public List<QuizDetails> findByFlashcardId(int flashcardId) {
+        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+            TypedQuery<QuizDetails> q = em.createQuery(
+                    "SELECT qd FROM QuizDetails qd WHERE qd.flashcard.flashcardId = :fid",
+                    QuizDetails.class
+            );
+            q.setParameter("fid", flashcardId);
+            return q.getResultList();
+        }
+    }
+
+    public void deleteByFlashcardId(int flashcardId) {
+        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+            em.getTransaction().begin();
+            try {
+                em.createQuery("DELETE FROM QuizDetails qd WHERE qd.flashcard.flashcardId = :fid")
+                        .setParameter("fid", flashcardId)
+                        .executeUpdate();
+                em.getTransaction().commit();
+            } catch (Exception e) {
+                em.getTransaction().rollback();
+                throw e;
+            }
+        }
+    }
+
     public boolean exists(int quizId, int flashcardId) {
         try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
             Long count = em.createQuery(

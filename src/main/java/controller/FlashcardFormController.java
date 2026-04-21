@@ -2,6 +2,7 @@ package controller;
 
 import controller.components.HeaderController;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.Parent;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
@@ -10,6 +11,7 @@ import model.AppState;
 import model.entity.Flashcard;
 import model.service.FlashcardService;
 import model.service.FlashcardSetService;
+import util.I18n;
 import util.LocaleManager;
 import view.Navigator;
 import model.entity.FlashcardSet;
@@ -115,16 +117,15 @@ public class FlashcardFormController {
         // Get and trim input values
         String term = termField.getText() == null ? "" : termField.getText().trim();
         String def = definitionArea.getText() == null ? "" : definitionArea.getText().trim();
-
-        // Validate that term is not empty
-        if (term.isBlank()) return;
-
-        // Get the selected flashcard set and current user
         FlashcardSet set = subjectCombo.getSelectionModel().getSelectedItem();
         User user = AppState.currentUser.get();
 
-        // Validate that set and user are selected
-        if (set == null || user == null) return;
+        // Validate required fields before saving
+        String validationError = validateInput(set, term, def, user);
+        if (validationError != null) {
+            showWarning(validationError);
+            return;
+        }
 
         // ========== EDIT MODE ==========
         if (AppState.flashcardFormMode.get() == AppState.FormMode.EDIT) {
@@ -168,6 +169,22 @@ public class FlashcardFormController {
             // Return to flashcards list if form was accessed from there
             Navigator.go(AppState.Screen.FLASHCARDS);
         }
+    }
+
+    private String validateInput(FlashcardSet set, String term, String def, User user) {
+        if (set == null || user == null || term.isBlank() || def.isBlank()) {
+            return I18n.message(rb,
+                    "flashcardForm.warning.fillAllFields",
+                    "Please select a subject and fill in term and definition.");
+        }
+        return null;
+    }
+
+    private void showWarning(String message) {
+        Alert alert = new Alert(Alert.AlertType.WARNING, message);
+        alert.setTitle(I18n.message(rb, "flashcardForm.alertTitle", "Flashcard"));
+        alert.setHeaderText(null);
+        alert.showAndWait();
     }
 
     /**

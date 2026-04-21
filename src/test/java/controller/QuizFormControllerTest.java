@@ -8,6 +8,8 @@ import java.lang.reflect.Method;
 import java.util.ResourceBundle;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import util.I18n;
 
 class QuizFormControllerTest {
 
@@ -19,31 +21,52 @@ class QuizFormControllerTest {
     }
 
     @Test
-    void getMessage_returnsBundleValueWhenPresent() {
-        setPrivate("resources", ResourceBundle.getBundle("Messages"));
+    void i18nMessage_returnsBundleValueOrFallback() {
+        ResourceBundle bundle = ResourceBundle.getBundle("Messages");
 
-        assertEquals("New Quiz", callGetMessage("quizForm.header", "fallback"));
+        assertEquals("New Quiz", I18n.message(bundle, "quizForm.header", "fallback"));
+        assertEquals("fallback", I18n.message(null, "quizForm.header", "fallback"));
+        assertEquals("fallback", I18n.message(bundle, "missing.key", "fallback"));
     }
 
     @Test
-    void getMessage_returnsFallbackWhenResourcesMissing() {
-        setPrivate("resources", null);
+    void validateQuestionCount_returnsEmptyInputError() {
+        setPrivate("resources", ResourceBundle.getBundle("Messages"));
 
-        assertEquals("fallback", callGetMessage("quizForm.header", "fallback"));
+        assertEquals("Please enter the number of questions.",
+                callValidateQuestionCount("   ", 5));
     }
 
     @Test
-    void getMessage_returnsFallbackWhenKeyMissing() {
+    void validateQuestionCount_returnsInvalidNumberError() {
         setPrivate("resources", ResourceBundle.getBundle("Messages"));
 
-        assertEquals("fallback", callGetMessage("missing.key", "fallback"));
+        assertEquals("Please enter a valid positive number.",
+                callValidateQuestionCount("abc", 5));
+        assertEquals("Please enter a valid positive number.",
+                callValidateQuestionCount("0", 5));
     }
 
-    private String callGetMessage(String key, String fallback) {
+    @Test
+    void validateQuestionCount_returnsTooManyQuestionsError() {
+        setPrivate("resources", ResourceBundle.getBundle("Messages"));
+
+        assertEquals("Only 3 flashcards are available. Please enter a smaller number.",
+                callValidateQuestionCount("4", 3));
+    }
+
+    @Test
+    void validateQuestionCount_returnsNullWhenValid() {
+        setPrivate("resources", ResourceBundle.getBundle("Messages"));
+
+        assertNull(callValidateQuestionCount("3", 5));
+    }
+
+    private String callValidateQuestionCount(String rawCount, int availableCount) {
         try {
-            Method m = QuizFormController.class.getDeclaredMethod("getMessage", String.class, String.class);
+            Method m = QuizFormController.class.getDeclaredMethod("validateQuestionCount", String.class, int.class);
             m.setAccessible(true);
-            return (String) m.invoke(controller, key, fallback);
+            return (String) m.invoke(controller, rawCount, availableCount);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
