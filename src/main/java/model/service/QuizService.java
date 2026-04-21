@@ -33,8 +33,7 @@ public class QuizService {
         // pool of flashcards user can access
         List<Flashcard> pool = flashcardDao.findAvailableForUser(user.getUserId());
         if (pool == null || pool.isEmpty()) return null;
-
-        int n = Math.min(noOfQuestions, pool.size());
+        if (noOfQuestions > pool.size()) return null;
 
         // random pick
         Collections.shuffle(pool, RANDOM);
@@ -42,11 +41,11 @@ public class QuizService {
         // create QUIZ
         Quiz quiz = new Quiz();
         quiz.setUser(user);
-        quiz.setNoOfQuestions(n);
+        quiz.setNoOfQuestions(noOfQuestions);
         quizDao.persist(quiz);
 
         // create QUIZ_DETAILS
-        for (int i = 0; i < n; i++) {
+        for (int i = 0; i < noOfQuestions; i++) {
             Flashcard f = pool.get(i);
 
             QuizDetails qd = new QuizDetails(quiz, f);
@@ -54,6 +53,13 @@ public class QuizService {
         }
 
         return quiz;
+    }
+
+    public int getAvailableFlashcardCount(User user) {
+        if (user == null || user.getUserId() == null) return 0;
+
+        List<Flashcard> pool = flashcardDao.findAvailableForUser(user.getUserId());
+        return pool == null ? 0 : pool.size();
     }
 
     /**

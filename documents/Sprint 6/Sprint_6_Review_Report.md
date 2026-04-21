@@ -42,9 +42,9 @@ This sprint focuses on implementing multilingual database structures, performing
 
 - Collaboration within the team was smooth and effective, with tasks distributed clearly and completed on schedule.
 
-- Increase the coverage of UT(38% -> 55%)
+- Increase the coverage of UT(38% -> 85%)
 - Fix duplicates (2.2% -> 0.4%)
-- Fix issues(177 -> 25)
+- Fix issues(177 -> 38)
 
 - Support for Arabic(RTL) worked reliably across all tested screens.
 
@@ -59,8 +59,8 @@ This sprint focuses on implementing multilingual database structures, performing
 
 | Team Member  | view.Main Contributions                                    | Time Spent (Hours) | In-class tasks |
 |--------------|------------------------------------------------------------|--------------------|----------------|
-| Ngoc Nguyen  | - Response for localization                                |                    | Submitted      |
+| Ngoc Nguyen  | - Response for localization, UT, Readme                    | 8                  | Submitted      |
 | Thanh Nguyen | - Scrum master, Response Acceptance test planning document | 9                  | Submitted      |
-| Nhut Vo      | - Response for UT and fix duplicates, issues               |                   | Submitted      |
-| Hoang Vu     | - Response for Statistical code review document            |                  | Submitted      |
-| **Total**    |                                                            | ****             |                |
+| Nhut Vo      | - Response for UT and fix duplicates, issues               | 8                  | Submitted      |
+| Hoang Vu     | - Response for Statistical code review document            | 4                  | Submitted      |
+| **Total**    |                                                            | **29**             |                |

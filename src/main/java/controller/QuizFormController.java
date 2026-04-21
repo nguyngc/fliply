@@ -9,8 +9,9 @@ import model.AppState;
 import model.entity.Quiz;
 import model.entity.User;
 import model.service.QuizService;
+import util.I18n;
 import view.Navigator;
-import java.util.MissingResourceException;
+
 import java.util.ResourceBundle;
 
 /**
@@ -43,7 +44,7 @@ public class QuizFormController {
         // ========== Configure Header ==========
         if (headerController != null) {
             // Set the header title
-            headerController.setTitle(getMessage("quizForm.header", "New Quiz"));
+            headerController.setTitle(I18n.message(resources, "quizForm.header", "New Quiz"));
             
             // Show back button
             headerController.setBackVisible(true);
@@ -64,30 +65,26 @@ public class QuizFormController {
      */
     @FXML
     private void generate() {
-        // ========== Parse Question Count ==========
-        // Default to 10 questions if parsing fails
-        int n = 10;
-        try {
-            // Parse the number of questions from the input field
-            n = Integer.parseInt(countField.getText().trim());
-        } catch (Exception ignored) {
-            // Use default if parsing fails
-        }
-        
         // ========== Get Current User ==========
         User user = AppState.currentUser.get();
         if (user == null) return;
+
+        String validationError = validateQuestionCount(countField == null ? null : countField.getText(),
+                quizService.getAvailableFlashcardCount(user));
+        if (validationError != null) {
+            showWarning(validationError);
+            return;
+        }
+
+        int n = Integer.parseInt(countField.getText().trim());
 
         // ========== Generate Quiz ==========
         // Build a quiz with n questions from user's flashcards
         Quiz quiz = quizService.generateQuiz(user, n);
         
         if (quiz == null) {
-            // Show error if no flashcards available or invalid number
-            Alert a = new Alert(Alert.AlertType.WARNING,
-                    getMessage("quizForm.noFlashcards", "No flashcards available (or invalid number)."));
-            a.setHeaderText(null);
-            a.showAndWait();
+            // Show error if no flashcards available
+            showWarning(I18n.message(resources, "quizForm.error.noFlashcards", "There are no flashcards available."));
             return;
         }
         
@@ -108,6 +105,42 @@ public class QuizFormController {
         Navigator.go(AppState.Screen.QUIZ_DETAIL);
     }
 
+    private String validateQuestionCount(String rawCount, int availableCount) {
+        if (rawCount == null || rawCount.trim().isEmpty()) {
+            return I18n.message(resources, "quizForm.error.emptyInput", "Please enter the number of questions.");
+        }
+
+        final int requestedCount;
+        try {
+            requestedCount = Integer.parseInt(rawCount.trim());
+        } catch (NumberFormatException ignored) {
+            return I18n.message(resources, "quizForm.error.invalidNumber", "Please enter a valid positive number.");
+        }
+
+        if (requestedCount <= 0) {
+            return I18n.message(resources, "quizForm.error.invalidNumber", "Please enter a valid positive number.");
+        }
+
+        if (availableCount <= 0) {
+            return I18n.message(resources, "quizForm.error.noFlashcards", "There are no flashcards available.");
+        }
+
+        if (requestedCount > availableCount) {
+            return I18n.format(resources, "quizForm.error.tooManyQuestions",
+                    "Only {0} flashcards are available. Please enter a smaller number.",
+                    availableCount);
+        }
+
+        return null;
+    }
+
+    private void showWarning(String message) {
+        Alert a = new Alert(Alert.AlertType.WARNING, message);
+        a.setTitle(I18n.message(resources, "quizForm.alertTitle", "Quiz"));
+        a.setHeaderText(null);
+        a.showAndWait();
+    }
+
     /**
      * Handles the cancel button click event.
      * Navigates back to the quizzes list without generating a quiz.
@@ -118,22 +151,4 @@ public class QuizFormController {
         Navigator.go(AppState.Screen.QUIZZES);
     }
 
-    /**
-     * Retrieves a localized message from the resource bundle.
-     * Provides a fallback message if the key is not found.
-     *
-     * @param key The resource bundle key
-     * @param fallback The fallback message if key is not found
-     * @return The localized message or the fallback
-     */
-    private String getMessage(String key, String fallback) {
-        if (resources == null) {
-            return fallback;
-        }
-        try {
-            return resources.getString(key);
-        } catch (MissingResourceException ignored) {
-            return fallback;
-        }
-    }
 }
