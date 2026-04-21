@@ -66,11 +66,7 @@ public class TeacherAddClassController {
         
         // Validate that class code is not empty
         if (code.isBlank()) {
-            Alert alert = new Alert(Alert.AlertType.WARNING);
-            alert.setTitle(rb.getString("addClass.code.empty"));
-            alert.setHeaderText(null);
-            alert.setContentText(rb.getString("addClass.code.message"));
-            alert.showAndWait();
+            showBlankCodeWarning();
             return;
         }
 
@@ -94,5 +90,16 @@ public class TeacherAddClassController {
     @FXML
     private void onCancel() {
         Navigator.go(AppState.Screen.CLASSES);
+    }
+
+    /**
+     * Displays a warning alert when the class code input is blank.
+     */
+    void showBlankCodeWarning() {
+        Alert alert = new Alert(Alert.AlertType.WARNING);
+        alert.setTitle(rb.getString("addClass.code.empty"));
+        alert.setHeaderText(null);
+        alert.setContentText(rb.getString("addClass.code.message"));
+        alert.showAndWait();
     }
 }

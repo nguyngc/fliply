@@ -50,7 +50,7 @@ public class QuizFormController {
             headerController.setBackVisible(true);
             
             // Set back button to navigate to quizzes list
-            headerController.setOnBack(() -> Navigator.go(AppState.Screen.QUIZZES));
+            headerController.setOnBack(() -> navigateTo(AppState.Screen.QUIZZES));
         }
         
         // Set the active navigation item to QUIZZES
@@ -70,7 +70,7 @@ public class QuizFormController {
         if (user == null) return;
 
         String validationError = validateQuestionCount(countField == null ? null : countField.getText(),
-                quizService.getAvailableFlashcardCount(user));
+                getAvailableFlashcardCount(user));
         if (validationError != null) {
             showWarning(validationError);
             return;
@@ -80,7 +80,7 @@ public class QuizFormController {
 
         // ========== Generate Quiz ==========
         // Build a quiz with n questions from user's flashcards
-        Quiz quiz = quizService.generateQuiz(user, n);
+        Quiz quiz = generateQuiz(user, n);
         
         if (quiz == null) {
             // Show error if no flashcards available
@@ -102,9 +102,17 @@ public class QuizFormController {
 
         // ========== Navigate to Quiz ==========
         // Navigate to the quiz detail screen to start taking the quiz
-        Navigator.go(AppState.Screen.QUIZ_DETAIL);
+        navigateTo(AppState.Screen.QUIZ_DETAIL);
     }
 
+    /**
+     * Validates the input for the number of questions.
+     * Ensures it's a positive integer and does not exceed available flashcards.
+     *
+     * @param rawCount The raw input string for question count.
+     * @param availableCount The number of flashcards available for quizzing.
+     * @return An error message if validation fails, or null if input is valid.
+     */
     private String validateQuestionCount(String rawCount, int availableCount) {
         if (rawCount == null || rawCount.trim().isEmpty()) {
             return I18n.message(resources, "quizForm.error.emptyInput", "Please enter the number of questions.");
@@ -134,7 +142,12 @@ public class QuizFormController {
         return null;
     }
 
-    private void showWarning(String message) {
+    /**
+     * Displays a warning alert with the given message.
+     *
+     * @param message The message to display in the alert.
+     */
+    void showWarning(String message) {
         Alert a = new Alert(Alert.AlertType.WARNING, message);
         a.setTitle(I18n.message(resources, "quizForm.alertTitle", "Quiz"));
         a.setHeaderText(null);
@@ -148,7 +161,38 @@ public class QuizFormController {
     @FXML
     private void cancel() {
         AppState.navOverride.set(AppState.NavItem.QUIZZES);
-        Navigator.go(AppState.Screen.QUIZZES);
+        navigateTo(AppState.Screen.QUIZZES);
+    }
+
+    /** ========== Helper Methods for Quiz Generation and Navigation ========== */
+    /**
+     * Retrieves the count of available flashcards for the user from the QuizService.
+     *
+     * @param user The current logged-in user.
+     * @return The number of flashcards available for quizzing.
+     */
+    int getAvailableFlashcardCount(User user) {
+        return quizService.getAvailableFlashcardCount(user);
+    }
+
+    /**
+     * Generates a quiz for the user with the specified number of questions using the QuizService.
+     *
+     * @param user The current logged-in user.
+     * @param count The number of questions to include in the quiz.
+     * @return A Quiz object containing the generated quiz questions and answers.
+     */
+    Quiz generateQuiz(User user, int count) {
+        return quizService.generateQuiz(user, count);
+    }
+
+    /**
+     * Navigates to the specified screen using the Navigator.
+     *
+     * @param screen The screen to navigate to.
+     */
+    void navigateTo(AppState.Screen screen) {
+        Navigator.go(screen);
     }
 
 }

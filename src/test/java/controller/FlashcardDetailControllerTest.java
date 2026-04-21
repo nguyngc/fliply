@@ -60,6 +60,7 @@ class FlashcardDetailControllerTest {
         private Flashcard deletedCard;
         private RuntimeException deleteFailure;
         private boolean deleteErrorShown;
+        private boolean deleteSuccessShown;
 
         @Override
         Map<String, String> loadLocalizedStrings() {
@@ -82,6 +83,11 @@ class FlashcardDetailControllerTest {
         @Override
         void showDeleteError() {
             deleteErrorShown = true;
+        }
+
+        @Override
+        void showDeleteSuccess() {
+            deleteSuccessShown = true;
         }
     }
 
@@ -306,6 +312,7 @@ class FlashcardDetailControllerTest {
         assertSame(card1, AppState.myFlashcards.getFirst());
         assertEquals(1, set.getCards().size());
         assertSame(card1, new ArrayList<>(set.getCards()).getFirst());
+        assertTrue(controller.deleteSuccessShown);
         assertEquals(0, AppState.currentDetailIndex.get());
         assertEquals("1 / 1", pageLabel.getText());
         assertEquals("Cell", flipCardController.term);
@@ -330,6 +337,7 @@ class FlashcardDetailControllerTest {
         assertTrue(AppState.currentDetailList.isEmpty());
         assertTrue(AppState.myFlashcards.isEmpty());
         assertTrue(set.getCards().isEmpty());
+        assertTrue(controller.deleteSuccessShown);
         assertEquals(AppState.NavItem.FLASHCARDS, AppState.navOverride.get());
         assertEquals(AppState.Screen.FLASHCARDS, controller.lastNavigatedScreen);
     }
@@ -348,6 +356,7 @@ class FlashcardDetailControllerTest {
 
         assertTrue(controller.deleteErrorShown);
         assertSame(card, controller.deletedCard);
+        assertFalse(controller.deleteSuccessShown);
         assertEquals(1, AppState.currentDetailList.size());
         assertEquals(1, AppState.myFlashcards.size());
         assertEquals(1, set.getCards().size());

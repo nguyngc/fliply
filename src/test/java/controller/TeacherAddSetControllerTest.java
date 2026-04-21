@@ -1,6 +1,7 @@
 package controller;
 
 import controller.components.HeaderController;
+import javafx.application.Platform;
 import javafx.embed.swing.JFXPanel;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -8,101 +9,276 @@ import javafx.scene.layout.StackPane;
 import model.AppState;
 import model.entity.ClassModel;
 import model.entity.FlashcardSet;
-import model.service.FlashcardSetService;
+import model.entity.User;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import util.LocaleManager;
+import util.FlashcardFileParser;
 
 import java.io.File;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.nio.file.Files;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
+import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicReference;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TeacherAddSetControllerTest {
 
-    static { new JFXPanel(); }
+    static {
+        System.setProperty("javafx.cachedir", System.getProperty("java.io.tmpdir") + "/openjfx-cache");
+        new JFXPanel();
+    }
 
-    private TeacherAddSetController controller;
+    private TestableTeacherAddSetController controller;
+    private FakeHeaderController headerController;
+    private TextField subjectField;
+    private Label fileStatusLabel;
+    private ClassModel previousSelectedClass;
+    private User previousCurrentUser;
 
-    // ---------------- Fake HeaderController ----------------
-    private static class FakeHeaderController extends HeaderController {
-        public Label titleLabel = new Label();
-        public Label subtitleLabel = new Label();
-        public Label backButton = new Label(); // fake button
+    private static final class TestableTeacherAddSetController extends TeacherAddSetController {
+        private Map<String, String> strings = Map.of(
+                "teacherAddSet.title", "New Set of Flashcard",
+                "teacherAddSet.fileStatusSuccess", "Loaded: {0} ({1} cards)",
+                "teacherAddSet.fileStatusError", "Cannot read file."
+        );
+        private File chosenFile;
+        private List<String> linesToRead = List.of();
+        private Exception readFailure;
+        private List<FlashcardFileParser.ParsedCard> parsedCards = List.of();
+        private Exception parseFailure;
+        private String createdSubject;
+        private ClassModel createdClass;
+        private FlashcardSet createdSet = new FlashcardSet();
+        private final List<String> createdFlashcards = new ArrayList<>();
+        private FlashcardSet lastCreatedFlashcardSet;
+        private User lastTeacher;
+        private Integer reloadedClassId;
+        private ClassModel reloadedClass;
+        private AppState.Screen lastNavigatedScreen;
 
         @Override
-        public void setTitle(String title) {
-            titleLabel.setText(title);
+        Map<String, String> loadLocalizedStrings() {
+            return strings;
         }
 
         @Override
-        public void setSubtitle(String subtitle) {
-            subtitleLabel.setText(subtitle);
+        File chooseFile() {
+            return chosenFile;
+        }
+
+        @Override
+        List<String> readAllLines(File file) throws Exception {
+            if (readFailure != null) {
+                throw readFailure;
+            }
+            return linesToRead;
+        }
+
+        @Override
+        List<FlashcardFileParser.ParsedCard> parseSelectedFile(File file) throws Exception {
+            if (parseFailure != null) {
+                throw parseFailure;
+            }
+            return parsedCards;
+        }
+
+        @Override
+        FlashcardSet createSet(String subject, ClassModel classModel) {
+            createdSubject = subject;
+            createdClass = classModel;
+            return createdSet;
+        }
+
+        @Override
+        void createFlashcard(String term, String definition, FlashcardSet set, User teacher) {
+            createdFlashcards.add(term + "=" + definition);
+            lastCreatedFlashcardSet = set;
+            lastTeacher = teacher;
+        }
+
+        @Override
+        ClassModel reloadClass(int classId) {
+            reloadedClassId = classId;
+            return reloadedClass;
+        }
+
+        @Override
+        void navigateTo(AppState.Screen screen) {
+            lastNavigatedScreen = screen;
+        }
+    }
+
+    private static final class FakeHeaderController extends HeaderController {
+        private String title;
+        private boolean backVisible;
+        private Runnable backAction;
+
+        @Override
+        public void setTitle(String title) {
+            this.title = title;
         }
 
         @Override
         public void setBackVisible(boolean visible) {
-            backButton.setVisible(visible);
-            backButton.setManaged(visible);
+            backVisible = visible;
         }
-    }
-
-
-    // ---------------- Fake FlashcardSetService ----------------
-    private static class FakeFlashcardSetService extends FlashcardSetService {
-        FlashcardSet savedSet = null;
 
         @Override
-        public void save(FlashcardSet set) {
-            this.savedSet = set;
+        public void setOnBack(Runnable action) {
+            backAction = action;
         }
     }
 
     @BeforeEach
     void setUp() {
-        controller = new TeacherAddSetController();
+        previousSelectedClass = AppState.selectedClass.get();
+        previousCurrentUser = AppState.currentUser.get();
 
-        FakeHeaderController fakeHeader = new FakeHeaderController();
+        controller = new TestableTeacherAddSetController();
+        headerController = new FakeHeaderController();
+        subjectField = new TextField();
+        fileStatusLabel = new Label();
+
         setPrivate("header", new StackPane());
-        setPrivate("headerController", fakeHeader);
+        setPrivate("headerController", headerController);
+        setPrivate("subjectField", subjectField);
+        setPrivate("fileStatusLabel", fileStatusLabel);
 
-        setPrivate("subjectField", new TextField());
-        setPrivate("fileStatusLabel", new Label());
-
-        FakeFlashcardSetService fakeService = new FakeFlashcardSetService();
-
-        ClassModel c = new ClassModel();
-        setClassId(c);
-        c.setClassName("Math");
-        AppState.selectedClass.set(c);
-
-        AppState.navOverride.set(null);
-
-        callPrivate("initialize");
+        AppState.selectedClass.set(null);
+        AppState.currentUser.set(null);
     }
 
-    // ---------------- Reflection helpers ----------------
+    @AfterEach
+    void tearDown() {
+        AppState.selectedClass.set(previousSelectedClass);
+        AppState.currentUser.set(previousCurrentUser);
+    }
 
-    private void setPrivate(String field, Object value) {
+    @Test
+    void initialize_setsHeaderAndBackAction() {
+        runOnFxThread(() -> callPrivate("initialize"));
+
+        assertEquals("New Set of Flashcard", headerController.title);
+        assertTrue(headerController.backVisible);
+
+        headerController.backAction.run();
+        assertEquals(AppState.Screen.TEACHER_CLASS_DETAIL, controller.lastNavigatedScreen);
+    }
+
+    @Test
+    void onUpload_whenFileCanBeRead_updatesStatusAndCount() {
+        controller.chosenFile = new File("cards.csv");
+        controller.linesToRead = List.of("term,definition", "A,B", "C,D");
+        runOnFxThread(() -> callPrivate("initialize"));
+
+        runOnFxThread(() -> callPrivate("onUpload"));
+
+        assertSame(controller.chosenFile, getPrivate("selectedFile"));
+        assertEquals(2, getPrivate("parsedCount"));
+        assertEquals("Loaded: cards.csv (2 cards)", fileStatusLabel.getText());
+    }
+
+    @Test
+    void onUpload_whenReadFails_setsErrorMessage() {
+        controller.chosenFile = new File("broken.csv");
+        controller.readFailure = new Exception("boom");
+        runOnFxThread(() -> callPrivate("initialize"));
+
+        runOnFxThread(() -> callPrivate("onUpload"));
+
+        assertEquals(0, getPrivate("parsedCount"));
+        assertEquals("Cannot read file.", fileStatusLabel.getText());
+    }
+
+    @Test
+    void onAdd_withBlankSubject_doesNothing() {
+        ClassModel selectedClass = createClass(10);
+        AppState.selectedClass.set(selectedClass);
+        setPrivate("selectedFile", new File("cards.csv"));
+        controller.parsedCards = List.of(new FlashcardFileParser.ParsedCard("Cell", "Basic unit"));
+        subjectField.setText("   ");
+
+        runOnFxThread(() -> callPrivate("onAdd"));
+
+        assertNull(controller.createdSubject);
+        assertNull(controller.lastNavigatedScreen);
+        assertEquals(List.of(), controller.createdFlashcards);
+    }
+
+    @Test
+    void onAdd_happyPath_createsSetImportsCardsReloadsClassAndNavigates() {
+        ClassModel selectedClass = createClass(15);
+        ClassModel reloadedClass = createClass(15);
+        User teacher = createUser(4);
+        AppState.selectedClass.set(selectedClass);
+        AppState.currentUser.set(teacher);
+        setPrivate("selectedFile", new File("science.csv"));
+        subjectField.setText("Science");
+        controller.parsedCards = List.of(
+                new FlashcardFileParser.ParsedCard("Cell", "Basic unit"),
+                new FlashcardFileParser.ParsedCard("DNA", "Genetic code")
+        );
+        controller.reloadedClass = reloadedClass;
+
+        runOnFxThread(() -> callPrivate("onAdd"));
+
+        assertEquals("Science", controller.createdSubject);
+        assertSame(selectedClass, controller.createdClass);
+        assertEquals(List.of("Cell=Basic unit", "DNA=Genetic code"), controller.createdFlashcards);
+        assertSame(controller.createdSet, controller.lastCreatedFlashcardSet);
+        assertSame(teacher, controller.lastTeacher);
+        assertEquals(15, controller.reloadedClassId);
+        assertSame(reloadedClass, AppState.selectedClass.get());
+        assertEquals(AppState.Screen.TEACHER_CLASS_DETAIL, controller.lastNavigatedScreen);
+    }
+
+    @Test
+    void onCancel_navigatesBackToTeacherClassDetail() {
+        runOnFxThread(() -> callPrivate("onCancel"));
+
+        assertEquals(AppState.Screen.TEACHER_CLASS_DETAIL, controller.lastNavigatedScreen);
+    }
+
+    private ClassModel createClass(int classId) {
+        ClassModel classModel = new ClassModel();
+        setField(ClassModel.class, classModel, "classId", classId);
+        return classModel;
+    }
+
+    private User createUser(int userId) {
+        User user = new User();
+        setField(User.class, user, "userId", userId);
+        return user;
+    }
+
+    private Object getPrivate(String fieldName) {
         try {
-            Field f = TeacherAddSetController.class.getDeclaredField(field);
-            f.setAccessible(true);
-            f.set(controller, value);
+            Field field = TeacherAddSetController.class.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            return field.get(controller);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
-    private Object getPrivate(String field) {
+    private void setPrivate(String fieldName, Object value) {
+        setField(TeacherAddSetController.class, controller, fieldName, value);
+    }
+
+    private void setField(Class<?> type, Object target, String fieldName, Object value) {
         try {
-            Field f = TeacherAddSetController.class.getDeclaredField(field);
-            f.setAccessible(true);
-            return f.get(controller);
+            Field field = type.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(target, value);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -110,93 +286,43 @@ class TeacherAddSetControllerTest {
 
     private void callPrivate(String methodName) {
         try {
-            Method m = TeacherAddSetController.class.getDeclaredMethod(methodName);
-            m.setAccessible(true);
-            m.invoke(controller);
+            Method method = TeacherAddSetController.class.getDeclaredMethod(methodName);
+            method.setAccessible(true);
+            method.invoke(controller);
         } catch (Exception e) {
-            e.getCause().printStackTrace();
             throw new RuntimeException(e);
         }
     }
 
-    private void setClassId(ClassModel c) {
+    private void runOnFxThread(Runnable action) {
+        runOnFxThreadWithResult(() -> {
+            action.run();
+            return null;
+        });
+    }
+
+    private <T> T runOnFxThreadWithResult(Callable<T> action) {
+        AtomicReference<T> result = new AtomicReference<>();
+        AtomicReference<Throwable> error = new AtomicReference<>();
+        CountDownLatch latch = new CountDownLatch(1);
+        Platform.runLater(() -> {
+            try {
+                result.set(action.call());
+            } catch (Throwable throwable) {
+                error.set(throwable);
+            } finally {
+                latch.countDown();
+            }
+        });
         try {
-            Field f = ClassModel.class.getDeclaredField("classId");
-            f.setAccessible(true);
-            f.set(c, 10);
-        } catch (Exception e) {
+            latch.await();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
             throw new RuntimeException(e);
         }
-    }
-
-    // ---------------- Tests ----------------
-
-    @Test
-    void testInitialize_setsHeaderCorrectly() {
-        FakeHeaderController header = (FakeHeaderController) getPrivate("headerController");
-
-        assertEquals("New Set of Flashcard", header.titleLabel.getText());
-        assertTrue(header.backButton.isVisible());
-    }
-    @Disabled("Requires JavaFX file chooser interaction not stable in headless unit tests")
-    @Test
-    void testOnUpload_validFile() throws Exception {
-        File temp = File.createTempFile("test", ".csv");
-        Files.write(temp.toPath(), List.of(
-                "term,definition",
-                "A,B",
-                "C,D"
-        ));
-
-        setPrivate("selectedFile", temp);
-
-        callPrivate("onUpload");
-
-        int parsed = (int) getPrivate("parsedCount");
-        assertEquals(2, parsed);
-
-        Label label = (Label) getPrivate("fileStatusLabel");
-        assertTrue(label.getText().contains("Loaded:"));
-        assertTrue(label.getText().contains("(2 cards)"));
-    }
-    @Disabled("Requires JavaFX file chooser interaction not stable in headless unit tests")
-    @Test
-    void testOnUpload_cannotReadFile() {
-        File fake = new File("not_exist.csv");
-        setPrivate("selectedFile", fake);
-
-        callPrivate("onUpload");
-
-        int parsed = (int) getPrivate("parsedCount");
-        assertEquals(0, parsed);
-
-        Label label = (Label) getPrivate("fileStatusLabel");
-        assertEquals("Cannot read file.", label.getText());
-    }
-    @Disabled("Depends on navigation side effects not deterministic in headless unit tests")
-    @Test
-    void testOnAdd_validSet_createsAndNavigates() {
-        TextField subject = (TextField) getPrivate("subjectField");
-        subject.setText("Animals");
-
-        callPrivate("onAdd");
-
-        FakeFlashcardSetService fake = (FakeFlashcardSetService) getPrivate("flashcardSetService");
-
-        assertNotNull(fake.savedSet);
-        assertEquals("Animals", fake.savedSet.getSubject());
-        assertNull(AppState.navOverride.get());
-    }
-    @Disabled("Depends on navigation side effects not deterministic in headless unit tests")
-    @Test
-    void testOnAdd_blankSubject_doesNothing() {
-        TextField subject = (TextField) getPrivate("subjectField");
-        subject.setText("   ");
-
-        callPrivate("onAdd");
-
-        FakeFlashcardSetService fake = (FakeFlashcardSetService) getPrivate("flashcardSetService");
-        assertNull(fake.savedSet);
-        assertNull(AppState.navOverride.get());
+        if (error.get() != null) {
+            throw new RuntimeException(error.get());
+        }
+        return result.get();
     }
 }

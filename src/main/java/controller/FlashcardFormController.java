@@ -63,7 +63,7 @@ public class FlashcardFormController {
     private void initialize() {
         // ========== Load Flashcard Sets ==========
         // Fetch all flashcard sets from the database
-        List<FlashcardSet> sets = flashcardSetService.getAllSets();
+        List<FlashcardSet> sets = loadAllSets();
         subjectCombo.getItems().setAll(sets);
 
         // ========== Configure for EDIT Mode ==========
@@ -80,7 +80,7 @@ public class FlashcardFormController {
             // Set back action to navigate to flashcards list
             headerController.setOnBack(() -> {
                 AppState.navOverride.set(AppState.NavItem.FLASHCARDS);
-                Navigator.go(AppState.Screen.FLASHCARDS);
+                navigateTo(AppState.Screen.FLASHCARDS);
             });
 
             // Set appropriate title based on form mode
@@ -143,7 +143,7 @@ public class FlashcardFormController {
                 card.setFlashcardSet(set);
 
                 // Save changes to the database
-                flashcardService.update(card);
+                updateFlashcard(card);
 
                 // Update the card in app state
                 AppState.currentDetailList.set(idx, card);
@@ -154,7 +154,7 @@ public class FlashcardFormController {
             Flashcard newCard = new Flashcard(term, def, set, user);
             
             // Save the new card to the database
-            flashcardService.save(newCard);
+            saveFlashcard(newCard);
 
             // Add the new card to the user's flashcard list in app state
             AppState.myFlashcards.add(newCard);
@@ -164,13 +164,23 @@ public class FlashcardFormController {
         // Return to the appropriate screen based on origin context
         if (AppState.isFromFlashcardSet.get()) {
             // Return to flashcard set details if form was accessed from there
-            Navigator.go(AppState.Screen.FLASHCARD_SET);
+            navigateTo(AppState.Screen.FLASHCARD_SET);
         } else {
             // Return to flashcards list if form was accessed from there
-            Navigator.go(AppState.Screen.FLASHCARDS);
+            navigateTo(AppState.Screen.FLASHCARDS);
         }
     }
 
+    /**
+     * Validates the input fields before saving.
+     * Ensures that a flashcard set is selected, term and definition are not blank, and user is logged in.
+     *
+     * @param set  The selected flashcard set
+     * @param term The entered term/question
+     * @param def  The entered definition/answer
+     * @param user The current logged-in user
+     * @return An error message if validation fails, or null if input is valid
+     */
     private String validateInput(FlashcardSet set, String term, String def, User user) {
         if (set == null || user == null || term.isBlank() || def.isBlank()) {
             return I18n.message(rb,
@@ -180,7 +190,12 @@ public class FlashcardFormController {
         return null;
     }
 
-    private void showWarning(String message) {
+    /**
+     * Displays a warning alert with the given message.
+     *
+     * @param message The warning message to display
+     */
+    void showWarning(String message) {
         Alert alert = new Alert(Alert.AlertType.WARNING, message);
         alert.setTitle(I18n.message(rb, "flashcardForm.alertTitle", "Flashcard"));
         alert.setHeaderText(null);
@@ -194,6 +209,41 @@ public class FlashcardFormController {
     @FXML
     private void cancel() {
         AppState.navOverride.set(AppState.NavItem.FLASHCARDS);
-        Navigator.go(AppState.Screen.FLASHCARDS);
+        navigateTo(AppState.Screen.FLASHCARDS);
+    }
+
+    // ========== Helper Methods for Database Operations and Navigation ==========
+    /**
+     * Loads all flashcard sets from the database using the FlashcardSetService.
+     */
+    List<FlashcardSet> loadAllSets() {
+        return flashcardSetService.getAllSets();
+    }
+
+    /**
+     * Updates an existing flashcard in the database using the FlashcardService.
+     *
+     * @param card The flashcard to update
+     */
+    void updateFlashcard(Flashcard card) {
+        flashcardService.update(card);
+    }
+
+    /**
+     * Saves a new flashcard to the database using the FlashcardService.
+     *
+     * @param newCard The new flashcard to save
+     */
+    void saveFlashcard(Flashcard newCard) {
+        flashcardService.save(newCard);
+    }
+
+    /**
+     * Navigates to the specified screen using the Navigator.
+     *
+     * @param screen The screen to navigate to
+     */
+    void navigateTo(AppState.Screen screen) {
+        Navigator.go(screen);
     }
 }

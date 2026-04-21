@@ -21,7 +21,16 @@ class TeacherAddClassControllerTest {
 
     static { new JFXPanel(); }
 
-    private TeacherAddClassController controller;
+    private TestableTeacherAddClassController controller;
+
+    private static class TestableTeacherAddClassController extends TeacherAddClassController {
+        private boolean blankCodeWarningShown;
+
+        @Override
+        void showBlankCodeWarning() {
+            blankCodeWarningShown = true;
+        }
+    }
 
     // Fake HeaderController with real UI nodes
     private static class FakeHeaderController extends HeaderController {
@@ -61,7 +70,7 @@ class TeacherAddClassControllerTest {
 
     @BeforeEach
     void setUp() {
-        controller = new TeacherAddClassController();
+        controller = new TestableTeacherAddClassController();
 
         // Inject fake header
         FakeHeaderController fakeHeader = new FakeHeaderController();
@@ -116,13 +125,14 @@ class TeacherAddClassControllerTest {
     }
 
     @Test
-    void testOnAdd_blankCode_doesNothing() {
+    void testOnAdd_blankCode_showsWarningAndDoesNotNavigate() {
         TextField field = (TextField) getPrivate("classCodeField");
         field.setText("   ");
 
         callPrivate("onAdd");
 
         FakeTeacherAddClassService fake = (FakeTeacherAddClassService) getPrivate("teacherAddClass");
+        assertTrue(controller.blankCodeWarningShown);
         assertNull(fake.lastCreatedCode);
         assertNull(AppState.navOverride.get());
     }

@@ -57,7 +57,7 @@ public class QuizzesController {
         if (user == null) return;
 
         // Load all quizzes assigned to the user
-        List<Quiz> quizzes = quizService.getQuizzesByUser(user.getUserId());
+        List<Quiz> quizzes = loadQuizzesForUser(user.getUserId());
         // Store quizzes in app state for access from other screens
         AppState.quizList.setAll(quizzes);
 
@@ -119,12 +119,9 @@ public class QuizzesController {
      */
     private Node loadQuizCard(Quiz quiz) {
         try {
-            // Load the quiz card FXML template
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/components/quiz_card.fxml"));
-            Node node = loader.load();
-
-            // Get the quiz card controller
-            QuizCardController cardCtrl = loader.getController();
+            LoadedQuizCard loadedQuizCard = loadQuizCardNode();
+            Node node = loadedQuizCard.node();
+            QuizCardController cardCtrl = loadedQuizCard.controller();
             
             // Configure the card with quiz data
             if (cardCtrl != null) cardCtrl.setQuiz(quiz);
@@ -147,7 +144,7 @@ public class QuizzesController {
                 AppState.navOverride.set(AppState.NavItem.QUIZZES);
                 
                 // Navigate to the quiz detail view
-                Navigator.go(AppState.Screen.QUIZ_DETAIL);
+                navigateTo(AppState.Screen.QUIZ_DETAIL);
             });
 
             return node;
@@ -184,7 +181,7 @@ public class QuizzesController {
         // Add click handler to navigate to quiz creation form
         box.setOnMouseClicked(e -> {
             AppState.navOverride.set(AppState.NavItem.QUIZZES);
-            Navigator.go(AppState.Screen.QUIZ_FORM);
+            navigateTo(AppState.Screen.QUIZ_FORM);
         });
 
         return box;
@@ -225,6 +222,82 @@ public class QuizzesController {
             return resources.getString(key);
         } catch (MissingResourceException ignored) {
             return fallback;
+        }
+    }
+
+    // ========== Helper Methods for Data Loading and Navigation ==========
+
+    /**
+     * Loads all quizzes assigned to the specified user from the database using the QuizService.
+     * @param userId
+     * @return A list of Quiz objects associated with the user
+     */
+    List<Quiz> loadQuizzesForUser(int userId) {
+        return quizService.getQuizzesByUser(userId);
+    }
+
+    /**
+     * Loads the quiz card FXML and returns both the Node and its controller.
+     *
+     * @return A LoadedQuizCard containing the Node and QuizCardController
+     * @throws IOException If loading the FXML fails
+     */
+    LoadedQuizCard loadQuizCardNode() throws IOException {
+        FXMLLoader loader = createQuizCardLoader();
+        Node node = loader.load();
+        return new LoadedQuizCard(node, loader.getController());
+    }
+
+    /**
+     * Creates an FXMLLoader for the quiz card FXML template.
+     *
+     * @return A new FXMLLoader instance configured to load quiz_card.fxml
+     */
+    FXMLLoader createQuizCardLoader() {
+        return new FXMLLoader(getClass().getResource("/components/quiz_card.fxml"));
+    }
+
+    /**
+     * Navigates to the specified screen using the Navigator.
+     *
+     * @param screen The screen to navigate to
+     */
+    void navigateTo(AppState.Screen screen) {
+        Navigator.go(screen);
+    }
+
+    // ========== Helper Class for Loaded Quiz Card ==========
+    static final class LoadedQuizCard {
+        private final Node node;
+        private final QuizCardController controller;
+
+        /**
+         * Constructs a LoadedQuizCard with the given Node and QuizCardController.
+         *
+         * @param node The Node representing the loaded quiz card
+         * @param controller The controller associated with the quiz card
+         */
+        LoadedQuizCard(Node node, QuizCardController controller) {
+            this.node = node;
+            this.controller = controller;
+        }
+
+        /**
+         * Returns the Node representing the loaded quiz card.
+         *
+         * @return The Node of the quiz card
+         */
+        Node node() {
+            return node;
+        }
+
+        /**
+         * Returns the QuizCardController associated with the loaded quiz card.
+         *
+         * @return The QuizCardController of the quiz card
+         */
+        QuizCardController controller() {
+            return controller;
         }
     }
 }

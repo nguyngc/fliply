@@ -14,7 +14,7 @@
         <javafx.version>21.0.2</javafx.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <sonar.projectKey>fliply</sonar.projectKey>
-        <sonar.coverage.exclusions>**/app/**,**/default/**,**/view/**,**/controller/HomeController.java,**/controller/ClassesController.java,**/controller/TeacherStudentDetailController.java,**/controller/QuizzesController.java,**/controller/FlashcardFormController.java,**/controller/TeacherAddSetController.java,**/controller/QuizFormController.java</sonar.coverage.exclusions>
+        <sonar.coverage.exclusions>**/app/**,**/default/**,**/view/**</sonar.coverage.exclusions>
     </properties>
 
     <dependencies>
@@ -134,12 +134,6 @@
                         <exclude>app/**</exclude>
                         <exclude>default/**</exclude>
                         <exclude>view/**</exclude>
-                        <exclude>controller/ClassesController*</exclude>
-                        <exclude>controller/TeacherStudentDetailController*</exclude>
-                        <exclude>controller/QuizzesController*</exclude>
-                        <exclude>controller/FlashcardFormController*</exclude>
-                        <exclude>controller/TeacherAddSetController*</exclude>
-                        <exclude>controller/QuizFormController*</exclude>
                     </excludes>
                 </configuration>
             </plugin>

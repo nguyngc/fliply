@@ -81,12 +81,12 @@ public class ClassesController {
         boolean isTeacher = user.isTeacher();
 
         // Load all classes from database that the user belongs to
-        List<ClassModel> classes = classDetailsService.getClassesOfUser(user.getUserId());
+        List<ClassModel> classes = loadClassesForUser(user.getUserId());
         
         // Create a card for each class and add to the list
         for (ClassModel c : classes) {
             if (c.getClassId() != null) {
-                ClassModel loadedClass = classDetailsService.reloadClass(c.getClassId());
+                ClassModel loadedClass = reloadClass(c.getClassId());
                 if (loadedClass != null) {
                     classListBox.getChildren().add(buildClassCard(loadedClass, isTeacher));
                 }
@@ -109,14 +109,13 @@ public class ClassesController {
      */
     private Node buildClassCard(ClassModel c, boolean isTeacher) {
         try {
-            // Load the class card FXML template
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/components/class_card.fxml"));
-            Node node = loader.load();
-            ClassCardController ctrl = loader.getController();
+            // Load the class card UI and its controller.
+            LoadedClassCard loadedCard = loadClassCard();
+            Node node = loadedCard.node();
+            ClassCardController ctrl = loadedCard.controller();
 
             // Calculate the user's progress in this class
-            StudyService studyService = new StudyService();
-            double progress = studyService.getClassProgress(AppState.currentUser.get(), c);
+            double progress = calculateProgress(AppState.currentUser.get(), c);
 
             // Configure the card differently based on user role
             if (isTeacher) {
@@ -140,7 +139,7 @@ public class ClassesController {
             node.setOnMouseClicked(e -> {
                 AppState.selectedClass.set(c);
                 // Navigate to appropriate detail view based on user role
-                Navigator.go(isTeacher ? AppState.Screen.TEACHER_CLASS_DETAIL : AppState.Screen.CLASS_DETAIL);
+                navigateTo(isTeacher ? AppState.Screen.TEACHER_CLASS_DETAIL : AppState.Screen.CLASS_DETAIL);
             });
 
             return node;
@@ -174,7 +173,108 @@ public class ClassesController {
         tile.getChildren().add(text);
 
         // Add click handler to navigate to the add class screen
-        tile.setOnMouseClicked(e -> Navigator.go(AppState.Screen.TEACHER_ADD_CLASS));
+        tile.setOnMouseClicked(e -> navigateTo(AppState.Screen.TEACHER_ADD_CLASS));
         return tile;
+    }
+
+    // ================================ Helper Methods ============================
+    /**
+     * Loads the list of classes that the user is enrolled in from the database.
+     *
+     * @param userId The ID of the user whose classes to load
+     * @return A list of ClassModel objects representing the user's classes
+     */
+    List<ClassModel> loadClassesForUser(int userId) {
+        return classDetailsService.getClassesOfUser(userId);
+    }
+
+    /**
+     * Reloads the class details from the database to ensure we have the most up-to-date information.
+     *
+     * @param classId The ID of the class to reload
+     * @return A ClassModel object with the latest details of the class
+     */
+    ClassModel reloadClass(int classId) {
+        return classDetailsService.reloadClass(classId);
+    }
+
+    /**
+     * Calculates the user's progress in a given class as a percentage.
+     *
+     * @param user The user whose progress to calculate
+     * @param classModel The class for which to calculate progress
+     * @return A double value between 0 and 100 representing the user's progress in the class
+     */
+    double calculateProgress(User user, ClassModel classModel) {
+        StudyService studyService = new StudyService();
+        return studyService.getClassProgress(user, classModel);
+    }
+
+    /**
+     * Loads the class card UI component and its controller from FXML.
+     *
+     * @return A LoadedClassCard containing the Node and its controller
+     * @throws Exception if there is an error loading the FXML
+     */
+    LoadedClassCard loadClassCard() throws Exception {
+        FXMLLoader loader = createClassCardLoader();
+        Node node = loader.load();
+        return new LoadedClassCard(node, loader.getController());
+    }
+
+    /**
+     * Creates a new FXMLLoader for the class card FXML file.
+     *
+     * @return A new FXMLLoader instance ready to load the class card UI
+     */
+    FXMLLoader createClassCardLoader() {
+        return new FXMLLoader(getClass().getResource("/components/class_card.fxml"));
+    }
+
+    /**
+     * Navigates to a different screen in the application.
+     *
+     * @param screen The screen to navigate to
+     */
+    void navigateTo(AppState.Screen screen) {
+        Navigator.go(screen);
+    }
+
+    /**
+     * A simple data class to hold the loaded class card Node and its controller together.
+     * This allows us to easily return both from the loadClassCard method.
+     */
+    static final class LoadedClassCard {
+        private final Node node;
+        private final ClassCardController controller;
+
+        /**
+         * Constructs a new LoadedClassCard with the given Node and controller.
+         *
+         * @param node The Node representing the class card UI
+         * @param controller The controller for the class card, used to configure its content
+         */
+        LoadedClassCard(Node node, ClassCardController controller) {
+            this.node = node;
+            this.controller = controller;
+        }
+
+        /**
+         * Gets the Node representing the class card UI.
+         *
+         * @return The Node of the class card
+         */
+        Node node() {
+            return node;
+        }
+
+        /**
+         * Gets the controller for the class card, which can be used to set its content.
+         *
+         * @return The ClassCardController for the class card
+         */
+        ClassCardController controller() {
+            return controller;
+        }
     }
 }
