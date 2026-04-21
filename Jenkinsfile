@@ -83,6 +83,14 @@ pipeline {
             }
         }
 
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQubeServer') {
+                    sh 'mvn sonar:sonar'
+                }
+            }
+        }
+
         stage('Build Docker Image') {
             environment {
                 PATH = "/usr/local/bin:/opt/homebrew/bin:${env.PATH}"

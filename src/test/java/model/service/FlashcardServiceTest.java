@@ -14,10 +14,15 @@ import model.entity.QuizDetails;
 import model.entity.User;
 import org.junit.jupiter.api.*;
 
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class FlashcardServiceTest {
 
@@ -173,5 +178,54 @@ class FlashcardServiceTest {
         classDao.delete(clazz);
         userDao.delete(teacher);
     }
-}
 
+    @Test
+    void delete_nullCard_doesNothing() throws Exception {
+        FlashcardDao flashcardDaoMock = mock(FlashcardDao.class);
+        QuizDetailsDao quizDetailsDaoMock = mock(QuizDetailsDao.class);
+        injectDao(flashcardService, "flashDao", flashcardDaoMock);
+        injectDao(flashcardService, "quizDetailsDao", quizDetailsDaoMock);
+
+        flashcardService.delete(null);
+
+        verify(quizDetailsDaoMock, never()).deleteByFlashcardId(org.mockito.ArgumentMatchers.anyInt());
+        verify(flashcardDaoMock, never()).delete(org.mockito.ArgumentMatchers.any());
+    }
+
+    @Test
+    void delete_transientCardWithoutId_doesNothing() throws Exception {
+        FlashcardDao flashcardDaoMock = mock(FlashcardDao.class);
+        QuizDetailsDao quizDetailsDaoMock = mock(QuizDetailsDao.class);
+        injectDao(flashcardService, "flashDao", flashcardDaoMock);
+        injectDao(flashcardService, "quizDetailsDao", quizDetailsDaoMock);
+
+        Flashcard transientCard = new Flashcard();
+        transientCard.setTerm("Transient");
+
+        flashcardService.delete(transientCard);
+
+        verify(quizDetailsDaoMock, never()).deleteByFlashcardId(org.mockito.ArgumentMatchers.anyInt());
+        verify(flashcardDaoMock, never()).delete(org.mockito.ArgumentMatchers.any());
+    }
+
+    @Test
+    void getFlashcardsBySet_delegatesToDao() throws Exception {
+        FlashcardDao flashcardDaoMock = mock(FlashcardDao.class);
+        injectDao(flashcardService, "flashDao", flashcardDaoMock);
+
+        Flashcard flashcard = new Flashcard();
+        List<Flashcard> expected = List.of(flashcard);
+        when(flashcardDaoMock.findByFlashcardSetId(12)).thenReturn(expected);
+
+        List<Flashcard> actual = flashcardService.getFlashcardsBySet(12);
+
+        assertSame(expected, actual);
+        verify(flashcardDaoMock).findByFlashcardSetId(12);
+    }
+
+    private void injectDao(Object target, String fieldName, Object value) throws Exception {
+        Field field = FlashcardService.class.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        field.set(target, value);
+    }
+}
