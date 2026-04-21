@@ -36,6 +36,24 @@ import java.util.stream.Collectors;
  */
 public class TeacherClassDetailController {
 
+    static final class FlashcardSetCardView {
+        private final Node node;
+        private final FlashcardSetCardController controller;
+
+        FlashcardSetCardView(Node node, FlashcardSetCardController controller) {
+            this.node = node;
+            this.controller = controller;
+        }
+
+        Node node() {
+            return node;
+        }
+
+        FlashcardSetCardController controller() {
+            return controller;
+        }
+    }
+
     @FXML
     private Parent header;
     @FXML
@@ -83,14 +101,14 @@ public class TeacherClassDetailController {
         c = AppState.selectedClass.get();
         if (c == null) {
             // Navigate back to classes list if no class is selected
-            Navigator.go(AppState.Screen.CLASSES);
+            navigateTo(AppState.Screen.CLASSES);
             return;
         }
         if (c.getClassId() == null) {
-            Navigator.go(AppState.Screen.CLASSES);
+            navigateTo(AppState.Screen.CLASSES);
             return;
         }
-        c = classDetailsService.reloadClass(c.getClassId());
+        c = reloadClass(c.getClassId());
         AppState.selectedClass.set(c);
 
         // ========== Configure Header ==========
@@ -100,7 +118,7 @@ public class TeacherClassDetailController {
             // Set header title to the class name
             headerController.setTitle(c.getClassName());
             // Set back navigation
-            headerController.setOnBack(() -> Navigator.go(AppState.Screen.CLASSES));
+            headerController.setOnBack(() -> navigateTo(AppState.Screen.CLASSES));
             // Apply teacher variant styling
             headerController.applyVariant(HeaderController.Variant.TEACHER);
         }
@@ -188,8 +206,8 @@ public class TeacherClassDetailController {
                         -fx-cursor: hand;
                 """);
         del.setOnAction(e -> {
-            classDetailsService.removeStudentFromClass(cd);
-            c = classDetailsService.reloadClass(c.getClassId());
+            removeStudentFromClass(cd);
+            c = reloadClass(c.getClassId());
             renderEnrolledStudents();
             renderSearchResults(); // update search list availability
         });
@@ -197,7 +215,7 @@ public class TeacherClassDetailController {
         // Click name/row -> view student detail
         row.setOnMouseClicked(e -> {
             AppState.selectedStudent.set(student);
-            Navigator.go(AppState.Screen.TEACHER_STUDENT_DETAIL);
+            navigateTo(AppState.Screen.TEACHER_STUDENT_DETAIL);
         });
 
         row.getChildren().addAll(left, del);
@@ -255,7 +273,7 @@ public class TeacherClassDetailController {
             return;
         }
         // get all students
-        List<User> allStudents = userService.getAllStudents();
+        List<User> allStudents = loadAllStudents();
 
         // Exclude already-enrolled students (by email match)
         var enrolledEmails = c.getStudents().stream()
@@ -311,8 +329,8 @@ public class TeacherClassDetailController {
                 """);
         add.setOnAction(e -> {
             // Add to class (later: DB insert into enrollment)
-            classDetailsService.addStudentToClass(student, c);
-            c = classDetailsService.reloadClass(c.getClassId()); // reload class
+            addStudentToClass(student, c);
+            c = reloadClass(c.getClassId()); // reload class
             renderEnrolledStudents();
             renderSearchResults();
         });
@@ -333,10 +351,9 @@ public class TeacherClassDetailController {
         for (FlashcardSet set : c.getFlashcardSets()) {
             try {
                 // Load the flashcard set card component from FXML
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/components/flashcard_set_card.fxml"));
-                Node node = loader.load();
-
-                FlashcardSetCardController ctrl = loader.getController();
+                FlashcardSetCardView view = loadSetCardView();
+                Node node = view.node();
+                FlashcardSetCardController ctrl = view.controller();
                 ctrl.setSubject(set.getSubject());
                 ctrl.setCardCount(set.getTotalCards().size());
 
@@ -346,7 +363,7 @@ public class TeacherClassDetailController {
                 // Handle card click to navigate to set detail
                 node.setOnMouseClicked(e -> {
                     AppState.selectedSet.set(set);
-                    Navigator.go(AppState.Screen.TEACHER_FLASHCARD_SET_DETAIL);
+                    navigateTo(AppState.Screen.TEACHER_FLASHCARD_SET_DETAIL);
                 });
 
                 setListBox.getChildren().add(node);
@@ -366,7 +383,33 @@ public class TeacherClassDetailController {
      */
     @FXML
     private void onAddSet() {
-        Navigator.go(AppState.Screen.TEACHER_ADD_SET);
+        navigateTo(AppState.Screen.TEACHER_ADD_SET);
+    }
+
+    ClassModel reloadClass(int classId) {
+        return classDetailsService.reloadClass(classId);
+    }
+
+    void removeStudentFromClass(ClassDetails classDetails) {
+        classDetailsService.removeStudentFromClass(classDetails);
+    }
+
+    ClassDetails addStudentToClass(User student, ClassModel classModel) {
+        return classDetailsService.addStudentToClass(student, classModel);
+    }
+
+    List<User> loadAllStudents() {
+        return userService.getAllStudents();
+    }
+
+    FlashcardSetCardView loadSetCardView() throws Exception {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/components/flashcard_set_card.fxml"));
+        Node node = loader.load();
+        return new FlashcardSetCardView(node, loader.getController());
+    }
+
+    void navigateTo(AppState.Screen screen) {
+        Navigator.go(screen);
     }
     
 }

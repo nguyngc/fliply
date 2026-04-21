@@ -190,6 +190,10 @@ public class NavController {
         quizBtn.setManaged(!teacher);
     }
 
+    void navigateTo(AppState.Screen screen) {
+        Navigator.go(screen);
+    }
+
     // ========== Navigation Action Methods ==========
 
     /**
@@ -198,7 +202,7 @@ public class NavController {
      */
     @FXML
     private void goHome() {
-        Navigator.go(AppState.Screen.HOME);
+        navigateTo(AppState.Screen.HOME);
     }
 
     /**
@@ -207,7 +211,7 @@ public class NavController {
      */
     @FXML
     private void goClass() {
-        Navigator.go(AppState.Screen.CLASSES);
+        navigateTo(AppState.Screen.CLASSES);
     }
 
     /**
@@ -216,7 +220,7 @@ public class NavController {
      */
     @FXML
     private void goFlash() {
-        Navigator.go(AppState.Screen.FLASHCARDS);
+        navigateTo(AppState.Screen.FLASHCARDS);
     }
 
     /**
@@ -225,7 +229,7 @@ public class NavController {
      */
     @FXML
     private void goQuiz() {
-        Navigator.go(AppState.Screen.QUIZZES);
+        navigateTo(AppState.Screen.QUIZZES);
     }
 
     /**
@@ -234,6 +238,6 @@ public class NavController {
      */
     @FXML
     private void goAccount() {
-        Navigator.go(AppState.Screen.ACCOUNT);
+        navigateTo(AppState.Screen.ACCOUNT);
     }
 }

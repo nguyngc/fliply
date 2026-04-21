@@ -56,13 +56,13 @@ public class WelcomeController {
     /** Navigates to the login screen when the login button is clicked. */
     @FXML
     private void goLogin() {
-        Navigator.go(AppState.Screen.LOGIN);
+        navigateTo(AppState.Screen.LOGIN);
     }
 
     /** Navigates to the registration screen when the register button is clicked. */
     @FXML
     private void goRegister() {
-        Navigator.go(AppState.Screen.REGISTER);
+        navigateTo(AppState.Screen.REGISTER);
     }
 
     /** Switches the application locale to English and reloads the current view to apply changes. */
@@ -70,45 +70,53 @@ public class WelcomeController {
     private void switchToEnglish() {
         updateLocale("en", "US");
         // Reload to re-resolve localized strings for the current view.
-        Navigator.reloadCurrent();
+        reloadCurrentView();
     }
 
     /** Switches the application locale to Arabic and reloads the current view to apply changes. */
     @FXML
     private void switchToArabic() {
         updateLocale("ar", "AR");
-        Navigator.reloadCurrent();
+        reloadCurrentView();
     }
 
     /** Switches the application locale to Finnish and reloads the current view to apply changes. */
     @FXML
     private void switchToFinnish() {
         updateLocale("fi", "FI");
-        Navigator.reloadCurrent();
+        reloadCurrentView();
     }
 
     /** Switches the application locale to Korean and reloads the current view to apply changes. */
     @FXML
     private void switchToKorean() {
         updateLocale("ko", "KR");
-        Navigator.reloadCurrent();
+        reloadCurrentView();
     }
 
     /** Switches the application locale to Lao and reloads the current view to apply changes. */
     @FXML
     private void switchToLao() {
         updateLocale("lo", "LA");
-        Navigator.reloadCurrent();
+        reloadCurrentView();
     }
 
     /** Switches the application locale to Vietnamese and reloads the current view to apply changes. */
     @FXML
     private void switchToVietnamese() {
         updateLocale("vi", "VN");
-        Navigator.reloadCurrent();
+        reloadCurrentView();
     }
 
     void updateLocale(String language, String country) {
         LocaleManager.setLocale(language, country);
+    }
+
+    void navigateTo(AppState.Screen screen) {
+        Navigator.go(screen);
+    }
+
+    void reloadCurrentView() {
+        Navigator.reloadCurrent();
     }
 }

@@ -5,6 +5,7 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.VBox;
 import model.AppState;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import util.LocaleManager;
@@ -19,9 +20,11 @@ class ClassCardControllerTest {
     static { new JFXPanel(); }
 
     private ClassCardController controller;
+    private AppState.Role previousRole;
 
     @BeforeEach
     void setUp() {
+        previousRole = AppState.getRole();
         controller = new ClassCardController();
 
         // Inject UI components
@@ -37,6 +40,11 @@ class ClassCardControllerTest {
 
         // Reset AppState
         AppState.role.set(null);
+    }
+
+    @AfterEach
+    void tearDown() {
+        AppState.role.set(previousRole);
     }
 
     // ---------------- Reflection Helpers ----------------
@@ -115,6 +123,29 @@ class ClassCardControllerTest {
     }
 
     @Test
+    void testInitializeDoesNothing() {
+        assertDoesNotThrow(() -> {
+            Method m = ClassCardController.class.getDeclaredMethod("initialize");
+            m.setAccessible(true);
+            m.invoke(controller);
+        });
+    }
+
+    @Test
+    void testFireWithoutCallbackDoesNothing() {
+        assertDoesNotThrow(controller::fire);
+    }
+
+    @Test
+    void testApplyRoleVariantHandlesMissingBoxes() {
+        setPrivate("teacherInfoBox", null);
+        setPrivate("studentInfoBox", null);
+        AppState.setRole(AppState.Role.TEACHER);
+
+        assertDoesNotThrow(controller::applyRoleVariant);
+    }
+
+    @Test
     void testSetStudentCard_andProgress() {
         AppState.setRole(AppState.Role.STUDENT);
 
@@ -124,6 +155,19 @@ class ClassCardControllerTest {
         assertEquals("Teacher Name", ((Label) getPrivate("teacherNameLabel")).getText());
         assertEquals(0.42, ((ProgressBar) getPrivate("progressBar")).getProgress(), 0.0001);
         assertEquals("42% Completed", ((Label) getPrivate("progressTextLabel")).getText());
+    }
+
+    @Test
+    void testSetStudentCard_handlesMissingOptionalControls() {
+        AppState.setRole(AppState.Role.STUDENT);
+        setPrivate("teacherNameLabel", null);
+        setPrivate("progressBar", null);
+        setPrivate("progressTextLabel", null);
+        setPrivate("teacherInfoBox", null);
+        setPrivate("studentInfoBox", null);
+
+        assertDoesNotThrow(() -> controller.setStudentCard("CLS-404", "Teacher Name", 0.42));
+        assertEquals("CLS-404", ((Label) getPrivate("classNameLabel")).getText());
     }
 
     @Test
@@ -138,5 +182,19 @@ class ClassCardControllerTest {
         assertEquals("3 " + rb.getString("classDetail.sets"), ((Label) getPrivate("setsCountLabel")).getText());
         assertEquals(0.75, ((ProgressBar) getPrivate("progressBar")).getProgress(), 0.0001);
         assertEquals("75% Completed", ((Label) getPrivate("progressTextLabel")).getText());
+    }
+
+    @Test
+    void testSetTeacherCard_handlesMissingOptionalControls() {
+        AppState.setRole(AppState.Role.TEACHER);
+        setPrivate("studentsCountLabel", null);
+        setPrivate("setsCountLabel", null);
+        setPrivate("progressBar", null);
+        setPrivate("progressTextLabel", null);
+        setPrivate("teacherInfoBox", null);
+        setPrivate("studentInfoBox", null);
+
+        assertDoesNotThrow(() -> controller.setTeacherCard("CLS-505", 10, 2, 0.75));
+        assertEquals("CLS-505", ((Label) getPrivate("classNameLabel")).getText());
     }
 }

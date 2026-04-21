@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -131,7 +133,14 @@ class TeacherAddClassControllerTest {
         TextField field = (TextField) getPrivate("classCodeField");
         field.setText("error");
 
-        callPrivate("onAdd");
+        Logger logger = Logger.getLogger(TeacherAddClassController.class.getName());
+        Level previousLevel = logger.getLevel();
+        try {
+            logger.setLevel(Level.OFF);
+            callPrivate("onAdd");
+        } finally {
+            logger.setLevel(previousLevel);
+        }
 
         assertNull(AppState.navOverride.get());
     }

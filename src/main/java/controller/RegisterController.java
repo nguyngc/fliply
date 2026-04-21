@@ -164,7 +164,7 @@ public class RegisterController {
         // ========== Check Email Uniqueness and Register ==========
         try {
             // Check if email is already registered
-            if (userDao.existsByEmail(email)) {
+            if (emailExists(email)) {
                 showWarning(resources.getString("register.warning.emailExists"));
                 return;
             }
@@ -182,7 +182,7 @@ public class RegisterController {
 
             // ========== Save to Database ==========
             // Persist the new user to the database
-            userDao.persist(user);
+            persistUser(user);
 
             // ========== Authenticate and Navigate ==========
             // Store the newly created user in app state (auto-login)
@@ -192,7 +192,7 @@ public class RegisterController {
             AppState.setRole(user.isTeacher() ? AppState.Role.TEACHER : AppState.Role.STUDENT);
 
             // Navigate to the home screen
-            Navigator.go(AppState.Screen.HOME);
+            navigateTo(AppState.Screen.HOME);
 
         } catch (Exception e) {
             LOGGER.log(Level.WARNING, "Registration failed due to persistence error", e);
@@ -207,7 +207,7 @@ public class RegisterController {
      *
      * @param msg The warning message to display
      */
-    private void showWarning(String msg) {
+    void showWarning(String msg) {
         // Create a warning alert
         Dialogs.show(Alert.AlertType.WARNING, resources.getString("register.alertTitle"), msg);
     }
@@ -218,6 +218,18 @@ public class RegisterController {
      */
     @FXML
     public void goLogin() {
-        Navigator.go(AppState.Screen.LOGIN);
+        navigateTo(AppState.Screen.LOGIN);
+    }
+
+    boolean emailExists(String email) {
+        return userDao.existsByEmail(email);
+    }
+
+    void persistUser(User user) {
+        userDao.persist(user);
+    }
+
+    void navigateTo(AppState.Screen screen) {
+        Navigator.go(screen);
     }
 }

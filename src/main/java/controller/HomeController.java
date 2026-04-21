@@ -33,6 +33,7 @@ public class HomeController {
     // ========== Services ==========
     private final ClassDetailsService classDetailsService = new ClassDetailsService();
     private final QuizService quizService = new QuizService();
+    private final StudyService studyService = new StudyService();
 
     // ========== Header Components ==========
     // Label for displaying user's first name
@@ -54,6 +55,24 @@ public class HomeController {
 
     // Cache of the latest quiz for handling click events
     private Quiz latestQuiz;
+
+    static final class LatestClassCardView {
+        private final Node node;
+        private final ClassCardController controller;
+
+        LatestClassCardView(Node node, ClassCardController controller) {
+            this.node = node;
+            this.controller = controller;
+        }
+
+        Node node() {
+            return node;
+        }
+
+        ClassCardController controller() {
+            return controller;
+        }
+    }
 
     /**
      * Initializes the controller when the FXML is loaded.
@@ -112,7 +131,7 @@ public class HomeController {
 
         // ========== Load Classes ==========
         // Fetch all classes the user is enrolled in or teaches
-        List<ClassModel> classes = classDetailsService.getClassesOfUser(user.getUserId());
+        List<ClassModel> classes = loadClassesForUser(user.getUserId());
         if (classes.isEmpty()) return;
 
         // Get the latest class (by ID, most recent)
@@ -122,18 +141,16 @@ public class HomeController {
 
         // Reload the selected class with the relations needed for the home card
         // so rendering does not depend on lazy collections after the DAO closes.
-        ClassModel cd = classDetailsService.reloadClass(latestClass.getClassId());
+        ClassModel cd = loadClassWithRelations(latestClass.getClassId());
         if (cd == null) return;
 
         try {
             // ========== Load Class Card Component ==========
-            // Load the class card FXML template
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/components/class_card.fxml"));
-            Node node = loader.load();
-            ClassCardController ctrl = loader.getController();
+            LatestClassCardView view = loadLatestClassCardView();
+            Node node = view.node();
+            ClassCardController ctrl = view.controller();
 
             // ========== Calculate Progress ==========
-            StudyService studyService = new StudyService();
             double progress = 0.0;
 
             // Calculate progress for students only
@@ -142,8 +159,9 @@ public class HomeController {
                 int totalCards = 0;
                 // Sum progress across all flashcard sets in the class
                 for (FlashcardSet set : cd.getFlashcardSets()) {
-                    totalLearned += (int) (studyService.getProgressPercent(user, set) * set.getCards().size());
-                    totalCards += set.getCards().size();
+                    int setCardCount = getCardCount(set);
+                    totalLearned += (int) (getProgressPercent(user, set) * setCardCount);
+                    totalCards += setCardCount;
                 }
                 progress = (totalCards == 0) ? 0.0 : (double) totalLearned / totalCards;
             }
@@ -160,10 +178,7 @@ public class HomeController {
 
             // ========== Add Click Handler ==========
             // Navigate to class details when card is clicked
-            node.setOnMouseClicked(e -> {
-                AppState.selectedClass.set(cd);
-                Navigator.go(AppState.Screen.CLASSES);
-            });
+            node.setOnMouseClicked(e -> openClass(cd));
 
             // Add the card to the display
             latestClassHolder.getChildren().add(node);
@@ -184,7 +199,7 @@ public class HomeController {
 
         // ========== Load Quizzes ==========
         // Fetch all quizzes assigned to the user
-        List<Quiz> quizzes = quizService.getQuizzesByUser(user.getUserId());
+        List<Quiz> quizzes = loadQuizzesForUser(user.getUserId());
         if (quizzes == null || quizzes.isEmpty()) {
             // No quizzes available
             latestQuiz = null;
@@ -216,7 +231,7 @@ public class HomeController {
 
         // If no quiz is available, navigate to the quizzes list
         if (latestQuiz == null) {
-            Navigator.go(AppState.Screen.QUIZZES);
+            navigateTo(AppState.Screen.QUIZZES);
             return;
         }
 
@@ -237,6 +252,41 @@ public class HomeController {
         AppState.navOverride.set(AppState.NavItem.QUIZZES);
         
         // Navigate to the quiz detail screen
-        Navigator.go(AppState.Screen.QUIZ_DETAIL);
+        navigateTo(AppState.Screen.QUIZ_DETAIL);
+    }
+
+    List<ClassModel> loadClassesForUser(int userId) {
+        return classDetailsService.getClassesOfUser(userId);
+    }
+
+    ClassModel loadClassWithRelations(int classId) {
+        return classDetailsService.reloadClass(classId);
+    }
+
+    int getCardCount(FlashcardSet set) {
+        return set.getCards().size();
+    }
+
+    double getProgressPercent(User user, FlashcardSet set) {
+        return studyService.getProgressPercent(user, set);
+    }
+
+    LatestClassCardView loadLatestClassCardView() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/components/class_card.fxml"));
+        Node node = loader.load();
+        return new LatestClassCardView(node, loader.getController());
+    }
+
+    List<Quiz> loadQuizzesForUser(int userId) {
+        return quizService.getQuizzesByUser(userId);
+    }
+
+    void openClass(ClassModel classModel) {
+        AppState.selectedClass.set(classModel);
+        navigateTo(AppState.Screen.CLASSES);
+    }
+
+    void navigateTo(AppState.Screen screen) {
+        Navigator.go(screen);
     }
 }

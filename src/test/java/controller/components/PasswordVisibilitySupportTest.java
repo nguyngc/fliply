@@ -7,6 +7,9 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class PasswordVisibilitySupportTest {
@@ -68,5 +71,13 @@ class PasswordVisibilitySupportTest {
         assertEquals("changed", masked.getText());
         assertSame(eyeClosed, eyeIcon.getImage());
     }
-}
 
+    @Test
+    void utilityConstructorThrows() throws Exception {
+        Constructor<PasswordVisibilitySupport> constructor = PasswordVisibilitySupport.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+
+        InvocationTargetException thrown = assertThrows(InvocationTargetException.class, constructor::newInstance);
+        assertInstanceOf(UnsupportedOperationException.class, thrown.getCause());
+    }
+}

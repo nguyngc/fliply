@@ -101,13 +101,13 @@ public class QuizDetailController {
         quiz = AppState.selectedQuiz.get();
         if (quiz == null) {
             // Navigate back to quizzes list if no quiz is selected
-            Navigator.go(AppState.Screen.QUIZZES);
+            navigateTo(AppState.Screen.QUIZZES);
             return;
         }
         
         // ========== Build Quiz Questions ==========
         // Generate the quiz questions with shuffled options
-        questions = quizService.buildQuizQuestions(quiz.getQuizId(), AppState.currentUser.get().getUserId());
+        questions = loadQuestions(quiz.getQuizId(), AppState.currentUser.get().getUserId());
 
         // ========== Configure Header ==========
         if (headerController != null) {
@@ -117,7 +117,7 @@ public class QuizDetailController {
             
             // Show back button to return to quizzes list
             headerController.setBackVisible(true);
-            headerController.setOnBack(() -> Navigator.go(AppState.Screen.QUIZZES));
+            headerController.setOnBack(() -> navigateTo(AppState.Screen.QUIZZES));
         }
 
         // ========== Setup Navigation ==========
@@ -312,7 +312,7 @@ public class QuizDetailController {
     @FXML
     private void viewResult() {
         AppState.navOverride.set(AppState.NavItem.QUIZZES);
-        Navigator.go(AppState.Screen.QUIZ_RESULT);
+        navigateTo(AppState.Screen.QUIZ_RESULT);
     }
 
     /**
@@ -416,5 +416,13 @@ public class QuizDetailController {
         } catch (MissingResourceException ignored) {
             return fallback;
         }
+    }
+
+    List<QuizService.QuizQuestion> loadQuestions(int quizId, int userId) {
+        return quizService.buildQuizQuestions(quizId, userId);
+    }
+
+    void navigateTo(AppState.Screen screen) {
+        Navigator.go(screen);
     }
 }

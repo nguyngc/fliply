@@ -75,28 +75,28 @@ public class TeacherFlashcardSetDetailController {
     @FXML
     private void initialize() {
         // ========== Load Localized Strings ==========
-        localizedStrings = LocalizationService.getLocalizedStrings();
+        localizedStrings = loadLocalizedStrings();
         
         // ========== Get Selected Flashcard Set ==========
         // Retrieve the flashcard set selected from the previous screen
         set = AppState.selectedSet.get();
         if (set == null) {
             // Navigate back if no set is selected
-            Navigator.go(AppState.Screen.TEACHER_CLASS_DETAIL);
+            navigateTo(AppState.Screen.TEACHER_CLASS_DETAIL);
             return;
         }
         if (set.getFlashcardSetId() == null) {
-            Navigator.go(AppState.Screen.TEACHER_CLASS_DETAIL);
+            navigateTo(AppState.Screen.TEACHER_CLASS_DETAIL);
             return;
         }
-        set = flashcardSetService.getSetWithCards(set.getFlashcardSetId());
+        set = loadSetWithCards(set.getFlashcardSetId());
         AppState.selectedSet.set(set);
 
         // ========== Configure Header ==========
         headerController.setBackVisible(true);
         headerController.setTitle(set.getSubject());
         headerController.setSubtitle(MessageFormat.format(localizedStrings.get("teacherFlashcardSetDetail.subtitle"), set.getCards().size()));
-        headerController.setOnBack(() -> Navigator.go(AppState.Screen.TEACHER_CLASS_DETAIL));
+        headerController.setOnBack(() -> navigateTo(AppState.Screen.TEACHER_CLASS_DETAIL));
         headerController.applyVariant(HeaderController.Variant.TEACHER);
 
         // Set the active navigation item
@@ -315,5 +315,17 @@ public class TeacherFlashcardSetDetailController {
         renderList();
         // Update the header count
         updateHeaderTotal();
+    }
+
+    Map<String, String> loadLocalizedStrings() {
+        return LocalizationService.getLocalizedStrings();
+    }
+
+    FlashcardSet loadSetWithCards(int setId) {
+        return flashcardSetService.getSetWithCards(setId);
+    }
+
+    void navigateTo(AppState.Screen screen) {
+        Navigator.go(screen);
     }
 }

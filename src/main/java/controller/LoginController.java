@@ -113,7 +113,7 @@ public class LoginController {
         
         // ========== Authenticate User ==========
         // Query the database for user with matching email and password
-        User user = userDao.findByEmailAndPassword(email, password);
+        User user = authenticate(email, password);
         
         if (user != null) {
             // ========== Login Success ==========
@@ -130,7 +130,7 @@ public class LoginController {
             AppState.setRole(user.isTeacher() ? AppState.Role.TEACHER : AppState.Role.STUDENT);
             
             // Navigate to the home screen
-            Navigator.go(AppState.Screen.HOME);
+            navigateTo(AppState.Screen.HOME);
         } else {
             // ========== Login Failed ==========
             // Display error message with localized string
@@ -145,7 +145,7 @@ public class LoginController {
      */
     @FXML
     public void goRegister() {
-        Navigator.go(AppState.Screen.REGISTER);
+        navigateTo(AppState.Screen.REGISTER);
     }
 
     /**
@@ -159,6 +159,18 @@ public class LoginController {
         String message = rb.getString("login.forgot");
 
         // Create and display an information alert
+        showInfoDialog(title, message);
+    }
+
+    User authenticate(String email, String password) {
+        return userDao.findByEmailAndPassword(email, password);
+    }
+
+    void navigateTo(AppState.Screen screen) {
+        Navigator.go(screen);
+    }
+
+    void showInfoDialog(String title, String message) {
         Dialogs.show(Alert.AlertType.INFORMATION, title, message);
     }
 }

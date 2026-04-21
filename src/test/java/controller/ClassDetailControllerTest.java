@@ -2,155 +2,237 @@ package controller;
 
 import controller.components.HeaderController;
 import javafx.embed.swing.JFXPanel;
+import javafx.scene.Parent;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import model.AppState;
 import model.entity.ClassModel;
+import model.entity.FlashcardSet;
 import model.entity.User;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import util.LocaleManager;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ClassDetailControllerTest {
 
-    static { new JFXPanel(); }
+    static {
+        System.setProperty("javafx.cachedir", System.getProperty("java.io.tmpdir") + "/openjfx-cache");
+        new JFXPanel();
+    }
 
-    private ClassDetailController controller;
+    private TestableClassDetailController controller;
+    private FakeHeaderController headerController;
+    private VBox flashcardSetListBox;
+    private Locale previousLocale;
+    private User previousUser;
+    private ClassModel previousSelectedClass;
+    private FlashcardSet previousSelectedSet;
 
-    // ---------- Fake HeaderController ----------
-    private static class FakeHeaderController extends HeaderController {
-        public Label titleLabel = new Label();
-        public Label subtitleLabel = new Label();
-        public Label metaLabel = new Label();
-        public Button backButton = new Button();
+    private static final class TestableClassDetailController extends ClassDetailController {
+        private final List<FlashcardSet> setsToLoad = new ArrayList<>();
+        private Integer lastRequestedClassId;
+        private int loadCallCount;
+        private AppState.Screen lastNavigatedScreen;
+
+        @Override
+        List<FlashcardSet> loadSetsForClass(int classId) {
+            lastRequestedClassId = classId;
+            loadCallCount++;
+            return new ArrayList<>(setsToLoad);
+        }
+
+        @Override
+        void navigateTo(AppState.Screen screen) {
+            lastNavigatedScreen = screen;
+        }
+    }
+
+    private static final class FakeHeaderController extends HeaderController {
+        private String title;
+        private String meta;
+        private boolean backVisible;
+        private Runnable backAction;
+        private Variant variant;
 
         @Override
         public void setTitle(String title) {
-            titleLabel.setText(title);
-        }
-
-        @Override
-        public void setSubtitle(String subtitle) {
-            subtitleLabel.setText(subtitle);
-        }
-
-        @Override
-        public void setBackVisible(boolean visible) {
-            backButton.setVisible(visible);
-            backButton.setManaged(visible);
+            this.title = title;
         }
 
         @Override
         public void setMeta(String text) {
-            metaLabel.setText(text);
+            meta = text;
+        }
+
+        @Override
+        public void setBackVisible(boolean visible) {
+            backVisible = visible;
+        }
+
+        @Override
+        public void setOnBack(Runnable action) {
+            backAction = action;
+        }
+
+        @Override
+        public void applyVariant(Variant variant) {
+            this.variant = variant;
         }
     }
 
     @BeforeEach
     void setUp() {
-        controller = new ClassDetailController();
+        previousLocale = LocaleManager.getLocale();
+        previousUser = AppState.currentUser.get();
+        previousSelectedClass = AppState.selectedClass.get();
+        previousSelectedSet = AppState.selectedFlashcardSet.get();
 
-        FakeHeaderController fakeHeader = new FakeHeaderController();
+        LocaleManager.setLocale("en", "US");
+        controller = new TestableClassDetailController();
+        headerController = new FakeHeaderController();
+        flashcardSetListBox = new VBox();
 
-        //  header = StackPane
         setPrivate("header", new StackPane());
+        setPrivate("headerController", headerController);
+        setPrivate("flashcardSetListBox", flashcardSetListBox);
 
-        // headerController = fakeHeader
-        setPrivate("headerController", fakeHeader);
-        // create fake VBox to ignored NPE
-        setPrivate("flashcardSetListBox", new VBox());
+        AppState.currentUser.set(null);
+        AppState.selectedClass.set(null);
+        AppState.selectedFlashcardSet.set(null);
+    }
 
-        // Fake logged-in user
-        User teacher = new User();
-        setUserId(teacher);
-        teacher.setRole(1);
-        teacher.setFirstName("Alice");
-        teacher.setLastName("Teacher");
+    @AfterEach
+    void tearDown() {
+        LocaleManager.setLocale(previousLocale);
+        AppState.currentUser.set(previousUser);
+        AppState.selectedClass.set(previousSelectedClass);
+        AppState.selectedFlashcardSet.set(previousSelectedSet);
+    }
+
+    @Test
+    void initialize_withoutSelectedClass_setsFallbackHeaderAndBackNavigation() {
+        callPrivate("initialize");
+        ResourceBundle rb = ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
+
+        assertEquals(rb.getString("class.title"), headerController.title);
+        assertTrue(headerController.backVisible);
+        assertNull(headerController.meta);
+        assertEquals(0, controller.loadCallCount);
+
+        headerController.backAction.run();
+        assertEquals(AppState.Screen.CLASSES, controller.lastNavigatedScreen);
+    }
+
+    @Test
+    void initialize_withTeacherUser_setsHeaderLoadsSetsAndClearsList() {
+        User teacher = createUser(1, "Alice", "Teacher");
+        ClassModel selectedClass = createClass(10, "Math 101", teacher);
         AppState.currentUser.set(teacher);
+        AppState.selectedClass.set(selectedClass);
+        flashcardSetListBox.getChildren().add(new Button("Old"));
 
-        // Fake selected class
-        ClassModel c = new ClassModel();
-        setClassId(c);
-        c.setClassName("Math 101");
-        c.setTeacher(teacher);
-        AppState.selectedClass.set(c);
+        callPrivate("initialize");
+        ResourceBundle rb = ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
 
-        AppState.navOverride.set(null);
+        assertEquals("Math 101", headerController.title);
+        assertEquals(rb.getString("class.teacher") + " Alice Teacher", headerController.meta);
+        assertTrue(headerController.backVisible);
+        assertEquals(HeaderController.Variant.TEACHER, headerController.variant);
+        assertEquals(1, controller.loadCallCount);
+        assertEquals(10, controller.lastRequestedClassId);
+        assertTrue(flashcardSetListBox.getChildren().isEmpty());
 
-        callPrivateInitialize();
-    }
-
-
-    private void setUserId(User user) {
-        try {
-            Field f = User.class.getDeclaredField("userId");
-            f.setAccessible(true);
-            f.set(user, 1);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void setClassId(ClassModel c) {
-        try {
-            Field f = ClassModel.class.getDeclaredField("classId");
-            f.setAccessible(true);
-            f.set(c, 10);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void setPrivate(String field, Object value) {
-        try {
-            Field f = ClassDetailController.class.getDeclaredField(field);
-            f.setAccessible(true);
-            f.set(controller, value);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private Object getHeader() {
-        try {
-            Field f = ClassDetailController.class.getDeclaredField("headerController");
-            f.setAccessible(true);
-            return f.get(controller);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    private void callPrivateInitialize() {
-        try {
-            Method m = ClassDetailController.class.getDeclaredMethod("initialize");
-            m.setAccessible(true);
-            m.invoke(controller);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    // ---------- Tests ----------
-
-    @Test
-    void testInitialize_setsHeaderCorrectly() {
-        FakeHeaderController header = (FakeHeaderController) getHeader();
-
-        assertEquals("Math 101", header.titleLabel.getText());
-        assertEquals("Teacher Alice Teacher", header.metaLabel.getText());
+        headerController.backAction.run();
+        assertEquals(AppState.Screen.CLASSES, controller.lastNavigatedScreen);
     }
 
     @Test
-    void testInitialize_setsBackButton() {
-        FakeHeaderController header = (FakeHeaderController) getHeader();
-        assertTrue(header.backButton.isVisible());
+    void initialize_withStudentUser_rendersSetButtonsAndOpensSelectedSet() {
+        User teacher = createUser(1, "Alice", "Teacher");
+        User student = createUser(0, "Bob", "Student");
+        ClassModel selectedClass = createClass(20, "Biology", teacher);
+        FlashcardSet firstSet = createSet("Cells");
+        FlashcardSet secondSet = createSet("DNA");
+
+        AppState.currentUser.set(student);
+        AppState.selectedClass.set(selectedClass);
+        controller.setsToLoad.add(firstSet);
+        controller.setsToLoad.add(secondSet);
+        flashcardSetListBox.getChildren().add(new Button("Placeholder"));
+
+        callPrivate("initialize");
+
+        assertEquals(HeaderController.Variant.STUDENT, headerController.variant);
+        assertEquals(2, flashcardSetListBox.getChildren().size());
+        assertEquals("Cells", ((Button) flashcardSetListBox.getChildren().get(0)).getText());
+        assertEquals("DNA", ((Button) flashcardSetListBox.getChildren().get(1)).getText());
+
+        ((Button) flashcardSetListBox.getChildren().get(0)).fire();
+
+        assertSame(firstSet, AppState.selectedFlashcardSet.get());
+        assertEquals(AppState.Screen.FLASHCARD_SET, controller.lastNavigatedScreen);
     }
 
+    private User createUser(int role, String firstName, String lastName) {
+        User user = new User();
+        user.setRole(role);
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        return user;
+    }
+
+    private ClassModel createClass(int classId, String name, User teacher) {
+        ClassModel classModel = new ClassModel();
+        try {
+            Field classIdField = ClassModel.class.getDeclaredField("classId");
+            classIdField.setAccessible(true);
+            classIdField.set(classModel, classId);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        classModel.setClassName(name);
+        classModel.setTeacher(teacher);
+        return classModel;
+    }
+
+    private FlashcardSet createSet(String subject) {
+        FlashcardSet flashcardSet = new FlashcardSet();
+        flashcardSet.setSubject(subject);
+        return flashcardSet;
+    }
+
+    private void setPrivate(String fieldName, Object value) {
+        try {
+            Field field = ClassDetailController.class.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(controller, value);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void callPrivate(String methodName) {
+        try {
+            Method method = ClassDetailController.class.getDeclaredMethod(methodName);
+            method.setAccessible(true);
+            method.invoke(controller);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 }

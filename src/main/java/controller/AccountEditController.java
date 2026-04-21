@@ -49,7 +49,7 @@ public class AccountEditController {
         headerController.setBackVisible(true);
         headerController.setTitle(rb.getString("edit.header.title"));
         headerController.setSubtitle("");
-        headerController.setOnBack(() -> Navigator.go(AppState.Screen.ACCOUNT));
+        headerController.setOnBack(() -> navigateTo(AppState.Screen.ACCOUNT));
         
         // Apply styling variant based on whether the user is a teacher or student
         headerController.applyVariant(AppState.isTeacher()
@@ -82,10 +82,10 @@ public class AccountEditController {
         user.setEmail(emailField.getText() == null ? "" : emailField.getText().trim());
         
         // Save the updated user information to the database
-        userService.update(user);
+        updateUser(user);
 
         // Navigate back to account screen after successful update
-        Navigator.go(AppState.Screen.ACCOUNT);
+        navigateTo(AppState.Screen.ACCOUNT);
     }
 
     /**
@@ -94,6 +94,14 @@ public class AccountEditController {
      */
     @FXML
     private void onCancel() {
-        Navigator.go(AppState.Screen.ACCOUNT);
+        navigateTo(AppState.Screen.ACCOUNT);
+    }
+
+    void updateUser(User user) {
+        userService.update(user);
+    }
+
+    void navigateTo(AppState.Screen screen) {
+        Navigator.go(screen);
     }
 }
