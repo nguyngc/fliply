@@ -56,5 +56,30 @@ class LocalizationServiceTest {
         assertEquals("Lớp học", strings.get("nav.classes"));
         assertEquals("Bộ thẻ học mới", strings.get("teacherAddSet.title"));
     }
-}
 
+    @Test
+    void getLocalizedStrings_whenPrimaryBundleMissing_usesFallbackBundle() {
+        Map<String, String> strings = LocalizationService.getLocalizedStrings(
+                "MissingMessages",
+                Locale.of("zz", "ZZ"),
+                "Messages",
+                Locale.of("en", "US")
+        );
+
+        assertEquals("Fliply", strings.get("welcome.title"));
+        assertEquals("Classes", strings.get("nav.classes"));
+        assertEquals("New Set of Flashcard", strings.get("teacherAddSet.title"));
+    }
+
+    @Test
+    void getLocalizedStrings_whenPrimaryAndFallbackBundlesMissing_returnsEmptyMap() {
+        Map<String, String> strings = LocalizationService.getLocalizedStrings(
+                "MissingMessages",
+                Locale.of("zz", "ZZ"),
+                "AlsoMissingMessages",
+                Locale.of("en", "US")
+        );
+
+        assertTrue(strings.isEmpty());
+    }
+}

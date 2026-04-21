@@ -25,11 +25,17 @@ public final class LocalizationService {
      * @return a map of localized strings for the current locale, with keys corresponding to resource bundle keys
      */
     public static Map<String, String> getLocalizedStrings() {
+        return getLocalizedStrings("Messages", LocaleManager.getLocale(), "Messages", Locale.of("en", "US"));
+    }
+
+    static Map<String, String> getLocalizedStrings(String baseName,
+                                                   Locale locale,
+                                                   String fallbackBaseName,
+                                                   Locale fallbackLocale) {
         Map<String, String> strings = new HashMap<>();
-        Locale locale = LocaleManager.getLocale();
 
         try {
-            ResourceBundle bundle = ResourceBundle.getBundle("Messages", locale);
+            ResourceBundle bundle = ResourceBundle.getBundle(baseName, locale);
 
             // Extract all keys
             for (String key : bundle.keySet()) {
@@ -40,8 +46,8 @@ public final class LocalizationService {
             // Fallback to English
             try {
                 ResourceBundle fallback = ResourceBundle.getBundle(
-                        "Messages",
-                        Locale.of("en", "US")
+                        fallbackBaseName,
+                        fallbackLocale
                 );
                 for (String key : fallback.keySet()) {
                     strings.put(key, fallback.getString(key));

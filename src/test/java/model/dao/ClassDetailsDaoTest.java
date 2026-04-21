@@ -1,5 +1,9 @@
 package model.dao;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
 import model.entity.ClassDetails;
 import model.entity.ClassModel;
 import model.entity.User;
@@ -9,6 +13,8 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 class ClassDetailsDaoTest {
 
@@ -283,6 +289,126 @@ class ClassDetailsDaoTest {
         RuntimeException exception = assertThrows(RuntimeException.class, () -> classDetailsDao.delete(invalid));
         assertNotNull(exception);
     }
+
+    @Test
+    void persist_invalidClassDetailsRollsBackAndThrows() {
+        ClassDetails invalid = new ClassDetails();
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> classDetailsDao.persist(invalid));
+        assertNotNull(exception);
+    }
+
+    @Test
+    void update_invalidClassDetailsRollsBackAndLeavesStoredRecordUntouched() {
+        User teacher = newUser("Teacher");
+        userDao.persist(teacher);
+
+        ClassModel c = newClass(teacher);
+        classDao.persist(c);
+
+        User student = newUser("Student");
+        userDao.persist(student);
+
+        ClassDetails cd = newClassDetails(student, c);
+        classDetailsDao.persist(cd);
+        Integer id = cd.getClassDetailsId();
+
+        cd.setClassModel(null);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> classDetailsDao.update(cd));
+        assertNotNull(exception);
+
+        ClassDetails reloaded = classDetailsDao.find(id);
+        assertNotNull(reloaded);
+        assertNotNull(reloaded.getClassModel());
+        assertEquals(c.getClassId(), reloaded.getClassModel().getClassId());
+        assertEquals(student.getUserId(), reloaded.getStudent().getUserId());
+
+        classDetailsDao.delete(reloaded);
+        classDao.delete(c);
+        userDao.delete(student);
+        userDao.delete(teacher);
+    }
+
+    @Test
+    void delete_managedClassDetails_skipsMergeAndCommits() {
+        EntityManager em = mock(EntityManager.class);
+        EntityTransaction tx = mock(EntityTransaction.class);
+        ClassDetails managed = new ClassDetails();
+        ClassDetailsDao dao = new ClassDetailsDao() {
+            @Override
+            EntityManager createEntityManager() {
+                return em;
+            }
+        };
+
+        when(em.getTransaction()).thenReturn(tx);
+        when(em.contains(managed)).thenReturn(true);
+
+        dao.delete(managed);
+
+        verify(tx).begin();
+        verify(em, never()).merge(any());
+        verify(em).remove(managed);
+        verify(tx).commit();
+        verify(tx, never()).rollback();
+        verify(em).close();
+    }
+
+    @Test
+    void deleteByClassId_queryFailure_rollsBackAndThrows() {
+        EntityManager em = mock(EntityManager.class);
+        EntityTransaction tx = mock(EntityTransaction.class);
+        Query deleteQuery = mock(Query.class);
+        RuntimeException failure = new RuntimeException("delete failed");
+        ClassDetailsDao dao = new ClassDetailsDao() {
+            @Override
+            EntityManager createEntityManager() {
+                return em;
+            }
+        };
+
+        when(em.getTransaction()).thenReturn(tx);
+        when(em.createQuery("DELETE FROM ClassDetails cd WHERE cd.classModel.classId = :cid"))
+                .thenReturn(deleteQuery);
+        when(deleteQuery.setParameter("cid", 42)).thenReturn(deleteQuery);
+        when(deleteQuery.executeUpdate()).thenThrow(failure);
+
+        RuntimeException thrown = assertThrows(RuntimeException.class, () -> dao.deleteByClassId(42));
+        assertSame(failure, thrown);
+
+        verify(tx).begin();
+        verify(tx).rollback();
+        verify(tx, never()).commit();
+        verify(em).close();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    void existsByUserAndClass_nullCount_returnsFalse() {
+        EntityManager em = mock(EntityManager.class);
+        TypedQuery<Long> countQuery = mock(TypedQuery.class);
+        ClassDetailsDao dao = new ClassDetailsDao() {
+            @Override
+            EntityManager createEntityManager() {
+                return em;
+            }
+        };
+
+        when(em.createQuery(
+                "SELECT COUNT(cd) FROM ClassDetails cd " +
+                        "WHERE cd.student.userId = :uid AND cd.classModel.classId = :cid",
+                Long.class
+        )).thenReturn(countQuery);
+        when(countQuery.setParameter("uid", 7)).thenReturn(countQuery);
+        when(countQuery.setParameter("cid", 11)).thenReturn(countQuery);
+        when(countQuery.getSingleResult()).thenReturn(null);
+
+        assertFalse(dao.existsByUserAndClass(7, 11));
+
+        verify(em).close();
+    }
+
     @AfterEach
     void cleanupTestData() {
 

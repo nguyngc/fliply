@@ -1,46 +1,33 @@
 package controller.components;
 
+import javafx.embed.swing.JFXPanel;
 import javafx.scene.control.Label;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import model.AppState;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.io.ByteArrayInputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class NavControllerTest {
-    static { new javafx.embed.swing.JFXPanel(); }
+    static { new JFXPanel(); }
 
-    private NavController controller;
-
-    private Image dummyImage() {
-        return new Image(new ByteArrayInputStream(new byte[0]));
-    }
+    private TestableNavController controller;
+    private AppState.NavItem previousNav;
+    private AppState.Role previousRole;
 
     @BeforeEach
     void setUp() throws Exception {
-        controller = new NavController();
+        previousNav = AppState.activeNav.get();
+        previousRole = AppState.getRole();
+        controller = new TestableNavController();
 
-        // Inject dummy images to bypass real resource loading
-        for (String field : new String[]{
-                "homeActive","homeInactive",
-                "classActive","classInactive",
-                "flashcardActive","flashcardInactive",
-                "quizActive","quizInactive",
-                "accountActive","accountInactive"
-        }) {
-            Field f = NavController.class.getDeclaredField(field);
-            f.setAccessible(true);
-            f.set(controller, dummyImage());
-        }
-
-        // Inject UI components
         setPrivate("homeIcon", new ImageView());
         setPrivate("classIcon", new ImageView());
         setPrivate("flashcardIcon", new ImageView());
@@ -59,12 +46,15 @@ class NavControllerTest {
         setPrivate("quizLabel", new Label());
         setPrivate("accountLabel", new Label());
 
-        // Reset AppState
         AppState.activeNav.set(AppState.NavItem.HOME);
         AppState.role.set(AppState.Role.STUDENT);
-
-        // Call private initialize()
         callPrivate("initialize");
+    }
+
+    @AfterEach
+    void tearDown() {
+        AppState.activeNav.set(previousNav);
+        AppState.role.set(previousRole);
     }
 
     private void setPrivate(String field, Object value) {
@@ -160,9 +150,64 @@ class NavControllerTest {
     void testToggleButtonChangesIcon() {
         ToggleButton classBtn = (ToggleButton) getPrivate("classBtn");
         ImageView classIcon = (ImageView) getPrivate("classIcon");
+        Image classActive = (Image) getPrivate("classActive");
+        Image classInactive = (Image) getPrivate("classInactive");
 
         classBtn.setSelected(true);
+        assertSame(classActive, classIcon.getImage());
 
-        assertNotNull(classIcon.getImage());
+        classBtn.setSelected(false);
+        assertSame(classInactive, classIcon.getImage());
+    }
+
+    @Test
+    void testQuizAndAccountNavUpdateSelectionAndIcons() {
+        ToggleButton quizBtn = (ToggleButton) getPrivate("quizBtn");
+        ToggleButton accountBtn = (ToggleButton) getPrivate("accountBtn");
+        ImageView quizIcon = (ImageView) getPrivate("quizIcon");
+        ImageView accountIcon = (ImageView) getPrivate("accountIcon");
+        Label quizLabel = (Label) getPrivate("quizLabel");
+        Label accountLabel = (Label) getPrivate("accountLabel");
+
+        AppState.activeNav.set(AppState.NavItem.QUIZZES);
+
+        assertTrue(quizBtn.isSelected());
+        assertFalse(accountBtn.isSelected());
+        assertSame(getPrivate("quizActive"), quizIcon.getImage());
+        assertTrue(quizLabel.getStyle().contains("#3D8FEF"));
+
+        AppState.activeNav.set(AppState.NavItem.ACCOUNT);
+
+        assertTrue(accountBtn.isSelected());
+        assertFalse(quizBtn.isSelected());
+        assertSame(getPrivate("accountActive"), accountIcon.getImage());
+        assertTrue(accountLabel.getStyle().contains("#3D8FEF"));
+    }
+
+    @Test
+    void testNavigationHandlersUseNavigateToSeam() {
+        callPrivate("goHome");
+        assertEquals(AppState.Screen.HOME, controller.lastScreen);
+
+        callPrivate("goClass");
+        assertEquals(AppState.Screen.CLASSES, controller.lastScreen);
+
+        callPrivate("goFlash");
+        assertEquals(AppState.Screen.FLASHCARDS, controller.lastScreen);
+
+        callPrivate("goQuiz");
+        assertEquals(AppState.Screen.QUIZZES, controller.lastScreen);
+
+        callPrivate("goAccount");
+        assertEquals(AppState.Screen.ACCOUNT, controller.lastScreen);
+    }
+
+    private static final class TestableNavController extends NavController {
+        private AppState.Screen lastScreen;
+
+        @Override
+        void navigateTo(AppState.Screen screen) {
+            lastScreen = screen;
+        }
     }
 }

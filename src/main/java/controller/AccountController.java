@@ -59,7 +59,7 @@ public class AccountController {
      */
     @FXML
     private void onEditAccount() {
-        Navigator.go(AppState.Screen.ACCOUNT_EDIT);
+        navigateTo(AppState.Screen.ACCOUNT_EDIT);
     }
 
     /**
@@ -68,7 +68,7 @@ public class AccountController {
      */
     @FXML
     private void onChangePassword() {
-        Navigator.go(AppState.Screen.ACCOUNT_PASSWORD);
+        navigateTo(AppState.Screen.ACCOUNT_PASSWORD);
     }
 
     /**
@@ -77,7 +77,7 @@ public class AccountController {
      */
     @FXML
     private void onHelp() {
-        Navigator.go(AppState.Screen.ACCOUNT_HELP);
+        navigateTo(AppState.Screen.ACCOUNT_HELP);
     }
 
     /**
@@ -86,7 +86,7 @@ public class AccountController {
      */
     @FXML
     private void onAbout() {
-        Navigator.go(AppState.Screen.ACCOUNT_ABOUT);
+        navigateTo(AppState.Screen.ACCOUNT_ABOUT);
     }
 
     /**
@@ -103,7 +103,7 @@ public class AccountController {
         AppState.currentUser.set(null);
         
         // Navigate to login screen
-        Navigator.go(AppState.Screen.LOGIN);
+        navigateTo(AppState.Screen.LOGIN);
     }
 
     /**
@@ -172,10 +172,22 @@ public class AccountController {
             currentUser.setLanguage(language);
             
             // Save the updated preference to the database
-            userService.update(currentUser);
+            updateUser(currentUser);
         }
 
         // Reload the current screen to display content in the new language
+        reloadCurrentView();
+    }
+
+    void navigateTo(AppState.Screen screen) {
+        Navigator.go(screen);
+    }
+
+    void updateUser(User user) {
+        userService.update(user);
+    }
+
+    void reloadCurrentView() {
         Navigator.reloadCurrent();
     }
 }

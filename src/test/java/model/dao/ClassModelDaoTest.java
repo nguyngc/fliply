@@ -201,6 +201,48 @@ class ClassModelDaoTest {
         userDao.delete(student);
         userDao.delete(teacher);
     }
+
+    @Test
+    void persist_invalidClassModelRollsBackAndThrows() {
+        ClassModel invalid = new ClassModel();
+        invalid.setClassName("Class-" + UUID.randomUUID().toString().substring(0, 6));
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> classDao.persist(invalid));
+        assertNotNull(exception);
+    }
+
+    @Test
+    void update_invalidClassModelRollsBackAndLeavesStoredRecordUntouched() {
+        User teacher = newUser();
+        userDao.persist(teacher);
+
+        ClassModel classModel = newClass(teacher);
+        classDao.persist(classModel);
+        Integer classId = classModel.getClassId();
+
+        classModel.setTeacher(null);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> classDao.update(classModel));
+        assertNotNull(exception);
+
+        ClassModel reloaded = classDao.findById(classId);
+        assertNotNull(reloaded);
+        assertNotNull(reloaded.getTeacher());
+        assertTrue(reloaded.getClassName().startsWith("Class-"));
+
+        classDao.delete(reloaded);
+        userDao.delete(teacher);
+    }
+
+    @Test
+    void delete_invalidTransientClassModelRollsBackAndThrows() {
+        ClassModel invalid = new ClassModel();
+        invalid.setClassName("Class-" + UUID.randomUUID().toString().substring(0, 6));
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> classDao.delete(invalid));
+        assertNotNull(exception);
+    }
+
     @AfterEach
     void cleanupTestData() {
 
@@ -245,4 +287,3 @@ class ClassModelDaoTest {
 
 
 }
-

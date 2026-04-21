@@ -233,6 +233,63 @@ class FlashcardDaoTest {
         userDao.delete(creator);
         userDao.delete(teacher);
     }
+
+    @Test
+    void persist_invalidFlashcardRollsBackAndThrows() {
+        Flashcard invalid = new Flashcard();
+        invalid.setTerm("Term-" + UUID.randomUUID().toString().substring(0, 6));
+        invalid.setDefinition("Definition");
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> flashcardDao.persist(invalid));
+        assertNotNull(exception);
+    }
+
+    @Test
+    void update_invalidFlashcardRollsBackAndLeavesStoredRecordUntouched() {
+        User teacher = newUser("Teacher");
+        userDao.persist(teacher);
+
+        ClassModel clazz = newClass(teacher);
+        classDao.persist(clazz);
+
+        FlashcardSet flashcardSet = newSet(clazz);
+        setDao.persist(flashcardSet);
+
+        User creator = newUser("CardCreator");
+        userDao.persist(creator);
+
+        String term = "Term-" + UUID.randomUUID().toString().substring(0, 6);
+        Flashcard flashcard = newFlashcard(term, "Definition", flashcardSet, creator);
+        flashcardDao.persist(flashcard);
+        Integer flashcardId = flashcard.getFlashcardId();
+
+        flashcard.setUser(null);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> flashcardDao.update(flashcard));
+        assertNotNull(exception);
+
+        Flashcard reloaded = flashcardDao.find(flashcardId);
+        assertNotNull(reloaded);
+        assertEquals(term, reloaded.getTerm());
+        assertNotNull(reloaded.getUser());
+
+        flashcardDao.delete(reloaded);
+        setDao.delete(flashcardSet);
+        classDao.delete(clazz);
+        userDao.delete(creator);
+        userDao.delete(teacher);
+    }
+
+    @Test
+    void delete_invalidTransientFlashcardRollsBackAndThrows() {
+        Flashcard invalid = new Flashcard();
+        invalid.setTerm("Term-" + UUID.randomUUID().toString().substring(0, 6));
+        invalid.setDefinition("Definition");
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> flashcardDao.delete(invalid));
+        assertNotNull(exception);
+    }
+
     @AfterEach
     void cleanupTestData() {
 

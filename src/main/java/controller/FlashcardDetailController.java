@@ -71,7 +71,7 @@ public class FlashcardDetailController {
     @FXML
     private void initialize() {
         // Load localized strings for the current locale
-        localizedStrings = LocalizationService.getLocalizedStrings();
+        localizedStrings = loadLocalizedStrings();
         
         // Determine if we're viewing from a flashcard set or general flashcards
         boolean isFromFlashcardSet = AppState.isFromFlashcardSet.get();
@@ -101,11 +101,11 @@ public class FlashcardDetailController {
             // Configure based on navigation context
             if (isFromFlashcardSet) {
                 // Viewing from a flashcard set - limited actions
-                headerController.setOnBack(() -> Navigator.go(AppState.Screen.FLASHCARD_SET));
+                headerController.setOnBack(() -> navigateTo(AppState.Screen.FLASHCARD_SET));
                 headerController.setActionsVisible(false);
             } else {
                 // Viewing from flashcards screen - full actions enabled
-                headerController.setOnBack(() -> Navigator.go(AppState.Screen.FLASHCARDS));
+                headerController.setOnBack(() -> navigateTo(AppState.Screen.FLASHCARDS));
                 headerController.setActionsVisible(true);
 
                 // ========== Configure Edit Action ==========
@@ -124,7 +124,7 @@ public class FlashcardDetailController {
 
                     // Navigate to flashcard form
                     AppState.navOverride.set(AppState.NavItem.FLASHCARDS);
-                    Navigator.go(AppState.Screen.FLASHCARD_FORM);
+                    navigateTo(AppState.Screen.FLASHCARD_FORM);
                 });
 
                 // ========== Configure Delete Action ==========
@@ -140,45 +140,46 @@ public class FlashcardDetailController {
 
                     // Delete from database first
                     try {
-                        flashcardService.delete(toRemove);
+                        deleteFlashcard(toRemove);
                     } catch (Exception ex) {
                         // Show error dialog if delete fails
-                        Alert a = new Alert(Alert.AlertType.ERROR,
-                                "Delete failed. Could not delete flashcard from database.");
-                        a.showAndWait();
+                        showDeleteError();
                         return;
                     }
 
-                    // Remove from global app state lists by ID to avoid stale object-reference issues
-                    AppState.currentDetailList.removeIf(c ->
-                            c != null && toRemoveId != null && toRemoveId.equals(c.getFlashcardId()));
+                    // Remove the card from app state, matching by ID when available and
+                    // falling back to object identity for transient in-memory cards.
+                    AppState.currentDetailList.removeIf(c -> matchesCard(c, toRemove, toRemoveId));
 
                     // Remove from selected flashcard set if applicable
                     FlashcardSet selectedSet = AppState.selectedFlashcardSet.get();
                     if (selectedSet != null) {
-                        selectedSet.getCards().removeIf(c ->
-                                c != null && toRemoveId != null && toRemoveId.equals(c.getFlashcardId()));
+                        selectedSet.getCards().removeIf(c -> matchesCard(c, toRemove, toRemoveId));
                     }
 
                     // Remove from user's general flashcard list
-                    AppState.myFlashcards.removeIf(c ->
-                            c != null && toRemoveId != null && toRemoveId.equals(c.getFlashcardId()));
+                    AppState.myFlashcards.removeIf(c -> matchesCard(c, toRemove, toRemoveId));
 
                     // Refresh local list with updated state
                     cards.clear();
                     cards.addAll(AppState.currentDetailList);
 
-                    String successMessage = localizedStrings.getOrDefault(
-                            "flashcardDetail.delete.success",
-                            "Flashcard deleted successfully.");
-                    Alert success = new Alert(Alert.AlertType.INFORMATION, successMessage);
-                    success.setTitle(localizedStrings.getOrDefault("flashcardForm.alertTitle", "Flashcard"));
-                    success.setHeaderText(null);
-                    success.showAndWait();
+                    showDeleteSuccess();
 
-                    // After deleting a card from My Flashcards, return to the list screen.
-                    AppState.navOverride.set(AppState.NavItem.FLASHCARDS);
-                    Navigator.go(AppState.Screen.FLASHCARDS);
+                    // If no cards remain, return to the flashcards list.
+                    if (cards.isEmpty()) {
+                        AppState.navOverride.set(AppState.NavItem.FLASHCARDS);
+                        navigateTo(AppState.Screen.FLASHCARDS);
+                        return;
+                    }
+
+                    // Clamp the current index so the next available card stays visible.
+                    int maxIndex = cards.size() - 1;
+                    index = maxIndex < 0 ? 0 : Math.clamp(idx, 0, maxIndex);
+                    AppState.currentDetailIndex.set(index);
+
+                    render();
+                    updateNavButtons();
                 });
             }
         }
@@ -256,6 +257,61 @@ public class FlashcardDetailController {
             render();
             updateNavButtons();
         }
+    }
+
+    // ========== Helper Methods ==========
+    /** Loads localized strings from the resource bundle for the current locale.
+     * Returns a map of key-value pairs for string lookup.
+     */
+    Map<String, String> loadLocalizedStrings() {
+        return LocalizationService.getLocalizedStrings();
+    }
+
+    /** Navigates to the specified screen using the Navigator utility.
+     * @param screen The target screen to navigate to.
+     */
+    void navigateTo(AppState.Screen screen) {
+        Navigator.go(screen);
+    }
+
+    /** Deletes the specified flashcard from the database using the FlashcardService.
+     * @param card The flashcard to delete.
+     * @throws Exception if the delete operation fails.
+     */
+    void deleteFlashcard(Flashcard card) {
+        flashcardService.delete(card);
+    }
+
+    /** Shows an error alert if the flashcard delete operation fails.
+     * Displays a localized error message to the user.
+     */
+    void showDeleteError() {
+        Alert a = new Alert(Alert.AlertType.ERROR,
+                "Delete failed. Could not delete flashcard from database.");
+        a.showAndWait();
+    }
+
+    /** Shows a success alert after a flashcard is successfully deleted.
+     * Displays a localized success message to the user.
+     */
+    void showDeleteSuccess() {
+        String successMessage = localizedStrings.getOrDefault(
+                "flashcardDetail.delete.success",
+                "Flashcard deleted successfully.");
+        Alert success = new Alert(Alert.AlertType.INFORMATION, successMessage);
+        success.setTitle(localizedStrings.getOrDefault("flashcardForm.alertTitle", "Flashcard"));
+        success.setHeaderText(null);
+        success.showAndWait();
+    }
+
+    private boolean matchesCard(Flashcard candidate, Flashcard target, Integer targetId) {
+        if (candidate == null || target == null) {
+            return false;
+        }
+        if (targetId != null) {
+            return targetId.equals(candidate.getFlashcardId());
+        }
+        return candidate == target;
     }
 
 }

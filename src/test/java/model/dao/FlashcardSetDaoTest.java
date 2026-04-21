@@ -107,6 +107,52 @@ class FlashcardSetDaoTest {
         userDao.delete(teacher);
     }
 
+    @Test
+    void persist_invalidFlashcardSetRollsBackAndThrows() {
+        FlashcardSet invalid = new FlashcardSet();
+        invalid.setSubject("Subject-" + UUID.randomUUID().toString().substring(0, 6));
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> setDao.persist(invalid));
+        assertNotNull(exception);
+    }
+
+    @Test
+    void update_invalidFlashcardSetRollsBackAndLeavesStoredRecordUntouched() {
+        User teacher = newUser();
+        userDao.persist(teacher);
+
+        ClassModel clazz = newClass(teacher);
+        classDao.persist(clazz);
+
+        String subject = "Subject-" + UUID.randomUUID().toString().substring(0, 6);
+        FlashcardSet flashcardSet = newSet(clazz, subject);
+        setDao.persist(flashcardSet);
+        Integer setId = flashcardSet.getFlashcardSetId();
+
+        flashcardSet.setClassModel(null);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> setDao.update(flashcardSet));
+        assertNotNull(exception);
+
+        FlashcardSet reloaded = setDao.find(setId);
+        assertNotNull(reloaded);
+        assertEquals(subject, reloaded.getSubject());
+        assertNotNull(reloaded.getClassModel());
+
+        setDao.delete(reloaded);
+        classDao.delete(clazz);
+        userDao.delete(teacher);
+    }
+
+    @Test
+    void delete_invalidTransientFlashcardSetRollsBackAndThrows() {
+        FlashcardSet invalid = new FlashcardSet();
+        invalid.setSubject("Subject-" + UUID.randomUUID().toString().substring(0, 6));
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> setDao.delete(invalid));
+        assertNotNull(exception);
+    }
+
     @AfterEach
     void cleanupTestData() {
 

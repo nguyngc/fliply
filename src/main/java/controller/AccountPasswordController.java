@@ -53,7 +53,7 @@ public class AccountPasswordController {
         headerController.setBackVisible(true);
         headerController.setTitle(rb.getString("pwd.header.title"));
         headerController.setSubtitle("");
-        headerController.setOnBack(() -> Navigator.go(AppState.Screen.ACCOUNT));
+        headerController.setOnBack(() -> navigateTo(AppState.Screen.ACCOUNT));
         
         // Apply styling variant based on whether the user is a teacher or student
         headerController.applyVariant(AppState.isTeacher()
@@ -106,10 +106,10 @@ public class AccountPasswordController {
 
         // Update the user's password and save to database
         user.setPassword(newPwd);
-        userService.update(user);
+        updateUser(user);
         
         // Navigate back to account screen after successful password change
-        Navigator.go(AppState.Screen.ACCOUNT);
+        navigateTo(AppState.Screen.ACCOUNT);
 
     }
 
@@ -119,7 +119,7 @@ public class AccountPasswordController {
      */
     @FXML
     private void onCancel() {
-        Navigator.go(AppState.Screen.ACCOUNT);
+        navigateTo(AppState.Screen.ACCOUNT);
     }
 
     /**
@@ -142,5 +142,13 @@ public class AccountPasswordController {
         errorLabel.setText("");
         errorLabel.setVisible(false);
         errorLabel.setManaged(false);
+    }
+
+    void updateUser(User user) {
+        userService.update(user);
+    }
+
+    void navigateTo(AppState.Screen screen) {
+        Navigator.go(screen);
     }
 }

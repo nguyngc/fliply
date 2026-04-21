@@ -90,6 +90,48 @@ class QuizDaoTest {
         userDao.delete(user);
     }
 
+    @Test
+    void persist_invalidQuizRollsBackAndThrows() {
+        Quiz invalid = new Quiz();
+        invalid.setNoOfQuestions(10);
+        invalid.setUser(null);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> quizDao.persist(invalid));
+        assertNotNull(exception);
+    }
+
+    @Test
+    void update_invalidQuizRollsBackAndLeavesStoredRecordUntouched() {
+        User user = newUser();
+        userDao.persist(user);
+
+        Quiz quiz = newQuiz(user, 12);
+        quizDao.persist(quiz);
+        Integer quizId = quiz.getQuizId();
+
+        quiz.setUser(null);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> quizDao.update(quiz));
+        assertNotNull(exception);
+
+        Quiz reloaded = quizDao.find(quizId);
+        assertNotNull(reloaded);
+        assertEquals(12, reloaded.getNoOfQuestions());
+        assertNotNull(reloaded.getUser());
+
+        quizDao.delete(reloaded);
+        userDao.delete(user);
+    }
+
+    @Test
+    void delete_invalidTransientQuizRollsBackAndThrows() {
+        Quiz invalid = new Quiz();
+        invalid.setNoOfQuestions(5);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> quizDao.delete(invalid));
+        assertNotNull(exception);
+    }
+
     @AfterEach
     void cleanupTestData() {
 

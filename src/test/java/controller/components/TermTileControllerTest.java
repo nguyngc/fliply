@@ -64,10 +64,22 @@ class TermTileControllerTest {
         assertTrue(selected[0]);
     }
 
+    @Test
+    void onClickWithoutSelectionCallbackDoesNothing() {
+        assertDoesNotThrow(() -> callPrivate("onClick"));
+    }
+
+    @Test
+    void setStateHandlesMissingButton() {
+        TermTileController detachedController = new TermTileController();
+
+        assertDoesNotThrow(() -> detachedController.setState(TermTileController.State.READ));
+        assertEquals(TermTileController.State.READ, detachedController.getState());
+    }
+
     private void callPrivate(String method) throws Exception {
         Method m = TermTileController.class.getDeclaredMethod(method);
         m.setAccessible(true);
         m.invoke(controller);
     }
 }
-

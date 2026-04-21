@@ -51,7 +51,7 @@ public class ClassDetailController {
         if (c == null) {
             headerController.setTitle(rb.getString("class.title"));
             headerController.setBackVisible(true);
-            headerController.setOnBack(() -> Navigator.go(AppState.Screen.CLASSES));
+            headerController.setOnBack(() -> navigateTo(AppState.Screen.CLASSES));
             return;
         }
 
@@ -70,10 +70,10 @@ public class ClassDetailController {
         
         // Configure back button to navigate back to classes list
         headerController.setBackVisible(true);
-        headerController.setOnBack(() -> Navigator.go(AppState.Screen.CLASSES));
+        headerController.setOnBack(() -> navigateTo(AppState.Screen.CLASSES));
 
         // Load and display all flashcard sets for this class
-        List<FlashcardSet> sets = flashcardSetService.getSetsByClass(c.getClassId());
+        List<FlashcardSet> sets = loadSetsForClass(c.getClassId());
         renderSets(sets);
     }
 
@@ -106,11 +106,19 @@ public class ClassDetailController {
             // Add click handler to open the flashcard set when button is clicked
             btn.setOnAction(e -> {
                 AppState.selectedFlashcardSet.set(set);
-                Navigator.go(AppState.Screen.FLASHCARD_SET);
+                navigateTo(AppState.Screen.FLASHCARD_SET);
             });
 
             // Add the button to the list
             flashcardSetListBox.getChildren().add(btn);
         }
+    }
+
+    List<FlashcardSet> loadSetsForClass(int classId) {
+        return flashcardSetService.getSetsByClass(classId);
+    }
+
+    void navigateTo(AppState.Screen screen) {
+        Navigator.go(screen);
     }
 }

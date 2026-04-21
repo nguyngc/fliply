@@ -7,8 +7,12 @@ import model.AppState;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ListResourceBundle;
+import java.util.ResourceBundle;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -55,6 +59,29 @@ class AccountHeaderSupportTest {
         assertTrue(((Button) getHeaderField("backButton")).isVisible());
     }
 
+    @Test
+    void configureUsesProvidedResourcesWhenPresent() {
+        ResourceBundle bundle = new ListResourceBundle() {
+            @Override
+            protected Object[][] getContents() {
+                return new Object[][]{{"custom.header.title", "Custom Header"}};
+            }
+        };
+
+        AccountHeaderSupport.configure(header, bundle, "custom.header.title", null);
+
+        assertEquals("Custom Header", ((Label) getHeaderField("titleLabel")).getText());
+    }
+
+    @Test
+    void utilityConstructorThrows() throws Exception {
+        Constructor<AccountHeaderSupport> constructor = AccountHeaderSupport.class.getDeclaredConstructor();
+        constructor.setAccessible(true);
+
+        InvocationTargetException thrown = assertThrows(InvocationTargetException.class, constructor::newInstance);
+        assertInstanceOf(UnsupportedOperationException.class, thrown.getCause());
+    }
+
     private void injectHeaderField(String field, Object value) {
         try {
             Field f = HeaderController.class.getDeclaredField(field);
@@ -85,6 +112,5 @@ class AccountHeaderSupportTest {
         }
     }
 }
-
 
 

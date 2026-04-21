@@ -1,5 +1,9 @@
 package model.dao;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
 import model.entity.*;
 import org.junit.jupiter.api.*;
 
@@ -7,6 +11,8 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 class QuizDetailsDaoTest {
 
@@ -200,6 +206,54 @@ class QuizDetailsDaoTest {
     }
 
     @Test
+    void findByFlashcardId_andDeleteByFlashcardId() {
+        User teacher = newUser("Teacher");
+        userDao.persist(teacher);
+
+        ClassModel c = newClass(teacher);
+        classDao.persist(c);
+
+        FlashcardSet fs = newSet(c);
+        setDao.persist(fs);
+
+        User cardCreator = newUser("CardCreator");
+        userDao.persist(cardCreator);
+        Flashcard f = newFlashcard(fs, cardCreator, "DeleteByFlash-" + UUID.randomUUID().toString().substring(0, 6));
+        flashcardDao.persist(f);
+
+        User quizTaker = newUser("QuizTaker");
+        userDao.persist(quizTaker);
+        Quiz q1 = newQuiz(quizTaker, 3);
+        Quiz q2 = newQuiz(quizTaker, 4);
+        quizDao.persist(q1);
+        quizDao.persist(q2);
+
+        QuizDetails qd1 = newQuizDetails(q1, f);
+        QuizDetails qd2 = newQuizDetails(q2, f);
+        quizDetailsDao.persist(qd1);
+        quizDetailsDao.persist(qd2);
+
+        List<QuizDetails> byFlashcard = quizDetailsDao.findByFlashcardId(f.getFlashcardId());
+        assertEquals(2, byFlashcard.size());
+        assertTrue(byFlashcard.stream().allMatch(qd -> qd.getFlashcard().getFlashcardId().equals(f.getFlashcardId())));
+
+        quizDetailsDao.deleteByFlashcardId(f.getFlashcardId());
+
+        assertTrue(quizDetailsDao.findByFlashcardId(f.getFlashcardId()).isEmpty());
+        assertFalse(quizDetailsDao.exists(q1.getQuizId(), f.getFlashcardId()));
+        assertFalse(quizDetailsDao.exists(q2.getQuizId(), f.getFlashcardId()));
+
+        quizDao.delete(q1);
+        quizDao.delete(q2);
+        flashcardDao.delete(f);
+        setDao.delete(fs);
+        classDao.delete(c);
+        userDao.delete(quizTaker);
+        userDao.delete(cardCreator);
+        userDao.delete(teacher);
+    }
+
+    @Test
     void emptyQueriesReturnNoMatches() {
         assertTrue(quizDetailsDao.findByQuizId(999999).isEmpty());
         assertFalse(quizDetailsDao.exists(999999, 999999));
@@ -219,6 +273,91 @@ class QuizDetailsDaoTest {
 
         RuntimeException exception = assertThrows(RuntimeException.class, () -> quizDetailsDao.delete(invalid));
         assertNotNull(exception);
+    }
+
+    @Test
+    void delete_managedQuizDetails_skipsMergeAndCommits() {
+        EntityManager em = mock(EntityManager.class);
+        EntityTransaction tx = mock(EntityTransaction.class);
+        QuizDetails managed = new QuizDetails();
+        QuizDetailsDao dao = new QuizDetailsDao() {
+            @Override
+            EntityManager createEntityManager() {
+                return em;
+            }
+        };
+
+        when(em.getTransaction()).thenReturn(tx);
+        when(em.contains(managed)).thenReturn(true);
+
+        dao.delete(managed);
+
+        verify(tx).begin();
+        verify(em, never()).merge(any());
+        verify(em).remove(managed);
+        verify(tx).commit();
+        verify(tx, never()).rollback();
+        verify(em).close();
+    }
+
+    @Test
+    void deleteByFlashcardId_whenNoRowsExist_doesNotThrow() {
+        assertDoesNotThrow(() -> quizDetailsDao.deleteByFlashcardId(999999));
+        assertTrue(quizDetailsDao.findByFlashcardId(999999).isEmpty());
+    }
+
+    @Test
+    void deleteByFlashcardId_queryFailure_rollsBackAndThrows() {
+        EntityManager em = mock(EntityManager.class);
+        EntityTransaction tx = mock(EntityTransaction.class);
+        Query deleteQuery = mock(Query.class);
+        RuntimeException failure = new RuntimeException("delete failed");
+        QuizDetailsDao dao = new QuizDetailsDao() {
+            @Override
+            EntityManager createEntityManager() {
+                return em;
+            }
+        };
+
+        when(em.getTransaction()).thenReturn(tx);
+        when(em.createQuery("DELETE FROM QuizDetails qd WHERE qd.flashcard.flashcardId = :fid"))
+                .thenReturn(deleteQuery);
+        when(deleteQuery.setParameter("fid", 77)).thenReturn(deleteQuery);
+        when(deleteQuery.executeUpdate()).thenThrow(failure);
+
+        RuntimeException thrown = assertThrows(RuntimeException.class, () -> dao.deleteByFlashcardId(77));
+        assertSame(failure, thrown);
+
+        verify(tx).begin();
+        verify(tx).rollback();
+        verify(tx, never()).commit();
+        verify(em).close();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Test
+    void exists_nullCount_returnsFalse() {
+        EntityManager em = mock(EntityManager.class);
+        TypedQuery<Long> countQuery = mock(TypedQuery.class);
+        QuizDetailsDao dao = new QuizDetailsDao() {
+            @Override
+            EntityManager createEntityManager() {
+                return em;
+            }
+        };
+
+        when(em.createQuery(
+                "SELECT COUNT(qd) FROM QuizDetails qd " +
+                        "WHERE qd.quiz.quizId = :qid AND qd.flashcard.flashcardId = :fid",
+                Long.class
+        )).thenReturn(countQuery);
+        when(countQuery.setParameter("qid", 13)).thenReturn(countQuery);
+        when(countQuery.setParameter("fid", 29)).thenReturn(countQuery);
+        when(countQuery.getSingleResult()).thenReturn(null);
+
+        assertFalse(dao.exists(13, 29));
+
+        verify(em).close();
     }
 
     @AfterEach

@@ -143,6 +143,52 @@ class StudyDaoTest {
         studyDao.delete(s);
     }
 
+    @Test
+    void persist_invalidStudyRollsBackAndThrows() {
+        Study invalid = new Study();
+        invalid.setStatistic(1);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> studyDao.persist(invalid));
+        assertNotNull(exception);
+    }
+
+    @Test
+    void update_invalidStudyRollsBackAndLeavesStoredRecordUntouched() {
+        User user = newUser();
+        userDao.persist(user);
+
+        ClassModel clazz = newClass(user);
+        classDao.persist(clazz);
+
+        FlashcardSet flashcardSet = newSet(clazz);
+        setDao.persist(flashcardSet);
+
+        Study study = newStudy(user, flashcardSet, 4);
+        studyDao.persist(study);
+        Integer studyId = study.getStudyId();
+
+        study.setUser(null);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> studyDao.update(study));
+        assertNotNull(exception);
+
+        Study reloaded = studyDao.find(studyId);
+        assertNotNull(reloaded);
+        assertEquals(4, reloaded.getStatistic());
+        assertNotNull(reloaded.getUser());
+
+        studyDao.delete(reloaded);
+    }
+
+    @Test
+    void delete_invalidTransientStudyRollsBackAndThrows() {
+        Study invalid = new Study();
+        invalid.setStatistic(2);
+
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> studyDao.delete(invalid));
+        assertNotNull(exception);
+    }
+
     @AfterEach
     void cleanupTestData() {
 

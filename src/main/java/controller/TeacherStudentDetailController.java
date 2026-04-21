@@ -44,20 +44,24 @@ public class TeacherStudentDetailController {
 
         // Guard against stale navigation state; return to class detail if required context is missing.
         if (s == null || c == null) {
-            Navigator.go(AppState.Screen.TEACHER_CLASS_DETAIL);
+            navigateTo(AppState.Screen.TEACHER_CLASS_DETAIL);
             return;
         }
         if (c.getClassId() == null) {
-            Navigator.go(AppState.Screen.TEACHER_CLASS_DETAIL);
+            navigateTo(AppState.Screen.TEACHER_CLASS_DETAIL);
             return;
         }
-        c = classDetailsService.reloadClass(c.getClassId());
+        c = reloadClass(c.getClassId());
+        if (c == null) {
+            navigateTo(AppState.Screen.TEACHER_CLASS_DETAIL);
+            return;
+        }
         AppState.selectedClass.set(c);
 
         headerController.setBackVisible(true);
         headerController.setTitle(s.getFirstName() + " " + s.getLastName());
         headerController.setSubtitle(s.getEmail());
-        headerController.setOnBack(() -> Navigator.go(AppState.Screen.TEACHER_CLASS_DETAIL));
+        headerController.setOnBack(() -> navigateTo(AppState.Screen.TEACHER_CLASS_DETAIL));
         headerController.applyVariant(HeaderController.Variant.TEACHER);
 
         AppState.navOverride.set(AppState.NavItem.CLASSES);
@@ -74,16 +78,13 @@ public class TeacherStudentDetailController {
         User student = AppState.selectedStudent.get();
 
         for (FlashcardSet set : c.getFlashcardSets()) {
-            int totalCards = set.getTotalCards().size();
+            int totalCards = set.getTotalCards() == null ? 0 : set.getTotalCards().size();
 
-            // Service returns percentage in [0..100].
-            double pct = studyService.getProgressPercent(student, set);
+            // Service returns normalized progress in [0..1].
+            double progress = normalizeProgress(getProgressPercent(student, set));
 
             // Convert percentage to an approximate learned-card count for the "x/y" label.
-            int learnedCards = (int) Math.round((pct / 100.0) * totalCards);
-
-            // JavaFX ProgressBar expects normalized progress in [0..1].
-            double progress = pct / 100.0;
+            int learnedCards = (int) Math.round(progress * totalCards);
 
             String title = set.getSubject() + " (" + learnedCards + "/" + totalCards + ")";
 
@@ -125,5 +126,43 @@ public class TeacherStudentDetailController {
 
         rowCard.getChildren().addAll(top, right, bar);
         progressListBox.getChildren().add(rowCard);
+    }
+
+    // ========== Helper Methods ==========
+    /** Reloads the class from the database to ensure we have the latest flashcard set information.
+     * This is necessary because the progress calculation relies on up-to-date flashcard data.
+     * @param classId the ID of the class to reload
+     * @return a fresh ClassModel instance with updated flashcard sets, or null if loading fails
+     */
+    ClassModel reloadClass(int classId) {
+        return classDetailsService.reloadClass(classId);
+    }
+
+    /** Retrieves the student's progress percentage for the given flashcard set from the StudyService.
+     * @param student the student whose progress to retrieve
+     * @param set the flashcard set to calculate progress for
+     * @return a normalized progress value in [0..1], where 0 means no progress and 1 means fully completed
+     */
+    double getProgressPercent(User student, FlashcardSet set) {
+        return studyService.getProgressPercent(student, set);
+    }
+
+    /** Navigates to the specified screen using the Navigator.
+     * @param screen the screen to navigate to
+     */
+    void navigateTo(AppState.Screen screen) {
+        Navigator.go(screen);
+    }
+
+    /** Normalizes the progress value to ensure it falls within the range [0..1].
+     * This guards against any unexpected values returned by the StudyService (e.g., due to data issues).
+     * @param progress the raw progress value to normalize
+     * @return a normalized progress value in [0..1]
+     */
+    double normalizeProgress(double progress) {
+        if (Double.isNaN(progress) || Double.isInfinite(progress)) {
+            return 0.0;
+        }
+        return Math.max(0.0, Math.min(1.0, progress));
     }
 }

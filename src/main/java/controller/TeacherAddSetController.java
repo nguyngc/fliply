@@ -3,6 +3,7 @@ package controller;
 import controller.components.HeaderController;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
@@ -13,6 +14,7 @@ import model.entity.User;
 import model.service.ClassDetailsService;
 import model.service.FlashcardService;
 import model.service.FlashcardSetService;
+import util.Dialogs;
 import util.FlashcardFileParser;
 import util.LocalizationService;
 import view.Navigator;
@@ -65,7 +67,7 @@ public class TeacherAddSetController {
     @FXML
     private void initialize() {
         // Load localized strings for the current locale
-        localizedStrings = LocalizationService.getLocalizedStrings();
+        localizedStrings = loadLocalizedStrings();
         
         // Set the header title
         headerController.setTitle(localizedStrings.get("teacherAddSet.title"));
@@ -74,7 +76,7 @@ public class TeacherAddSetController {
         headerController.setBackVisible(true);
         
         // Set back button to navigate to teacher class detail screen
-        headerController.setOnBack(() -> Navigator.go(AppState.Screen.TEACHER_CLASS_DETAIL));
+        headerController.setOnBack(() -> navigateTo(AppState.Screen.TEACHER_CLASS_DETAIL));
     }
 
     /**
@@ -86,11 +88,7 @@ public class TeacherAddSetController {
     private void onUpload() {
         // ========== Open File Chooser ==========
         // Create a file chooser dialog
-        FileChooser chooser = new FileChooser();
-        // Filter to show only CSV files
-        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV", "*.csv"));
-        // Show the file chooser dialog
-        selectedFile = chooser.showOpenDialog(null);
+        selectedFile = chooseFile();
 
         // If user cancelled the file chooser
         if (selectedFile == null) return;
@@ -98,7 +96,7 @@ public class TeacherAddSetController {
         // ========== Parse File ==========
         try {
             // Read all lines from the selected file
-            List<String> lines = Files.readAllLines(selectedFile.toPath());
+            List<String> lines = readAllLines(selectedFile);
             // Calculate number of cards (total lines minus 1 for header row)
             parsedCount = Math.max(0, lines.size() - 1);
 
@@ -123,49 +121,49 @@ public class TeacherAddSetController {
     @FXML
     private void onAdd() {
         try {
-            // ========== Validate File ==========
-            // Check if a file has been selected
-            if (selectedFile == null) return;
+            // ========== Validate Required Inputs ==========
+            String subject = subjectField.getText() == null ? "" : subjectField.getText().trim();
+            String validationError = validateRequiredInput(selectedFile, subject);
+            if (validationError != null) {
+                showWarning(validationError);
+                return;
+            }
 
             // ========== Parse Flashcards from File ==========
             // Parse the CSV file to extract flashcard data
-            List<FlashcardFileParser.ParsedCard> cards = FlashcardFileParser.parse(selectedFile);
-            // If no cards were parsed, return early
-            if (cards.isEmpty()) return;
+            List<FlashcardFileParser.ParsedCard> cards = parseSelectedFile(selectedFile);
+            // If no cards were parsed, return early with feedback
+            if (cards.isEmpty()) {
+                showWarning(message(
+                        "teacherAddSet.warning.emptyFile",
+                        "The uploaded file does not contain any flashcards."
+                ));
+                return;
+            }
 
             // ========== Get Selected Class ==========
             // Retrieve the class from app state
             ClassModel c = AppState.selectedClass.get();
             if (c == null) return;
 
-            // ========== Validate Subject Name ==========
-            // Get and trim the subject name from the input field
-            String subject = subjectField.getText() == null ? "" : subjectField.getText().trim();
-            // Check that subject is not empty
-            if (subject.isBlank()) return;
-
             // ========== Create Flashcard Set ==========
             // Create a new flashcard set with the provided subject name
-            final FlashcardSetService flashcardSetService = new FlashcardSetService();
-            FlashcardSet set = flashcardSetService.createSet(subject, c);
+            FlashcardSet set = createSet(subject, c);
 
             // ========== Import Flashcards ==========
             // Get the current teacher user
             User teacher = AppState.currentUser.get();
-            final FlashcardService flashcardService = new FlashcardService();
-            
             // Create a flashcard for each parsed card from the file
             for (FlashcardFileParser.ParsedCard card : cards) {
-                flashcardService.createFlashcard(card.term(), card.definition(), set, teacher);
+                createFlashcard(card.term(), card.definition(), set, teacher);
             }
 
             // ========== Reload Class and Navigate ==========
             // Reload the class details to reflect the new flashcard set
-            ClassDetailsService classDetailsService = new ClassDetailsService();
-            AppState.selectedClass.set(classDetailsService.reloadClass(c.getClassId()));
+            AppState.selectedClass.set(reloadClass(c.getClassId()));
 
             // Navigate back to the teacher class detail screen
-            Navigator.go(AppState.Screen.TEACHER_CLASS_DETAIL);
+            navigateTo(AppState.Screen.TEACHER_CLASS_DETAIL);
         } catch (Exception ex) {
             LOGGER.log(Level.WARNING, "Error while adding flashcard set", ex);
         }
@@ -177,6 +175,111 @@ public class TeacherAddSetController {
      */
     @FXML
     private void onCancel() {
-        Navigator.go(AppState.Screen.TEACHER_CLASS_DETAIL);
+        navigateTo(AppState.Screen.TEACHER_CLASS_DETAIL);
+    }
+
+    // ========== Helper Methods ==========
+    /** Loads localized strings from the resource bundle for the current locale.
+     *
+     * @return A map of localization keys to their corresponding localized strings.
+     */
+    Map<String, String> loadLocalizedStrings() {
+        return LocalizationService.getLocalizedStrings();
+    }
+
+    /** Opens a file chooser dialog for selecting a CSV file.
+     *
+     * @return The selected File object, or null if the user cancels the dialog.
+     */
+    File chooseFile() {
+        FileChooser chooser = new FileChooser();
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV", "*.csv"));
+        return chooser.showOpenDialog(null);
+    }
+
+    /** Reads all lines from the given file.
+     *
+     * @param file The file to read from.
+     * @return A list of strings, each representing a line from the file.
+     * @throws Exception If an error occurs while reading the file.
+     */
+    List<String> readAllLines(File file) throws Exception {
+        return Files.readAllLines(file.toPath());
+    }
+
+    /** Parses the selected CSV file to extract flashcard data.
+     *
+     * @param file The CSV file to parse.
+     * @return A list of ParsedCard objects containing term and definition pairs.
+     * @throws Exception If an error occurs during parsing.
+     */
+    List<FlashcardFileParser.ParsedCard> parseSelectedFile(File file) throws Exception {
+        return FlashcardFileParser.parse(file);
+    }
+
+    /** Creates a new flashcard set with the given subject name and associates it with the specified class.
+     *
+     * @param subject The subject name for the flashcard set.
+     * @param classModel The class to associate the flashcard set with.
+     * @return The created FlashcardSet object.
+     */
+    FlashcardSet createSet(String subject, ClassModel classModel) {
+        FlashcardSetService flashcardSetService = new FlashcardSetService();
+        return flashcardSetService.createSet(subject, classModel);
+    }
+
+    /** Creates a new flashcard with the given term and definition, associates it with the specified flashcard set, and records the teacher who created it.
+     *
+     * @param term The term for the flashcard.
+     * @param definition The definition for the flashcard.
+     * @param set The flashcard set to associate the flashcard with.
+     * @param teacher The user who is creating the flashcard (should be a teacher).
+     */
+    void createFlashcard(String term, String definition, FlashcardSet set, User teacher) {
+        FlashcardService flashcardService = new FlashcardService();
+        flashcardService.createFlashcard(term, definition, set, teacher);
+    }
+
+    /** Reloads the class details for the given class ID to reflect any changes made (e.g., new flashcard set).
+     *
+     * @param classId The ID of the class to reload.
+     * @return The reloaded ClassModel object with updated details.
+     */
+    ClassModel reloadClass(int classId) {
+        ClassDetailsService classDetailsService = new ClassDetailsService();
+        return classDetailsService.reloadClass(classId);
+    }
+
+    /** Navigates to the specified screen using the Navigator.
+     *
+     * @param screen The screen to navigate to.
+     */
+    void navigateTo(AppState.Screen screen) {
+        Navigator.go(screen);
+    }
+
+    String validateRequiredInput(File file, String subject) {
+        if (file == null || subject == null || subject.isBlank()) {
+            return message(
+                    "teacherAddSet.warning.missingInfo",
+                    "Please enter a subject and upload a flashcard file."
+            );
+        }
+        return null;
+    }
+
+    String message(String key, String fallback) {
+        if (localizedStrings == null) {
+            return fallback;
+        }
+        return localizedStrings.getOrDefault(key, fallback);
+    }
+
+    void showWarning(String message) {
+        Dialogs.show(
+                Alert.AlertType.WARNING,
+                message("teacherAddSet.alertTitle", "Flashcard Set"),
+                message
+        );
     }
 }

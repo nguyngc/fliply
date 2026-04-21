@@ -9,8 +9,12 @@ import java.util.List;
 
 public class QuizDetailsDao {
 
+    EntityManager createEntityManager() {
+        return MariaDbJPAConnection.createEntityManager();
+    }
+
     public void persist(QuizDetails quizDetails) {
-        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+        try (EntityManager em = createEntityManager()) {
             em.getTransaction().begin();
             try {
                 em.persist(quizDetails);
@@ -23,20 +27,20 @@ public class QuizDetailsDao {
     }
 
     public QuizDetails find(int quizDetailsId) {
-        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+        try (EntityManager em = createEntityManager()) {
             return em.find(QuizDetails.class, Integer.valueOf(quizDetailsId));
         }
     }
 
     public List<QuizDetails> findAll() {
-        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+        try (EntityManager em = createEntityManager()) {
             return em.createQuery("SELECT qd FROM QuizDetails qd", QuizDetails.class)
                     .getResultList();
         }
     }
 
     public void delete(QuizDetails quizDetails) {
-        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+        try (EntityManager em = createEntityManager()) {
             em.getTransaction().begin();
             try {
                 if (!em.contains(quizDetails)) {
@@ -52,7 +56,7 @@ public class QuizDetailsDao {
     }
 
     public List<QuizDetails> findByQuizId(int quizId) {
-        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+        try (EntityManager em = createEntityManager()) {
             TypedQuery<QuizDetails> q = em.createQuery(
                     "SELECT qd FROM QuizDetails qd WHERE qd.quiz.quizId = :qid",
                     QuizDetails.class
@@ -63,7 +67,7 @@ public class QuizDetailsDao {
     }
 
     public List<QuizDetails> findByFlashcardId(int flashcardId) {
-        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+        try (EntityManager em = createEntityManager()) {
             TypedQuery<QuizDetails> q = em.createQuery(
                     "SELECT qd FROM QuizDetails qd WHERE qd.flashcard.flashcardId = :fid",
                     QuizDetails.class
@@ -74,7 +78,7 @@ public class QuizDetailsDao {
     }
 
     public void deleteByFlashcardId(int flashcardId) {
-        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+        try (EntityManager em = createEntityManager()) {
             em.getTransaction().begin();
             try {
                 em.createQuery("DELETE FROM QuizDetails qd WHERE qd.flashcard.flashcardId = :fid")
@@ -89,7 +93,7 @@ public class QuizDetailsDao {
     }
 
     public boolean exists(int quizId, int flashcardId) {
-        try (EntityManager em = MariaDbJPAConnection.createEntityManager()) {
+        try (EntityManager em = createEntityManager()) {
             Long count = em.createQuery(
                             "SELECT COUNT(qd) FROM QuizDetails qd " +
                                     "WHERE qd.quiz.quizId = :qid AND qd.flashcard.flashcardId = :fid",

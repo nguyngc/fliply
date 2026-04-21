@@ -7,62 +7,231 @@ import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import model.AppState;
 import model.entity.User;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
+import util.LocaleManager;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Locale;
+import java.util.ResourceBundle;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AccountPasswordControllerTest {
-    static { new JFXPanel(); }
 
-    private AccountPasswordController controller;
-
-    @BeforeEach
-    void setUp() {
-        controller = new AccountPasswordController();
-        HeaderController header = Mockito.mock(HeaderController.class);
-        // Inject UI components
-        setPrivate("header", new Parent() {});
-        setPrivate("headerController", header);
-
-        setPrivate("currentPwdField", new PasswordField());
-        setPrivate("newPwdField", new PasswordField());
-        setPrivate("confirmPwdField", new PasswordField());
-        setPrivate("errorLabel", new Label());
-
-        // Reset AppState
-        AppState.navOverride.set(null);
-
-        // Fake logged-in user
-        User u = new User();
-        u.setPassword("oldpass");
-        AppState.currentUser.set(u);
-
-        // Call private initialize()
-        callPrivate("initialize");
+    static {
+        System.setProperty("javafx.cachedir", System.getProperty("java.io.tmpdir") + "/openjfx-cache");
+        new JFXPanel();
     }
 
-    // ---------------- Reflection Helpers ----------------
+    private TestableAccountPasswordController controller;
+    private FakeHeaderController headerController;
+    private PasswordField currentPwdField;
+    private PasswordField newPwdField;
+    private PasswordField confirmPwdField;
+    private Label errorLabel;
+    private Locale previousLocale;
+    private AppState.Role previousRole;
+    private User previousUser;
+    private AppState.NavItem previousNavOverride;
 
-    private void setPrivate(String field, Object value) {
-        try {
-            Field f = AccountPasswordController.class.getDeclaredField(field);
-            f.setAccessible(true);
-            f.set(controller, value);
-        } catch (Exception e) {
-            throw new RuntimeException(e);
+    private static final class TestableAccountPasswordController extends AccountPasswordController {
+        private User lastUpdatedUser;
+        private int updateCount;
+        private AppState.Screen lastNavigatedScreen;
+
+        @Override
+        void updateUser(User user) {
+            lastUpdatedUser = user;
+            updateCount++;
+        }
+
+        @Override
+        void navigateTo(AppState.Screen screen) {
+            lastNavigatedScreen = screen;
         }
     }
 
-    private Object getPrivate(String field) {
+    private static final class FakeHeaderController extends HeaderController {
+        private boolean backVisible;
+        private String title;
+        private String subtitle;
+        private Runnable backAction;
+        private Variant variant;
+
+        @Override
+        public void setBackVisible(boolean visible) {
+            backVisible = visible;
+        }
+
+        @Override
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        @Override
+        public void setSubtitle(String subtitle) {
+            this.subtitle = subtitle;
+        }
+
+        @Override
+        public void setOnBack(Runnable action) {
+            backAction = action;
+        }
+
+        @Override
+        public void applyVariant(Variant variant) {
+            this.variant = variant;
+        }
+    }
+
+    @BeforeEach
+    void setUp() {
+        previousLocale = LocaleManager.getLocale();
+        previousRole = AppState.getRole();
+        previousUser = AppState.currentUser.get();
+        previousNavOverride = AppState.navOverride.get();
+
+        LocaleManager.setLocale("en", "US");
+        controller = new TestableAccountPasswordController();
+        headerController = new FakeHeaderController();
+        currentPwdField = new PasswordField();
+        newPwdField = new PasswordField();
+        confirmPwdField = new PasswordField();
+        errorLabel = new Label();
+
+        setPrivate("header", new Parent() {});
+        setPrivate("headerController", headerController);
+        setPrivate("currentPwdField", currentPwdField);
+        setPrivate("newPwdField", newPwdField);
+        setPrivate("confirmPwdField", confirmPwdField);
+        setPrivate("errorLabel", errorLabel);
+
+        User user = new User();
+        user.setPassword("oldpass");
+        AppState.currentUser.set(user);
+        AppState.role.set(AppState.Role.STUDENT);
+        AppState.navOverride.set(null);
+    }
+
+    @AfterEach
+    void tearDown() {
+        LocaleManager.setLocale(previousLocale);
+        AppState.role.set(previousRole);
+        AppState.currentUser.set(previousUser);
+        AppState.navOverride.set(previousNavOverride);
+    }
+
+    @Test
+    void initialize_configuresStudentHeaderAndNavOverride() {
+        callPrivate("initialize");
+        ResourceBundle rb = ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
+
+        assertTrue(headerController.backVisible);
+        assertEquals(rb.getString("pwd.header.title"), headerController.title);
+        assertEquals("", headerController.subtitle);
+        assertEquals(HeaderController.Variant.STUDENT, headerController.variant);
+        assertEquals(AppState.NavItem.ACCOUNT, AppState.navOverride.get());
+    }
+
+    @Test
+    void initialize_setsTeacherVariantAndBackActionNavigates() {
+        AppState.role.set(AppState.Role.TEACHER);
+
+        callPrivate("initialize");
+        headerController.backAction.run();
+
+        assertEquals(HeaderController.Variant.TEACHER, headerController.variant);
+        assertEquals(AppState.Screen.ACCOUNT, controller.lastNavigatedScreen);
+    }
+
+    @Test
+    void onSave_withoutUser_showsError() {
+        AppState.currentUser.set(null);
+
+        callPrivate("onSave");
+
+        assertTrue(errorLabel.isVisible());
+        assertEquals(ResourceBundle.getBundle("Messages", LocaleManager.getLocale()).getString("pwd.error.user"), errorLabel.getText());
+        assertEquals(0, controller.updateCount);
+        assertNull(controller.lastNavigatedScreen);
+    }
+
+    @Test
+    void onSave_wrongCurrentPassword_showsError() {
+        currentPwdField.setText("wrongpass");
+        newPwdField.setText("123456");
+        confirmPwdField.setText("123456");
+
+        callPrivate("onSave");
+
+        assertTrue(errorLabel.isVisible());
+        assertEquals(ResourceBundle.getBundle("Messages", LocaleManager.getLocale()).getString("pwd.error.oldPwd"), errorLabel.getText());
+    }
+
+    @Test
+    void onSave_newPasswordTooShort_showsError() {
+        currentPwdField.setText("oldpass");
+        newPwdField.setText("123");
+        confirmPwdField.setText("123");
+
+        callPrivate("onSave");
+
+        assertTrue(errorLabel.isVisible());
+        assertEquals(ResourceBundle.getBundle("Messages", LocaleManager.getLocale()).getString("pwd.error.newPwd1"), errorLabel.getText());
+    }
+
+    @Test
+    void onSave_confirmMismatch_showsError() {
+        currentPwdField.setText("oldpass");
+        newPwdField.setText("123456");
+        confirmPwdField.setText("654321");
+
+        callPrivate("onSave");
+
+        assertTrue(errorLabel.isVisible());
+        assertEquals(ResourceBundle.getBundle("Messages", LocaleManager.getLocale()).getString("pwd.error.newPwd2"), errorLabel.getText());
+    }
+
+    @Test
+    void onSave_successUpdatesPasswordHidesErrorAndNavigates() {
+        User user = AppState.currentUser.get();
+        errorLabel.setText("old error");
+        errorLabel.setVisible(true);
+        errorLabel.setManaged(true);
+        currentPwdField.setText("oldpass");
+        newPwdField.setText("123456");
+        confirmPwdField.setText("123456");
+
+        callPrivate("onSave");
+
+        assertEquals("123456", user.getPassword());
+        assertEquals(1, controller.updateCount);
+        assertSame(user, controller.lastUpdatedUser);
+        assertEquals("", errorLabel.getText());
+        assertTrue(!errorLabel.isVisible());
+        assertEquals(AppState.Screen.ACCOUNT, controller.lastNavigatedScreen);
+    }
+
+    @Test
+    void onCancel_navigatesBackWithoutUpdating() {
+        callPrivate("onCancel");
+
+        assertEquals(AppState.Screen.ACCOUNT, controller.lastNavigatedScreen);
+        assertEquals(0, controller.updateCount);
+        assertNull(controller.lastUpdatedUser);
+    }
+
+    private void setPrivate(String fieldName, Object value) {
         try {
-            Field f = AccountPasswordController.class.getDeclaredField(field);
-            f.setAccessible(true);
-            return f.get(controller);
+            Field field = AccountPasswordController.class.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(controller, value);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -70,70 +239,11 @@ class AccountPasswordControllerTest {
 
     private void callPrivate(String methodName) {
         try {
-            Method m = AccountPasswordController.class.getDeclaredMethod(methodName);
-            m.setAccessible(true);
-            m.invoke(controller);
+            Method method = AccountPasswordController.class.getDeclaredMethod(methodName);
+            method.setAccessible(true);
+            method.invoke(controller);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-
-    // ---------------- Tests ----------------
-
-    @Test
-    void testInitialize_setsNavOverride() {
-        assertEquals(AppState.NavItem.ACCOUNT, AppState.navOverride.get());
-    }
-
-    @Test
-    void testOnSave_wrongCurrentPassword_showsError() {
-        PasswordField current = (PasswordField) getPrivate("currentPwdField");
-        PasswordField newPwd = (PasswordField) getPrivate("newPwdField");
-        PasswordField confirm = (PasswordField) getPrivate("confirmPwdField");
-
-        current.setText("wrongpass");
-        newPwd.setText("123456");
-        confirm.setText("123456");
-
-        callPrivate("onSave");
-
-        Label error = (Label) getPrivate("errorLabel");
-        assertTrue(error.isVisible());
-        assertEquals("Current password is incorrect.", error.getText());
-    }
-
-    @Test
-    void testOnSave_newPasswordTooShort() {
-        PasswordField current = (PasswordField) getPrivate("currentPwdField");
-        PasswordField newPwd = (PasswordField) getPrivate("newPwdField");
-        PasswordField confirm = (PasswordField) getPrivate("confirmPwdField");
-
-        current.setText("oldpass");
-        newPwd.setText("123");
-        confirm.setText("123");
-
-        callPrivate("onSave");
-
-        Label error = (Label) getPrivate("errorLabel");
-        assertTrue(error.isVisible());
-        assertEquals("New password must be at least 6 characters.", error.getText());
-    }
-
-    @Test
-    void testOnSave_confirmMismatch() {
-        PasswordField current = (PasswordField) getPrivate("currentPwdField");
-        PasswordField newPwd = (PasswordField) getPrivate("newPwdField");
-        PasswordField confirm = (PasswordField) getPrivate("confirmPwdField");
-
-        current.setText("oldpass");
-        newPwd.setText("123456");
-        confirm.setText("654321");
-
-        callPrivate("onSave");
-
-        Label error = (Label) getPrivate("errorLabel");
-        assertTrue(error.isVisible());
-        assertEquals("New password and confirm password do not match.", error.getText());
-    }
-
 }
