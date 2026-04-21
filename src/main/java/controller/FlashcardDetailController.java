@@ -168,6 +168,14 @@ public class FlashcardDetailController {
                     cards.clear();
                     cards.addAll(AppState.currentDetailList);
 
+                    String successMessage = localizedStrings.getOrDefault(
+                            "flashcardDetail.delete.success",
+                            "Flashcard deleted successfully.");
+                    Alert success = new Alert(Alert.AlertType.INFORMATION, successMessage);
+                    success.setTitle(localizedStrings.getOrDefault("flashcardForm.alertTitle", "Flashcard"));
+                    success.setHeaderText(null);
+                    success.showAndWait();
+
                     // After deleting a card from My Flashcards, return to the list screen.
                     AppState.navOverride.set(AppState.NavItem.FLASHCARDS);
                     Navigator.go(AppState.Screen.FLASHCARDS);
