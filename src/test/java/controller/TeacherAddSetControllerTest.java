@@ -48,7 +48,9 @@ class TeacherAddSetControllerTest {
         private Map<String, String> strings = Map.of(
                 "teacherAddSet.title", "New Set of Flashcard",
                 "teacherAddSet.fileStatusSuccess", "Loaded: {0} ({1} cards)",
-                "teacherAddSet.fileStatusError", "Cannot read file."
+                "teacherAddSet.fileStatusError", "Cannot read file.",
+                "teacherAddSet.warning.missingInfo", "Please enter a subject and upload a flashcard file.",
+                "teacherAddSet.warning.emptyFile", "The uploaded file does not contain any flashcards."
         );
         private File chosenFile;
         private List<String> linesToRead = List.of();
@@ -64,6 +66,7 @@ class TeacherAddSetControllerTest {
         private Integer reloadedClassId;
         private ClassModel reloadedClass;
         private AppState.Screen lastNavigatedScreen;
+        private String warningMessage;
 
         @Override
         Map<String, String> loadLocalizedStrings() {
@@ -114,6 +117,11 @@ class TeacherAddSetControllerTest {
         @Override
         void navigateTo(AppState.Screen screen) {
             lastNavigatedScreen = screen;
+        }
+
+        @Override
+        void showWarning(String message) {
+            warningMessage = message;
         }
     }
 
@@ -211,6 +219,35 @@ class TeacherAddSetControllerTest {
 
         assertNull(controller.createdSubject);
         assertNull(controller.lastNavigatedScreen);
+        assertEquals("Please enter a subject and upload a flashcard file.", controller.warningMessage);
+        assertEquals(List.of(), controller.createdFlashcards);
+    }
+
+    @Test
+    void onAdd_withoutFile_showsWarningAndDoesNothing() {
+        AppState.selectedClass.set(createClass(10));
+        subjectField.setText("Science");
+
+        runOnFxThread(() -> callPrivate("onAdd"));
+
+        assertNull(controller.createdSubject);
+        assertNull(controller.lastNavigatedScreen);
+        assertEquals("Please enter a subject and upload a flashcard file.", controller.warningMessage);
+        assertEquals(List.of(), controller.createdFlashcards);
+    }
+
+    @Test
+    void onAdd_withEmptyParsedCards_showsWarningAndDoesNothing() {
+        AppState.selectedClass.set(createClass(10));
+        setPrivate("selectedFile", new File("cards.csv"));
+        subjectField.setText("Science");
+        controller.parsedCards = List.of();
+
+        runOnFxThread(() -> callPrivate("onAdd"));
+
+        assertNull(controller.createdSubject);
+        assertNull(controller.lastNavigatedScreen);
+        assertEquals("The uploaded file does not contain any flashcards.", controller.warningMessage);
         assertEquals(List.of(), controller.createdFlashcards);
     }
 

@@ -3,6 +3,7 @@ package controller;
 import controller.components.HeaderController;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.FileChooser;
@@ -13,6 +14,7 @@ import model.entity.User;
 import model.service.ClassDetailsService;
 import model.service.FlashcardService;
 import model.service.FlashcardSetService;
+import util.Dialogs;
 import util.FlashcardFileParser;
 import util.LocalizationService;
 import view.Navigator;
@@ -119,26 +121,30 @@ public class TeacherAddSetController {
     @FXML
     private void onAdd() {
         try {
-            // ========== Validate File ==========
-            // Check if a file has been selected
-            if (selectedFile == null) return;
+            // ========== Validate Required Inputs ==========
+            String subject = subjectField.getText() == null ? "" : subjectField.getText().trim();
+            String validationError = validateRequiredInput(selectedFile, subject);
+            if (validationError != null) {
+                showWarning(validationError);
+                return;
+            }
 
             // ========== Parse Flashcards from File ==========
             // Parse the CSV file to extract flashcard data
             List<FlashcardFileParser.ParsedCard> cards = parseSelectedFile(selectedFile);
-            // If no cards were parsed, return early
-            if (cards.isEmpty()) return;
+            // If no cards were parsed, return early with feedback
+            if (cards.isEmpty()) {
+                showWarning(message(
+                        "teacherAddSet.warning.emptyFile",
+                        "The uploaded file does not contain any flashcards."
+                ));
+                return;
+            }
 
             // ========== Get Selected Class ==========
             // Retrieve the class from app state
             ClassModel c = AppState.selectedClass.get();
             if (c == null) return;
-
-            // ========== Validate Subject Name ==========
-            // Get and trim the subject name from the input field
-            String subject = subjectField.getText() == null ? "" : subjectField.getText().trim();
-            // Check that subject is not empty
-            if (subject.isBlank()) return;
 
             // ========== Create Flashcard Set ==========
             // Create a new flashcard set with the provided subject name
@@ -250,5 +256,30 @@ public class TeacherAddSetController {
      */
     void navigateTo(AppState.Screen screen) {
         Navigator.go(screen);
+    }
+
+    String validateRequiredInput(File file, String subject) {
+        if (file == null || subject == null || subject.isBlank()) {
+            return message(
+                    "teacherAddSet.warning.missingInfo",
+                    "Please enter a subject and upload a flashcard file."
+            );
+        }
+        return null;
+    }
+
+    String message(String key, String fallback) {
+        if (localizedStrings == null) {
+            return fallback;
+        }
+        return localizedStrings.getOrDefault(key, fallback);
+    }
+
+    void showWarning(String message) {
+        Dialogs.show(
+                Alert.AlertType.WARNING,
+                message("teacherAddSet.alertTitle", "Flashcard Set"),
+                message
+        );
     }
 }
