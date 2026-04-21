@@ -108,6 +108,10 @@ public class QuizDetailController {
         // ========== Build Quiz Questions ==========
         // Generate the quiz questions with shuffled options
         questions = quizService.buildQuizQuestions(quiz.getQuizId(), AppState.currentUser.get().getUserId());
+        if (questions == null || questions.isEmpty()) {
+            Navigator.go(AppState.Screen.QUIZZES);
+            return;
+        }
 
         // ========== Configure Header ==========
         if (headerController != null) {
@@ -140,6 +144,10 @@ public class QuizDetailController {
      */
     private void render() {
         // ========== Get Current Question Index ==========
+        if (questions == null || questions.isEmpty()) {
+            return;
+        }
+
         int idx = AppState.quizQuestionIndex.get();
         int total = questions.size();
 
@@ -158,11 +166,11 @@ public class QuizDetailController {
         // Get all answer options
         List<String> opts = q.getOptions();
 
-        // Display the four options on buttons
-        opt1.setText(opts.get(0));
-        opt2.setText(opts.get(1));
-        opt3.setText(opts.get(2));
-        opt4.setText(opts.get(3));
+        // Display options safely even when fewer than 4 are available.
+        applyOption(opt1, opts, 0);
+        applyOption(opt2, opts, 1);
+        applyOption(opt3, opts, 2);
+        applyOption(opt4, opts, 3);
 
         // Enable text wrapping for long option texts
         opt1.setWrapText(true);
@@ -209,11 +217,20 @@ public class QuizDetailController {
             // Apply visual feedback for the selected answer
             if (chosen.equals(correct)) {
                 // User was correct - highlight in blue
-                getButtonByText(chosen).setStyle(correctStyle());
+                Button chosenBtn = getButtonByText(chosen);
+                if (chosenBtn != null) {
+                    chosenBtn.setStyle(correctStyle());
+                }
             } else {
                 // User was wrong - highlight selected answer in red and correct in blue
-                getButtonByText(chosen).setStyle(wrongStyle());
-                getButtonByText(correct).setStyle(correctStyle());
+                Button chosenBtn = getButtonByText(chosen);
+                if (chosenBtn != null) {
+                    chosenBtn.setStyle(wrongStyle());
+                }
+                Button correctBtn = getButtonByText(correct);
+                if (correctBtn != null) {
+                    correctBtn.setStyle(correctStyle());
+                }
             }
         } else {
             // Question not yet answered - enable option buttons
@@ -250,6 +267,9 @@ public class QuizDetailController {
 
         // Get the text of the selected option
         String chosen = clicked.getText();
+        if (chosen == null || chosen.isBlank()) {
+            return;
+        }
         
         // Get the correct answer
         String correct = q.getCorrectAnswer();
@@ -272,7 +292,10 @@ public class QuizDetailController {
             // Highlight selected answer in red
             clicked.setStyle(wrongStyle());
             // Highlight the correct answer in blue
-            getButtonByText(correct).setStyle(correctStyle());
+            Button correctBtn = getButtonByText(correct);
+            if (correctBtn != null) {
+                correctBtn.setStyle(correctStyle());
+            }
         }
 
         // Disable all option buttons to prevent changing the answer
@@ -326,6 +349,23 @@ public class QuizDetailController {
         opt2.setDisable(disabled);
         opt3.setDisable(disabled);
         opt4.setDisable(disabled);
+
+        // Keep unavailable options disabled to prevent blank selections.
+        if (opt1.getText() == null || opt1.getText().isBlank()) opt1.setDisable(true);
+        if (opt2.getText() == null || opt2.getText().isBlank()) opt2.setDisable(true);
+        if (opt3.getText() == null || opt3.getText().isBlank()) opt3.setDisable(true);
+        if (opt4.getText() == null || opt4.getText().isBlank()) opt4.setDisable(true);
+    }
+
+    private void applyOption(Button button, List<String> options, int optionIndex) {
+        if (button == null) {
+            return;
+        }
+        if (options != null && optionIndex < options.size()) {
+            button.setText(options.get(optionIndex));
+            return;
+        }
+        button.setText("");
     }
 
 
@@ -337,10 +377,13 @@ public class QuizDetailController {
      * @return The button with matching text, or opt1 if not found
      */
     private Button getButtonByText(String text) {
-        for (Button b : Arrays.asList(opt1, opt2, opt3, opt4)) {
-            if (b.getText().equals(text)) return b;
+        if (text == null) {
+            return null;
         }
-        return opt1;
+        for (Button b : Arrays.asList(opt1, opt2, opt3, opt4)) {
+            if (text.equals(b.getText())) return b;
+        }
+        return null;
     }
 
     /**
