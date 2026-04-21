@@ -2,6 +2,7 @@ package controller;
 
 import controller.components.HeaderController;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.TextField;
 import model.AppState;
 import model.service.TeacherAddClassService;
@@ -64,8 +65,15 @@ public class TeacherAddClassController {
         String code = classCodeField.getText() == null ? "" : classCodeField.getText().trim();
         
         // Validate that class code is not empty
-        if (code.isBlank()) return;
-        
+        if (code.isBlank()) {
+            Alert alert = new Alert(Alert.AlertType.WARNING);
+            alert.setTitle(rb.getString("addClass.code.empty"));
+            alert.setHeaderText(null);
+            alert.setContentText(rb.getString("addClass.code.message"));
+            alert.showAndWait();
+            return;
+        }
+
         // ========== Create Class ==========
         try {
             // Call the service to create a new class with the entered code
