@@ -136,6 +136,7 @@ public class FlashcardDetailController {
 
                     // Get the flashcard to delete
                     Flashcard toRemove = cards.get(idx);
+                    Integer toRemoveId = toRemove.getFlashcardId();
 
                     // Delete from database first
                     try {
@@ -148,39 +149,28 @@ public class FlashcardDetailController {
                         return;
                     }
 
-                    // Remove from global app state lists
-                    if (idx >= 0 && idx < AppState.currentDetailList.size()) {
-                        AppState.currentDetailList.remove(idx);
-                    }
+                    // Remove from global app state lists by ID to avoid stale object-reference issues
+                    AppState.currentDetailList.removeIf(c ->
+                            c != null && toRemoveId != null && toRemoveId.equals(c.getFlashcardId()));
 
                     // Remove from selected flashcard set if applicable
                     FlashcardSet selectedSet = AppState.selectedFlashcardSet.get();
                     if (selectedSet != null) {
-                        selectedSet.getCards().remove(toRemove);
+                        selectedSet.getCards().removeIf(c ->
+                                c != null && toRemoveId != null && toRemoveId.equals(c.getFlashcardId()));
                     }
 
                     // Remove from user's general flashcard list
-                    AppState.myFlashcards.remove(toRemove);
+                    AppState.myFlashcards.removeIf(c ->
+                            c != null && toRemoveId != null && toRemoveId.equals(c.getFlashcardId()));
 
                     // Refresh local list with updated state
                     cards.clear();
                     cards.addAll(AppState.currentDetailList);
 
-                    // If no cards remaining, navigate back to flashcards screen
-                    if (cards.isEmpty()) {
-                        AppState.navOverride.set(AppState.NavItem.FLASHCARDS);
-                        Navigator.go(AppState.Screen.FLASHCARDS);
-                        return;
-                    }
-
-                    // Clamp index to valid range and update
-                    int maxIndex = cards.size() - 1;
-                    index = maxIndex < 0 ? 0 : Math.clamp(idx, 0, maxIndex);
-                    AppState.currentDetailIndex.set(index);
-
-                    // Re-render the UI
-                    render();
-                    updateNavButtons();
+                    // After deleting a card from My Flashcards, return to the list screen.
+                    AppState.navOverride.set(AppState.NavItem.FLASHCARDS);
+                    Navigator.go(AppState.Screen.FLASHCARDS);
                 });
             }
         }

@@ -163,6 +163,39 @@ class QuizServiceTest {
     }
 
     @Test
+    void generateQuiz_requestedMoreThanAvailableReturnsNull() {
+        User teacher = newUser("Teacher");
+        userDao.persist(teacher);
+
+        ClassModel clazz = newClass(teacher);
+        classDao.persist(clazz);
+
+        FlashcardSet fs = newSet(clazz);
+        setDao.persist(fs);
+
+        Flashcard flashcard = newFlashcard(fs, teacher, "Term");
+        flashcardDao.persist(flashcard);
+
+        User student = newUser("Student");
+        userDao.persist(student);
+
+        ClassDetails enrollment = new ClassDetails();
+        enrollment.setStudent(student);
+        enrollment.setClassModel(clazz);
+        classDetailsDao.persist(enrollment);
+
+        assertNull(quizService.generateQuiz(student, 2));
+        assertEquals(1, quizService.getAvailableFlashcardCount(student));
+
+        classDetailsDao.delete(enrollment);
+        flashcardDao.delete(flashcard);
+        setDao.delete(fs);
+        classDao.delete(clazz);
+        userDao.delete(student);
+        userDao.delete(teacher);
+    }
+
+    @Test
     void buildQuizQuestions_missingQuizDetailsReturnsEmptyList() {
         User user = newUser("Reader");
         userDao.persist(user);

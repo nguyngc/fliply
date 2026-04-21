@@ -3,10 +3,14 @@ package model.service;
 import model.dao.ClassModelDao;
 import model.dao.FlashcardDao;
 import model.dao.FlashcardSetDao;
+import model.dao.QuizDao;
+import model.dao.QuizDetailsDao;
 import model.dao.UserDao;
 import model.entity.ClassModel;
 import model.entity.Flashcard;
 import model.entity.FlashcardSet;
+import model.entity.Quiz;
+import model.entity.QuizDetails;
 import model.entity.User;
 import org.junit.jupiter.api.*;
 
@@ -22,6 +26,8 @@ class FlashcardServiceTest {
     private ClassModelDao classDao;
     private FlashcardSetDao setDao;
     private FlashcardDao flashcardDao;
+    private QuizDao quizDao;
+    private QuizDetailsDao quizDetailsDao;
 
     @BeforeEach
     void setUp() {
@@ -30,6 +36,8 @@ class FlashcardServiceTest {
         classDao = new ClassModelDao();
         setDao = new FlashcardSetDao();
         flashcardDao = new FlashcardDao();
+        quizDao = new QuizDao();
+        quizDetailsDao = new QuizDetailsDao();
     }
 
     private User newUser(String prefix) {
@@ -129,6 +137,40 @@ class FlashcardServiceTest {
         setDao.delete(fs);
         classDao.delete(clazz);
         userDao.delete(creator);
+        userDao.delete(teacher);
+    }
+
+    @Test
+    void delete_removesQuizDetailsBeforeDeletingFlashcard() {
+        User teacher = newUser("Teacher");
+        userDao.persist(teacher);
+
+        ClassModel clazz = newClass(teacher);
+        classDao.persist(clazz);
+
+        FlashcardSet fs = newSet(clazz);
+        setDao.persist(fs);
+
+        Flashcard card = flashcardService.createFlashcard("Term-Q", "Def-Q", fs, teacher);
+        assertNotNull(card);
+
+        Quiz quiz = new Quiz();
+        quiz.setUser(teacher);
+        quiz.setNoOfQuestions(1);
+        quizDao.persist(quiz);
+
+        QuizDetails details = new QuizDetails(quiz, card);
+        quizDetailsDao.persist(details);
+        assertFalse(quizDetailsDao.findByFlashcardId(card.getFlashcardId()).isEmpty());
+
+        flashcardService.delete(card);
+
+        assertNull(flashcardDao.find(card.getFlashcardId()));
+        assertTrue(quizDetailsDao.findByFlashcardId(card.getFlashcardId()).isEmpty());
+
+        quizDao.delete(quiz);
+        setDao.delete(fs);
+        classDao.delete(clazz);
         userDao.delete(teacher);
     }
 }

@@ -1,6 +1,7 @@
 package model.service;
 
 import model.dao.FlashcardDao;
+import model.dao.QuizDetailsDao;
 import model.entity.Flashcard;
 import model.entity.FlashcardSet;
 import model.entity.User;
@@ -9,6 +10,7 @@ import java.util.List;
 
 public class FlashcardService {
     private final FlashcardDao flashDao = new FlashcardDao();
+    private final QuizDetailsDao quizDetailsDao = new QuizDetailsDao();
 
     public Flashcard createFlashcard(String term, String definition, FlashcardSet set, User user) {
         // avoid dup
@@ -32,6 +34,11 @@ public class FlashcardService {
         flashDao.update(card);
     }
     public void delete(Flashcard card) {
+        if (card == null || card.getFlashcardId() == null) {
+            return;
+        }
+        // Remove dependent quiz details first to satisfy FK constraints.
+        quizDetailsDao.deleteByFlashcardId(card.getFlashcardId());
         flashDao.delete(card);
     }
 
