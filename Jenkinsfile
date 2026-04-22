@@ -42,7 +42,7 @@ pipeline {
                         sh '''
                             mvn -DDB_HOST=${DB_HOST} -DDB_PORT=${DB_PORT} -DDB_NAME=${DB_NAME} \
                                 -DDB_USER=${DB_USER} -DDB_PASS=${DB_PASS} \
-                                -Dtest=*DaoTest,*ServiceTest,*RepositoryTest test
+                                test
                         '''
                     } else {
                         withEnv([
@@ -52,7 +52,7 @@ pipeline {
                             "DB_USER=${env.DB_USER}",
                             "DB_PASS=${env.DB_PASS}"
                         ]) {
-                            bat 'mvn -DDB_HOST=%DB_HOST% -DDB_PORT=%DB_PORT% -DDB_NAME=%DB_NAME% -DDB_USER=%DB_USER% -DDB_PASS=%DB_PASS% -Dtest=*DaoTest,*ServiceTest,*RepositoryTest test'
+                            bat 'mvn -DDB_HOST=%DB_HOST% -DDB_PORT=%DB_PORT% -DDB_NAME=%DB_NAME% -DDB_USER=%DB_USER% -DDB_PASS=%DB_PASS% test'
                         }
                     }
                 }
