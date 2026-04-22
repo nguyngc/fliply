@@ -5,11 +5,6 @@ pipeline {
     }
 
     environment {
-        DB_HOST = "localhost"
-        DB_PORT = "3306"
-        DB_NAME = "fliply"
-        DB_USER = "appuser"
-        DB_PASS = "password"
         DOCKERHUB_CREDENTIALS_ID = 'DockerID'
         DOCKERHUB_REPO = 'nguyngc/fliply'
         DOCKER_IMAGE_TAG = 'latest'
@@ -39,21 +34,9 @@ pipeline {
             steps {
                 script {
                     if (isUnix()) {
-                        sh '''
-                            mvn -DDB_HOST=${DB_HOST} -DDB_PORT=${DB_PORT} -DDB_NAME=${DB_NAME} \
-                                -DDB_USER=${DB_USER} -DDB_PASS=${DB_PASS} \
-                                test
-                        '''
+                        sh 'mvn test'
                     } else {
-                        withEnv([
-                            "DB_HOST=${env.DB_HOST}",
-                            "DB_PORT=${env.DB_PORT}",
-                            "DB_NAME=${env.DB_NAME}",
-                            "DB_USER=${env.DB_USER}",
-                            "DB_PASS=${env.DB_PASS}"
-                        ]) {
-                            bat 'mvn -DDB_HOST=%DB_HOST% -DDB_PORT=%DB_PORT% -DDB_NAME=%DB_NAME% -DDB_USER=%DB_USER% -DDB_PASS=%DB_PASS% test'
-                        }
+                        bat 'mvn test'
                     }
                 }
             }
@@ -131,6 +114,10 @@ pipeline {
         stage('Deploy') {
             environment {
                 PATH = "/usr/local/bin:/opt/homebrew/bin:${env.PATH}"
+                DB_HOST = "localhost"
+                DB_PORT = "3306"
+                DB_NAME = "fliply"
+                DB_USER = "appuser"
             }
             steps {
                 script {
