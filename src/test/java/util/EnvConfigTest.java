@@ -13,6 +13,13 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class EnvConfigTest {
+    private static final String TEST_PORT_KEY = "FLIPLY_TEST_DB_PORT";
+    private static final String TEST_HOST_KEY = "FLIPLY_TEST_DB_HOST";
+    private static final String TEST_NAME_KEY = "FLIPLY_TEST_DB_NAME";
+    private static final String TEST_USER_KEY = "FLIPLY_TEST_DB_USER";
+    private static final String TEST_BLANK_KEY = "FLIPLY_TEST_BLANK_VALUE";
+    private static final String TEST_INVALID_KEY = "FLIPLY_TEST_INVALID_LINE";
+    private static final String TEST_MISSING_KEY = "FLIPLY_TEST_MISSING_KEY";
 
     @Test
     void utilityConstructorThrows() throws Exception {
@@ -27,15 +34,15 @@ class EnvConfigTest {
     void get_prefersSystemPropertiesOverDotEnv() throws Exception {
         Path envFile = Files.createTempFile("fliply-test", ".env");
         try {
-            Files.writeString(envFile, "DB_PORT=3306\nDB_HOST=localhost\n");
+            Files.writeString(envFile, TEST_PORT_KEY + "=3306\n" + TEST_HOST_KEY + "=localhost\n");
             System.setProperty("fliply.env.file", envFile.toString());
-            System.setProperty("DB_PORT", "4406");
+            System.setProperty(TEST_PORT_KEY, "4406");
 
             EnvConfig.reload();
 
-            assertEquals("4406", EnvConfig.get("DB_PORT", "3307"));
-            assertEquals("localhost", EnvConfig.get("DB_HOST", "db"));
-            assertEquals("fallback", EnvConfig.get("MISSING_KEY", "fallback"));
+            assertEquals("4406", EnvConfig.get(TEST_PORT_KEY, "3307"));
+            assertEquals("localhost", EnvConfig.get(TEST_HOST_KEY, "db"));
+            assertEquals("fallback", EnvConfig.get(TEST_MISSING_KEY, "fallback"));
         } finally {
             Files.deleteIfExists(envFile);
         }
@@ -48,18 +55,18 @@ class EnvConfigTest {
             Files.writeString(envFile, """
                     # comment
                     INVALID_LINE
-                    DB_NAME="fliply"
-                    DB_USER='teacher'
-                    BLANK_VALUE=
+                    FLIPLY_TEST_DB_NAME="fliply"
+                    FLIPLY_TEST_DB_USER='teacher'
+                    FLIPLY_TEST_BLANK_VALUE=
                     """);
             System.setProperty("fliply.env.file", envFile.toString());
 
             EnvConfig.reload();
 
-            assertEquals("fliply", EnvConfig.get("DB_NAME", "fallback"));
-            assertEquals("teacher", EnvConfig.get("DB_USER", "fallback"));
-            assertEquals("fallback", EnvConfig.get("BLANK_VALUE", "fallback"));
-            assertEquals("fallback", EnvConfig.get("INVALID_LINE", "fallback"));
+            assertEquals("fliply", EnvConfig.get(TEST_NAME_KEY, "fallback"));
+            assertEquals("teacher", EnvConfig.get(TEST_USER_KEY, "fallback"));
+            assertEquals("fallback", EnvConfig.get(TEST_BLANK_KEY, "fallback"));
+            assertEquals("fallback", EnvConfig.get(TEST_INVALID_KEY, "fallback"));
         } finally {
             Files.deleteIfExists(envFile);
         }
@@ -71,12 +78,18 @@ class EnvConfigTest {
 
         EnvConfig.reload();
 
-        assertEquals("3307", EnvConfig.get("DB_PORT", "3307"));
+        assertEquals("3307", EnvConfig.get(TEST_PORT_KEY, "3307"));
     }
 
     @AfterEach
     void clearProperties() {
-        System.clearProperty("DB_PORT");
+        System.clearProperty(TEST_PORT_KEY);
+        System.clearProperty(TEST_HOST_KEY);
+        System.clearProperty(TEST_NAME_KEY);
+        System.clearProperty(TEST_USER_KEY);
+        System.clearProperty(TEST_BLANK_KEY);
+        System.clearProperty(TEST_INVALID_KEY);
+        System.clearProperty(TEST_MISSING_KEY);
         System.clearProperty("fliply.env.file");
         EnvConfig.reload();
     }
