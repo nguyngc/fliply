@@ -5,12 +5,16 @@ import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
+import java.util.function.Supplier;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.Locale;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 class LocalizationServiceTest {
+    private static final Logger LOCALIZATION_LOGGER = Logger.getLogger(LocalizationService.class.getName());
 
     private final Locale originalLocale = LocaleManager.getLocale();
 
@@ -59,12 +63,12 @@ class LocalizationServiceTest {
 
     @Test
     void getLocalizedStrings_whenPrimaryBundleMissing_usesFallbackBundle() {
-        Map<String, String> strings = LocalizationService.getLocalizedStrings(
+        Map<String, String> strings = withoutLocalizationLogs(() -> LocalizationService.getLocalizedStrings(
                 "MissingMessages",
                 Locale.of("zz", "ZZ"),
                 "Messages",
                 Locale.of("en", "US")
-        );
+        ));
 
         assertEquals("Fliply", strings.get("welcome.title"));
         assertEquals("Classes", strings.get("nav.classes"));
@@ -73,13 +77,24 @@ class LocalizationServiceTest {
 
     @Test
     void getLocalizedStrings_whenPrimaryAndFallbackBundlesMissing_returnsEmptyMap() {
-        Map<String, String> strings = LocalizationService.getLocalizedStrings(
+        Map<String, String> strings = withoutLocalizationLogs(() -> LocalizationService.getLocalizedStrings(
                 "MissingMessages",
                 Locale.of("zz", "ZZ"),
                 "AlsoMissingMessages",
                 Locale.of("en", "US")
-        );
+        ));
 
         assertTrue(strings.isEmpty());
+    }
+
+    private static <T> T withoutLocalizationLogs(Supplier<T> action) {
+        Level previousLevel = LOCALIZATION_LOGGER.getLevel();
+
+        LOCALIZATION_LOGGER.setLevel(Level.OFF);
+        try {
+            return action.get();
+        } finally {
+            LOCALIZATION_LOGGER.setLevel(previousLevel);
+        }
     }
 }
