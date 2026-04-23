@@ -47,6 +47,7 @@ class HomeControllerTest {
     private Label subtitleLabel;
     private StackPane latestClassHolder;
     private VBox latestQuizSection;
+    private StackPane latestQuizCardWrapper;
     private FakeQuizCardController latestQuizCardController;
     private Locale previousLocale;
     private AppState.Role previousRole;
@@ -167,12 +168,15 @@ class HomeControllerTest {
         subtitleLabel = new Label();
         latestClassHolder = new StackPane();
         latestQuizSection = new VBox();
+        latestQuizCardWrapper = new StackPane();
         latestQuizCardController = new FakeQuizCardController();
 
         setPrivate("nameLabel", nameLabel);
         setPrivate("subtitleLabel", subtitleLabel);
         setPrivate("latestClassHolder", latestClassHolder);
         setPrivate("latestQuizSection", latestQuizSection);
+        setPrivate("latestQuizCardWrapper", latestQuizCardWrapper);
+        setPrivate("latestQuizCard", new StackPane());
         setPrivate("latestQuizCardController", latestQuizCardController);
 
         AppState.role.set(null);
@@ -294,22 +298,39 @@ class HomeControllerTest {
     void renderLatestClass_returnsEarlyForMissingData() {
         User student = createUser(30, 0, "Sam", "Student");
         AppState.currentUser.set(student);
+        ResourceBundle rb = ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
 
         callPrivate("renderLatestClass");
-        assertTrue(latestClassHolder.getChildren().isEmpty());
+        assertEquals(1, latestClassHolder.getChildren().size());
+        assertTrue(containsLabel(latestClassHolder, rb.getString("home.latestClass.empty.title.student")));
         assertEquals(0, controller.loadClassCardViewCallCount);
 
         controller.classesToLoad = new ArrayList<>(List.of(new ClassModel()));
         callPrivate("renderLatestClass");
-        assertTrue(latestClassHolder.getChildren().isEmpty());
+        assertEquals(1, latestClassHolder.getChildren().size());
+        assertTrue(containsLabel(latestClassHolder, rb.getString("home.latestClass.empty.title.student")));
         assertEquals(0, controller.loadClassCardViewCallCount);
 
         ClassModel classWithId = createClass(40, "Physics", createUser(31, 1, "Tina", "Teacher"));
         controller.classesToLoad = new ArrayList<>(List.of(classWithId));
         controller.reloadedClasses.clear();
         callPrivate("renderLatestClass");
-        assertTrue(latestClassHolder.getChildren().isEmpty());
+        assertEquals(1, latestClassHolder.getChildren().size());
+        assertTrue(containsLabel(latestClassHolder, rb.getString("home.latestClass.empty.title.student")));
         assertEquals(0, controller.loadClassCardViewCallCount);
+    }
+
+    @Test
+    void renderLatestQuiz_withoutQuizzes_showsEmptyState() {
+        User student = createUser(32, 0, "Jamie", "Student");
+        AppState.currentUser.set(student);
+        ResourceBundle rb = ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
+
+        callPrivate("renderLatestQuiz");
+
+        assertNull(latestQuizCardController.lastQuiz);
+        assertEquals(1, latestQuizCardWrapper.getChildren().size());
+        assertTrue(containsLabel(latestQuizCardWrapper, rb.getString("home.latestQuiz.empty.title")));
     }
 
     @Test
@@ -442,5 +463,19 @@ class HomeControllerTest {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private boolean containsLabel(Node node, String expectedText) {
+        if (node instanceof Label label) {
+            return expectedText.equals(label.getText());
+        }
+        if (node instanceof javafx.scene.Parent parent) {
+            for (Node child : parent.getChildrenUnmodifiable()) {
+                if (containsLabel(child, expectedText)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

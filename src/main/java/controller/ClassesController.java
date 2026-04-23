@@ -14,6 +14,7 @@ import model.entity.ClassModel;
 import model.entity.User;
 import model.service.ClassDetailsService;
 import model.service.StudyService;
+import util.EmptyStateCards;
 import util.LocaleManager;
 import view.Navigator;
 
@@ -82,6 +83,10 @@ public class ClassesController {
 
         // Load all classes from database that the user belongs to
         List<ClassModel> classes = loadClassesForUser(user.getUserId());
+
+        if (classes.isEmpty()) {
+            classListBox.getChildren().add(buildEmptyState(isTeacher));
+        }
         
         // Create a card for each class and add to the list
         for (ClassModel c : classes) {
@@ -97,6 +102,20 @@ public class ClassesController {
         if (isTeacher) {
             classListBox.getChildren().add(buildAddMoreClassTile());
         }
+    }
+
+    /**
+     * Creates an empty state card to display when the user has no classes.
+     * The content of the card is different for teachers and students.
+     *
+     * @param isTeacher Whether the current user is a teacher
+     * @return A Node containing the empty state UI
+     */
+    private Node buildEmptyState(boolean isTeacher) {
+        return EmptyStateCards.create(
+                rb.getString(isTeacher ? "class.empty.title.teacher" : "class.empty.title.student"),
+                rb.getString(isTeacher ? "class.empty.body.teacher" : "class.empty.body.student")
+        );
     }
 
     /**

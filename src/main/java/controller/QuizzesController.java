@@ -13,6 +13,7 @@ import model.AppState;
 import model.entity.Quiz;
 import model.entity.User;
 import model.service.QuizService;
+import util.EmptyStateCards;
 import view.Navigator;
 
 import java.io.IOException;
@@ -90,6 +91,10 @@ public class QuizzesController {
     private void render() {
         // Clear any previously displayed quiz cards
         listBox.getChildren().clear();
+
+        if (AppState.quizList.isEmpty()) {
+            listBox.getChildren().add(buildEmptyState());
+        }
 
         // Create a card for each quiz in the user's list
         for (Quiz quiz : AppState.quizList) {
@@ -185,6 +190,18 @@ public class QuizzesController {
         });
 
         return box;
+    }
+
+    /**
+     * Builds an empty state card to display when there are no quizzes.
+     *
+     * @return A Node containing the empty state card with title and message
+     */
+    private Node buildEmptyState() {
+        return EmptyStateCards.create(
+                getMessage("quizzes.empty.title", "No quizzes yet"),
+                getMessage("quizzes.empty.body", "Generate a quiz from your flashcards to start practicing here.")
+        );
     }
 
     /**

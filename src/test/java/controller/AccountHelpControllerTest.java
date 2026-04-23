@@ -38,6 +38,14 @@ class AccountHelpControllerTest {
         // Inject controller
         setPrivate("header", new Parent() {});
         setPrivate("headerController", header);
+        setPrivate("quickStartTitleLabel", new Label());
+        setPrivate("quickStartBodyLabel", new Label());
+        setPrivate("roleGuideTitleLabel", new Label());
+        setPrivate("roleGuideBodyLabel", new Label());
+        setPrivate("commonTasksTitleLabel", new Label());
+        setPrivate("commonTasksBodyLabel", new Label());
+        setPrivate("faqTitleLabel", new Label());
+        setPrivate("faqBodyLabel", new Label());
 
         // Reset AppState
         AppState.navOverride.set(null);
@@ -98,9 +106,34 @@ class AccountHelpControllerTest {
         assertTrue(back.isVisible());
     }
 
+    @Test
+    void testInitialize_populatesTeacherHelpContent() {
+        Label quickStartTitle = getControllerLabel("quickStartTitleLabel");
+        Label roleGuideTitle = getControllerLabel("roleGuideTitleLabel");
+        Label roleGuideBody = getControllerLabel("roleGuideBodyLabel");
+        Label tasksTitle = getControllerLabel("commonTasksTitleLabel");
+        Label faqBody = getControllerLabel("faqBodyLabel");
+
+        assertEquals("Quick Start", quickStartTitle.getText());
+        assertEquals("Teacher Guide", roleGuideTitle.getText());
+        assertTrue(roleGuideBody.getText().contains("Teachers mainly work in Classes."));
+        assertEquals("Common Tasks", tasksTitle.getText());
+        assertTrue(faqBody.getText().contains("Why do I not see Flashcards or Quizzes in the bottom menu?"));
+    }
+
     @Disabled("Cannot test UI navigation in unit test environment")
     @Test
     void testInitialize_setsNavOverride() {
         assertEquals(AppState.NavItem.ACCOUNT, AppState.navOverride.get());
+    }
+
+    private Label getControllerLabel(String field) {
+        try {
+            Field f = AccountHelpController.class.getDeclaredField(field);
+            f.setAccessible(true);
+            return (Label) f.get(controller);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 }

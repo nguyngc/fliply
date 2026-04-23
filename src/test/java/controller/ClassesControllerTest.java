@@ -258,6 +258,20 @@ class ClassesControllerTest {
     }
 
     @Test
+    void initialize_teacherWithoutClassesShowsEmptyStateAndAddTile() {
+        User teacher = createUser(13, 1, "Alice", "Teacher");
+        AppState.currentUser.set(teacher);
+        AppState.setRole(AppState.Role.TEACHER);
+        ResourceBundle rb = ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
+
+        runOnFxThread(() -> callPrivate("initialize"));
+
+        assertEquals(2, classListBox.getChildren().size());
+        assertTrue(extractLabelTexts(classListBox.getChildren().get(0)).contains(rb.getString("class.empty.title.teacher")));
+        assertTrue(extractLabelTexts(classListBox.getChildren().get(1)).contains(rb.getString("class.addClass")));
+    }
+
+    @Test
     void render_withNullUserOrNullUserId_clearsListAndDoesNotLoadClasses() {
         runOnFxThread(() -> {
             classListBox.getChildren().add(new Label("placeholder"));

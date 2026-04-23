@@ -2,6 +2,7 @@ package controller;
 
 import controller.components.HeaderController;
 import javafx.embed.swing.JFXPanel;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import model.AppState;
@@ -15,6 +16,8 @@ import util.LocaleManager;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -26,6 +29,8 @@ class FlashcardsControllerTest {
     private FlashcardsController controller;
     private final UserDao userDao = new UserDao();
     private final FlashcardDao flashcardDao = new FlashcardDao();
+    private Locale previousLocale;
+    private ResourceBundle messages;
 
     private static class FakeHeaderController extends HeaderController {
         Label title = new Label();
@@ -38,7 +43,10 @@ class FlashcardsControllerTest {
 
     @BeforeEach
     void setUp() {
+        previousLocale = LocaleManager.getLocale();
+        LocaleManager.setLocale("en", "US");
         controller = new FlashcardsController();
+        messages = ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
         AppState.myFlashcards.clear();
         setPrivate("termGrid", new GridPane());
         setPrivate("headerController", new FakeHeaderController());
@@ -59,6 +67,17 @@ class FlashcardsControllerTest {
         f.setAccessible(true);
         GridPane grid = (GridPane) f.get(controller);
         assertEquals(2, grid.getChildren().size());
+    }
+
+    @Test
+    void renderGridWithoutCardsShowsEmptyStateAndAddButton() throws Exception {
+        Method m = FlashcardsController.class.getDeclaredMethod("renderGrid");
+        m.setAccessible(true);
+        m.invoke(controller);
+
+        GridPane grid = (GridPane) getPrivate("termGrid");
+        assertEquals(2, grid.getChildren().size());
+        assertTrue(containsLabel(grid, messages.getString("flashcards.empty.title")));
     }
 
     @Test
@@ -127,5 +146,23 @@ class FlashcardsControllerTest {
         }
     }
 
-}
+    private boolean containsLabel(Node node, String expectedText) {
+        if (node instanceof Label label) {
+            return expectedText.equals(label.getText());
+        }
+        if (node instanceof javafx.scene.Parent parent) {
+            for (Node child : parent.getChildrenUnmodifiable()) {
+                if (containsLabel(child, expectedText)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
 
+    @org.junit.jupiter.api.AfterEach
+    void tearDown() {
+        LocaleManager.setLocale(previousLocale);
+    }
+
+}
