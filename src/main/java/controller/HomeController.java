@@ -30,6 +30,7 @@ import static model.AppState.isTeacher;
  * Provides quick access to recent classes and quizzes through clickable cards.
  */
 public class HomeController {
+    private static final String MESSAGES_BUNDLE = "Messages";
 
     // ========== Services ==========
     private final ClassDetailsService classDetailsService = new ClassDetailsService();
@@ -87,7 +88,7 @@ public class HomeController {
     @FXML
     private void initialize() {
         // Get localized strings for the current locale
-        ResourceBundle rb = ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
+        ResourceBundle rb = ResourceBundle.getBundle(MESSAGES_BUNDLE, LocaleManager.getLocale());
         
         // Get the current logged-in user
         User user = AppState.currentUser.get();
@@ -125,7 +126,7 @@ public class HomeController {
      */
     private void renderLatestClass() {
         // Get localized strings for error messages
-        ResourceBundle rb = ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
+        ResourceBundle rb = ResourceBundle.getBundle(MESSAGES_BUNDLE, LocaleManager.getLocale());
         
         // Clear any previously rendered content
         latestClassHolder.getChildren().clear();
@@ -318,7 +319,7 @@ public class HomeController {
     private void showLatestClassEmptyState() {
         User user = AppState.currentUser.get();
         boolean teacher = user != null && user.isTeacher();
-        ResourceBundle rb = ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
+        ResourceBundle rb = ResourceBundle.getBundle(MESSAGES_BUNDLE, LocaleManager.getLocale());
 
         latestClassHolder.getChildren().setAll(EmptyStateCards.create(
                 rb.getString(teacher ? "home.latestClass.empty.title.teacher" : "home.latestClass.empty.title.student"),
@@ -330,7 +331,7 @@ public class HomeController {
         if (latestQuizCardWrapper == null) {
             return;
         }
-        ResourceBundle rb = ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
+        ResourceBundle rb = ResourceBundle.getBundle(MESSAGES_BUNDLE, LocaleManager.getLocale());
         latestQuizCardWrapper.getChildren().setAll(EmptyStateCards.create(
                 rb.getString("home.latestQuiz.empty.title"),
                 rb.getString("home.latestQuiz.empty.body")

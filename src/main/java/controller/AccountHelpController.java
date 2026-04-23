@@ -17,6 +17,43 @@ import java.util.ResourceBundle;
  * Provides users with assistance and guidance on using the application.
  */
 public class AccountHelpController {
+    private static final String TEACHER_COMMON_TASKS_FALLBACK = """
+            1. Create a class: Go to Classes and choose + Add more classes.
+
+            2. Add learning material: Open a class, then add a flashcard set.
+
+            3. Manage account settings: Open Account to edit your profile, language, or password.
+            """.stripTrailing();
+
+    private static final String STUDENT_COMMON_TASKS_FALLBACK = """
+            1. Open your classes: Go to Classes to review the classes you joined.
+
+            2. Study flashcards: Open Flashcards to review your cards or add a new one.
+
+            3. Practice with quizzes: Go to Quizzes, enter a question count, and start the generated quiz.
+            """.stripTrailing();
+
+    private static final String TEACHER_FAQ_FALLBACK = """
+            Q: Where do I add learning material?
+            A: Open a class first, then add or open its flashcard sets.
+
+            Q: Why do I not see Flashcards or Quizzes in the bottom menu?
+            A: Teacher accounts focus on Home, Classes, and Account, so student-only study tools are hidden.
+
+            Q: How do I change language or password?
+            A: Open Account, then choose Language or Change Password.
+            """.stripTrailing();
+
+    private static final String STUDENT_FAQ_FALLBACK = """
+            Q: Why can I not generate a quiz?
+            A: Quiz generation needs available flashcards. Add flashcards first or open a class that already has study material.
+
+            Q: Where can I find my latest activity?
+            A: Home shows your latest class and most recent quiz when they are available.
+
+            Q: How do I change language or password?
+            A: Open Account, then choose Language or Change Password.
+            """.stripTrailing();
 
     // UI Components injected from FXML
     @FXML
@@ -82,28 +119,14 @@ public class AccountHelpController {
         setText(commonTasksTitleLabel, message("help.commonTasks.title", "Common Tasks"));
         setText(commonTasksBodyLabel, message(roleKey("help.commonTasks.body", teacher),
                 teacher
-                        ? "1. Create a class: Go to Classes and choose + Add more classes.\n\n"
-                        + "2. Add learning material: Open a class, then add a flashcard set.\n\n"
-                        + "3. Manage account settings: Open Account to edit your profile, language, or password."
-                        : "1. Open your classes: Go to Classes to review the classes you joined.\n\n"
-                        + "2. Study flashcards: Open Flashcards to review your cards or add a new one.\n\n"
-                        + "3. Practice with quizzes: Go to Quizzes, enter a question count, and start the generated quiz."));
+                        ? TEACHER_COMMON_TASKS_FALLBACK
+                        : STUDENT_COMMON_TASKS_FALLBACK));
 
         setText(faqTitleLabel, message("help.faq.title", "FAQ"));
         setText(faqBodyLabel, message(roleKey("help.faq.body", teacher),
                 teacher
-                        ? "Q: Where do I add learning material?\n"
-                        + "A: Open a class first, then add or open its flashcard sets.\n\n"
-                        + "Q: Why do I not see Flashcards or Quizzes in the bottom menu?\n"
-                        + "A: Teacher accounts focus on Home, Classes, and Account, so student-only study tools are hidden.\n\n"
-                        + "Q: How do I change language or password?\n"
-                        + "A: Open Account, then choose Language or Change Password."
-                        : "Q: Why can I not generate a quiz?\n"
-                        + "A: Quiz generation needs available flashcards. Add flashcards first or open a class that already has study material.\n\n"
-                        + "Q: Where can I find my latest activity?\n"
-                        + "A: Home shows your latest class and most recent quiz when they are available.\n\n"
-                        + "Q: How do I change language or password?\n"
-                        + "A: Open Account, then choose Language or Change Password."));
+                        ? TEACHER_FAQ_FALLBACK
+                        : STUDENT_FAQ_FALLBACK));
     }
 
     /**
