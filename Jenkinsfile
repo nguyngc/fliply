@@ -69,7 +69,11 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 withSonarQubeEnv('SonarQubeServer') {
-                    sh 'mvn sonar:sonar'
+                    if (isUnix()) {
+                        sh 'mvn sonar:sonar'
+                    } else {
+                        bat 'mvn sonar:sonar'
+                    }
                 }
             }
         }
