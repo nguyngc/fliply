@@ -17,7 +17,7 @@
         <ScrollPane fitToWidth="true" hbarPolicy="NEVER"
                     style="-fx-background-color: transparent; -fx-background: transparent;">
             <content>
-                <VBox spacing="12">
+                <VBox spacing="14">
                     <padding>
                         <Insets top="18" right="18" bottom="18" left="18"/>
                     </padding>
@@ -25,9 +25,65 @@
                     <Label text="%help.title"
                            style="-fx-font-size: 20px; -fx-font-weight: 500; -fx-text-fill: #1F1F39;"/>
 
-                    <Label text="%help.description"
-                           wrapText="true"
-                           style="-fx-font-size: 14px; -fx-text-fill: rgba(0,0,0,0.55); -fx-font-weight: 400;"/>
+                    <VBox spacing="8"
+                          style="-fx-background-color: white; -fx-background-radius: 18;">
+                        <padding>
+                            <Insets top="16" right="16" bottom="16" left="16"/>
+                        </padding>
+
+                        <Label fx:id="quickStartTitleLabel"
+                               wrapText="true"
+                               style="-fx-font-size: 16px; -fx-font-weight: 600; -fx-text-fill: #1F1F39;"/>
+
+                        <Label fx:id="quickStartBodyLabel"
+                               wrapText="true"
+                               style="-fx-font-size: 14px; -fx-text-fill: rgba(0,0,0,0.68); -fx-font-weight: 400;"/>
+                    </VBox>
+
+                    <VBox spacing="8"
+                          style="-fx-background-color: white; -fx-background-radius: 18;">
+                        <padding>
+                            <Insets top="16" right="16" bottom="16" left="16"/>
+                        </padding>
+
+                        <Label fx:id="roleGuideTitleLabel"
+                               wrapText="true"
+                               style="-fx-font-size: 16px; -fx-font-weight: 600; -fx-text-fill: #1F1F39;"/>
+
+                        <Label fx:id="roleGuideBodyLabel"
+                               wrapText="true"
+                               style="-fx-font-size: 14px; -fx-text-fill: rgba(0,0,0,0.68); -fx-font-weight: 400;"/>
+                    </VBox>
+
+                    <VBox spacing="8"
+                          style="-fx-background-color: white; -fx-background-radius: 18;">
+                        <padding>
+                            <Insets top="16" right="16" bottom="16" left="16"/>
+                        </padding>
+
+                        <Label fx:id="commonTasksTitleLabel"
+                               wrapText="true"
+                               style="-fx-font-size: 16px; -fx-font-weight: 600; -fx-text-fill: #1F1F39;"/>
+
+                        <Label fx:id="commonTasksBodyLabel"
+                               wrapText="true"
+                               style="-fx-font-size: 14px; -fx-text-fill: rgba(0,0,0,0.68); -fx-font-weight: 400;"/>
+                    </VBox>
+
+                    <VBox spacing="8"
+                          style="-fx-background-color: white; -fx-background-radius: 18;">
+                        <padding>
+                            <Insets top="16" right="16" bottom="16" left="16"/>
+                        </padding>
+
+                        <Label fx:id="faqTitleLabel"
+                               wrapText="true"
+                               style="-fx-font-size: 16px; -fx-font-weight: 600; -fx-text-fill: #1F1F39;"/>
+
+                        <Label fx:id="faqBodyLabel"
+                               wrapText="true"
+                               style="-fx-font-size: 14px; -fx-text-fill: rgba(0,0,0,0.68); -fx-font-weight: 400;"/>
+                    </VBox>
                 </VBox>
             </content>
         </ScrollPane>

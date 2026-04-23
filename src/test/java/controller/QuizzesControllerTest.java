@@ -52,6 +52,7 @@ class QuizzesControllerTest {
     private int previousPoints;
     private Map<Integer, String> previousAnswers;
     private Map<Integer, Boolean> previousCorrectMap;
+    private ResourceBundle messages;
 
     private static final class TestableQuizzesController extends QuizzesController {
         private final List<Quiz> quizzesToReturn = new ArrayList<>();
@@ -121,12 +122,13 @@ class QuizzesControllerTest {
         headerController = new FakeHeaderController();
         listBox = new VBox();
         totalLabel = new Label();
+        messages = ResourceBundle.getBundle("Messages");
 
         setPrivate("header", new StackPane());
         setPrivate("headerController", headerController);
         setPrivate("listBox", listBox);
         setPrivate("totalLabel", totalLabel);
-        setPrivate("resources", ResourceBundle.getBundle("Messages"));
+        setPrivate("resources", messages);
 
         AppState.currentUser.set(null);
         AppState.navOverride.set(null);
@@ -221,6 +223,18 @@ class QuizzesControllerTest {
     }
 
     @Test
+    void initialize_withoutQuizzesShowsEmptyStateAndAddTile() {
+        AppState.currentUser.set(createUser(14));
+
+        runOnFxThread(() -> callPrivate("initialize"));
+
+        assertEquals("Total: 0", headerController.subtitle);
+        assertEquals("Total: 0", totalLabel.getText());
+        assertEquals(2, listBox.getChildren().size());
+        assertTrue(collectLabelTexts(listBox.getChildren().get(0)).contains(messages.getString("quizzes.empty.title")));
+    }
+
+    @Test
     void loadQuizCard_whenLoaderFails_wrapsException() {
         controller.failLoadingCard = true;
         Quiz quiz = createQuiz(22, 3);
@@ -310,5 +324,22 @@ class QuizzesControllerTest {
             throw new RuntimeException(error.get());
         }
         return result.get();
+    }
+
+    private List<String> collectLabelTexts(Node node) {
+        List<String> texts = new ArrayList<>();
+        collect(node, texts);
+        return texts;
+    }
+
+    private void collect(Node node, List<String> texts) {
+        if (node instanceof Label label) {
+            texts.add(label.getText());
+        }
+        if (node instanceof javafx.scene.Parent parent) {
+            for (Node child : parent.getChildrenUnmodifiable()) {
+                collect(child, texts);
+            }
+        }
     }
 }

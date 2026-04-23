@@ -14,6 +14,7 @@ import model.entity.*;
 import model.service.ClassDetailsService;
 import model.service.QuizService;
 import model.service.StudyService;
+import util.EmptyStateCards;
 import util.LocaleManager;
 import view.Navigator;
 
@@ -49,6 +50,10 @@ public class HomeController {
     // ========== Latest Quiz Section ==========
     // Section container for latest quiz (hidden for teachers)
     @FXML private VBox latestQuizSection;
+
+    @FXML private StackPane latestQuizCardWrapper;
+
+    @FXML private Node latestQuizCard;
     
     // Controller for the quiz card component
     @FXML private QuizCardController latestQuizCardController;
@@ -127,22 +132,34 @@ public class HomeController {
 
         // Get the current user
         User user = AppState.currentUser.get();
-        if (user == null || user.getUserId() == null) return;
+        if (user == null || user.getUserId() == null) {
+            showLatestClassEmptyState();
+            return;
+        }
 
         // ========== Load Classes ==========
         // Fetch all classes the user is enrolled in or teaches
         List<ClassModel> classes = loadClassesForUser(user.getUserId());
-        if (classes.isEmpty()) return;
+        if (classes.isEmpty()) {
+            showLatestClassEmptyState();
+            return;
+        }
 
         // Get the latest class (by ID, most recent)
         classes.sort((a, b) -> b.getClassId() - a.getClassId());
         ClassModel latestClass = classes.getFirst();
-        if (latestClass.getClassId() == null) return;
+        if (latestClass.getClassId() == null) {
+            showLatestClassEmptyState();
+            return;
+        }
 
         // Reload the selected class with the relations needed for the home card
         // so rendering does not depend on lazy collections after the DAO closes.
         ClassModel cd = loadClassWithRelations(latestClass.getClassId());
-        if (cd == null) return;
+        if (cd == null) {
+            showLatestClassEmptyState();
+            return;
+        }
 
         try {
             // ========== Load Class Card Component ==========
@@ -193,9 +210,17 @@ public class HomeController {
      * Teachers do not have access to this method.
      */
     private void renderLatestQuiz() {
+        if (latestQuizCardWrapper != null) {
+            latestQuizCardWrapper.getChildren().clear();
+        }
+
         // Get the current user (should be a student)
         User user = AppState.currentUser.get();
-        if (user == null || user.getUserId() == null) return;
+        if (user == null || user.getUserId() == null) {
+            latestQuiz = null;
+            showLatestQuizEmptyState();
+            return;
+        }
 
         // ========== Load Quizzes ==========
         // Fetch all quizzes assigned to the user
@@ -203,6 +228,7 @@ public class HomeController {
         if (quizzes == null || quizzes.isEmpty()) {
             // No quizzes available
             latestQuiz = null;
+            showLatestQuizEmptyState();
             return;
         }
 
@@ -214,6 +240,9 @@ public class HomeController {
         // Configure the quiz card component with the latest quiz data
         if (latestQuizCardController != null) {
             latestQuizCardController.setQuiz(latestQuiz);
+        }
+        if (latestQuizCardWrapper != null && latestQuizCard != null) {
+            latestQuizCardWrapper.getChildren().setAll(latestQuizCard);
         }
     }
 
@@ -284,6 +313,28 @@ public class HomeController {
     void openClass(ClassModel classModel) {
         AppState.selectedClass.set(classModel);
         navigateTo(AppState.Screen.CLASSES);
+    }
+
+    private void showLatestClassEmptyState() {
+        User user = AppState.currentUser.get();
+        boolean teacher = user != null && user.isTeacher();
+        ResourceBundle rb = ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
+
+        latestClassHolder.getChildren().setAll(EmptyStateCards.create(
+                rb.getString(teacher ? "home.latestClass.empty.title.teacher" : "home.latestClass.empty.title.student"),
+                rb.getString(teacher ? "home.latestClass.empty.body.teacher" : "home.latestClass.empty.body.student")
+        ));
+    }
+
+    private void showLatestQuizEmptyState() {
+        if (latestQuizCardWrapper == null) {
+            return;
+        }
+        ResourceBundle rb = ResourceBundle.getBundle("Messages", LocaleManager.getLocale());
+        latestQuizCardWrapper.getChildren().setAll(EmptyStateCards.create(
+                rb.getString("home.latestQuiz.empty.title"),
+                rb.getString("home.latestQuiz.empty.body")
+        ));
     }
 
     void navigateTo(AppState.Screen screen) {

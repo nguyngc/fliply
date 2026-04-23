@@ -12,6 +12,7 @@ import model.AppState;
 import model.entity.Flashcard;
 import model.entity.User;
 import model.service.FlashcardService;
+import util.EmptyStateCards;
 import util.LocaleManager;
 import view.Navigator;
 
@@ -82,6 +83,13 @@ public class FlashcardsController {
         // Clear any existing tiles from the grid
         termGrid.getChildren().clear();
 
+        if (AppState.myFlashcards.isEmpty()) {
+            termGrid.add(EmptyStateCards.create(
+                    rb.getString("flashcards.empty.title"),
+                    rb.getString("flashcards.empty.body")
+            ), 0, 0, 2, 1);
+        }
+
         // Create a tile for each flashcard in the user's collection
         for (int i = 0; i < AppState.myFlashcards.size(); i++) {
             // Get the current flashcard
@@ -112,7 +120,7 @@ public class FlashcardsController {
         // ========== Add the "+" Button Tile ==========
         // Create an "Add Flashcard" button tile
         Node addTile = buildAddTile();
-        int addIndex = AppState.myFlashcards.size();
+        int addIndex = AppState.myFlashcards.isEmpty() ? 2 : AppState.myFlashcards.size();
         int col = addIndex % 2;
         int row = addIndex / 2;
         termGrid.add(addTile, col, row);
