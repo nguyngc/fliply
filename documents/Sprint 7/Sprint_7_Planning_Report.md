@@ -80,12 +80,16 @@ Track information such as:
 
 ###  8. Documentation of Technical Changes
 
-- Review testing results to identify technical or architectural changes
-- Document updates to:
+| Problem identified | How it was implemented | Technical change / recommendation | Impact | Test / verification |
+|---|---|---|---|---|
+| Teacher Create Class: empty class code | Trim input, block blank code, then call service duplicate check | Require class code and show a clear localized error message | Prevents invalid class creation and gives immediate feedback | Verify create-class with empty code and confirm the error is shown |
+| Teacher Creates Flashcard Set: empty required fields | Validate subject/file first, then parse CSV, create set, import cards, reload class | Require subject and uploaded flashcard data | Avoids incomplete flashcard sets and improves input quality | Test submit with missing fields and confirm validation blocks it |
+| Student Creates Flashcard: empty term or definition | Validate set, term, definition, and user before save; update existing card in EDIT mode | Reject empty Term/Definition values and show a warning before saving | Prevents incomplete flashcards from being stored | Try saving with empty term/definition and confirm it is rejected |
+| Student Edit Flashcard: save changes stuck | Update `AppState.currentDetailList`, then return to the correct screen after save | Refresh the save flow so changes are applied and the user returns to flashcard details | Improves workflow stability and makes updates visible immediately | Edit a flashcard, save it, and verify the updated content appears |
+| Student Delete Flashcard: missing confirmation | Ask for confirmation, delete quiz details first, then sync all flashcard lists | Add a confirmation dialog before deleting and show success/error feedback after the action | Reduces accidental deletion and improves safety | Trigger delete and confirm the confirmation dialog appears first |
+| Student Create Quiz: invalid input | Validate empty, non-numeric, zero/negative, and too-large counts before service call | Validate empty, zero, negative, and too-large question counts against available flashcards | Prevents unexpected quiz generation and improves error handling | Test invalid inputs and verify the proper error message is shown |
 
-    - Technical specifications
-    - System architecture
-- Ensure documentation accurately reflects changes made during Sprint 7
+**Conclusion:** There is **no major impact on system architecture**. The changes are limited to controller logic, validation, and localization resources, so the overall system architecture remains unchanged.
 
 
 ## Team Capacity & Assumptions
