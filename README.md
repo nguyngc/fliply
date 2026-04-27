@@ -37,6 +37,9 @@ Fliply is an online flashcard learning application for students and teachers. Th
 ### Sequence Diagram
 ![Sequence Diagram](documents/Diagrams/SequenceDiagram.png)
 
+### Deployment Diagram
+![Deployment Diagram](documents/Diagrams/DeploymentDiagram.png)
+
 ## Technologies Used
 - Java 21
 - JavaFX
