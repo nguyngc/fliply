@@ -7,6 +7,7 @@ import javafx.geometry.NodeOrientation;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import model.AppState;
@@ -20,6 +21,7 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Controller for displaying flashcard details with flip card animation.
@@ -137,6 +139,11 @@ public class FlashcardDetailController {
                     // Get the flashcard to delete
                     Flashcard toRemove = cards.get(idx);
                     Integer toRemoveId = toRemove.getFlashcardId();
+
+                    // Ask for confirmation before mutating DB/app state.
+                    if (!confirmDelete()) {
+                        return;
+                    }
 
                     // Delete from database first
                     try {
@@ -287,7 +294,12 @@ public class FlashcardDetailController {
      */
     void showDeleteError() {
         Alert a = new Alert(Alert.AlertType.ERROR,
-                "Delete failed. Could not delete flashcard from database.");
+                localizedStrings.getOrDefault(
+                        "flashcardDetail.delete.error",
+                        "Delete failed. Could not delete flashcard from database."
+                ));
+        a.setTitle(localizedStrings.getOrDefault("flashcardForm.alertTitle", "Flashcard"));
+        a.setHeaderText(null);
         a.showAndWait();
     }
 
@@ -302,6 +314,19 @@ public class FlashcardDetailController {
         success.setTitle(localizedStrings.getOrDefault("flashcardForm.alertTitle", "Flashcard"));
         success.setHeaderText(null);
         success.showAndWait();
+    }
+
+    boolean confirmDelete() {
+        String title = localizedStrings.getOrDefault("flashcardForm.alertTitle", "Flashcard");
+        String message = localizedStrings.getOrDefault(
+                "flashcardDetail.delete.confirm",
+                "Are you sure you want to delete this flashcard?"
+        );
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION, message, ButtonType.OK, ButtonType.CANCEL);
+        confirm.setTitle(title);
+        confirm.setHeaderText(null);
+        Optional<ButtonType> decision = confirm.showAndWait();
+        return decision.isPresent() && decision.get() == ButtonType.OK;
     }
 
     private boolean matchesCard(Flashcard candidate, Flashcard target, Integer targetId) {

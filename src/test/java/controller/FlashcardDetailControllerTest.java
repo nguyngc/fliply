@@ -61,6 +61,7 @@ class FlashcardDetailControllerTest {
         private RuntimeException deleteFailure;
         private boolean deleteErrorShown;
         private boolean deleteSuccessShown;
+        private boolean confirmDelete = true;
 
         @Override
         Map<String, String> loadLocalizedStrings() {
@@ -88,6 +89,11 @@ class FlashcardDetailControllerTest {
         @Override
         void showDeleteSuccess() {
             deleteSuccessShown = true;
+        }
+
+        @Override
+        boolean confirmDelete() {
+            return confirmDelete;
         }
     }
 
@@ -356,6 +362,27 @@ class FlashcardDetailControllerTest {
 
         assertTrue(controller.deleteErrorShown);
         assertSame(card, controller.deletedCard);
+        assertFalse(controller.deleteSuccessShown);
+        assertEquals(1, AppState.currentDetailList.size());
+        assertEquals(1, AppState.myFlashcards.size());
+        assertEquals(1, set.getCards().size());
+        assertNull(controller.lastNavigatedScreen);
+    }
+
+    @Test
+    void deleteAction_whenCancelled_keepsCardsAndSkipsDelete() {
+        Flashcard card = createCard("Cell", "Basic unit");
+        FlashcardSet set = createSet(card);
+        controller.confirmDelete = false;
+        AppState.currentDetailList.add(card);
+        AppState.selectedFlashcardSet.set(set);
+        AppState.myFlashcards.add(card);
+
+        callPrivate("initialize");
+        headerController.deleteAction.run();
+
+        assertNull(controller.deletedCard);
+        assertFalse(controller.deleteErrorShown);
         assertFalse(controller.deleteSuccessShown);
         assertEquals(1, AppState.currentDetailList.size());
         assertEquals(1, AppState.myFlashcards.size());
