@@ -12,7 +12,6 @@ Sprint 7 ensures that your product is functional, usable, and aligned with the i
 **Functional Task Details**
 1. Test Plan Creation
 
-
 - Created a complete test plan including test objectives, required resources, test environment configuration, and functional testing scope.
 
 
@@ -49,6 +48,7 @@ Sprint 7 ensures that your product is functional, usable, and aligned with the i
 - Verified that code quality metrics meet the required standards.
 
 **Non-functional Task Details**
+
 6. Heuristic Evaluation
 
 
@@ -75,8 +75,6 @@ Sprint 7 ensures that your product is functional, usable, and aligned with the i
 | Student Edit Flashcard: save changes stuck | Update `AppState.currentDetailList`, then return to the correct screen after save | Refresh the save flow so changes are applied and the user returns to flashcard details | Improves workflow stability and makes updates visible immediately | Edit a flashcard, save it, and verify the updated content appears |
 | Student Delete Flashcard: missing confirmation | Ask for confirmation, delete quiz details first, then sync all flashcard lists | Add a confirmation dialog before deleting and show success/error feedback after the action | Reduces accidental deletion and improves safety | Trigger delete and confirm the confirmation dialog appears first |
 | Student Create Quiz: invalid input | Validate empty, non-numeric, zero/negative, and too-large counts before service call | Validate empty, zero, negative, and too-large question counts against available flashcards | Prevents unexpected quiz generation and improves error handling | Test invalid inputs and verify the proper error message is shown |
-
-**Conclusion:** There is **no major impact on system architecture**. The changes are limited to controller logic, validation, and localization resources, so the overall system architecture remains unchanged.
 
 
 **Conclusion:** There is **no major impact on system architecture**. The changes are limited to controller logic, validation, and localization resources, so the overall system architecture remains unchanged.
