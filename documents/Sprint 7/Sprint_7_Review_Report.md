@@ -109,10 +109,10 @@ Sprint 7 ensures that your product is functional, usable, and aligned with the i
 
 ## Time Spent by Team Members
 
-| Team Member  | view.Main Contributions                                                        | Time Spent (Hours) | In-class tasks |
-|--------------|--------------------------------------------------------------------------------|--------------------|----------------|
-| Ngoc Nguyen  | - Function and Non-function test task, Fix UT to increase code coverage        | 8                  | Submitted      |
-| Thanh Nguyen | - Function and non-function test task, user acceptance test document(4,5,6)    | 8                  | Submitted      |
-| Nhut Vo      | - Response for UT and fix duplicates, issues                                   | 8                  | Submitted      |
-| Hoang Vu     | - Function and non-function test task, user acceptance test document(10,11,12) | 5                  | Submitted      |
-| **Total**    |                                                                                | **2**              |                |
+| Team Member  | view.Main Contributions                                                                     | Time Spent (Hours) | In-class tasks |
+|--------------|---------------------------------------------------------------------------------------------|--------------------|----------------|
+| Ngoc Nguyen  | - Function and Non-function test task, Fix UT to increase code coverage                     | 8                  | Submitted      |
+| Thanh Nguyen | - Function and non-function test task, user acceptance test document(4,5,6)                 | 8                  | Submitted      |
+| Nhut Vo      | - Function and non-function test task, user acceptance test document(7,8,9), TechDoc Update | 8                  | Submitted      |
+| Hoang Vu     | - Function and non-function test task, user acceptance test document(10,11,12)              | 5                  | Submitted      |
+| **Total**    |                                                                                             | **29**             |                |
