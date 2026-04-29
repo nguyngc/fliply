@@ -15,8 +15,13 @@ Fliply is an online flashcard learning application for students and teachers. Th
 
 ## Screens
 ![Fliply Welcome](documents/Images/Fliply-Welcome.png)
-![Fliply Account](documents/Images/Fliply-Account.png)
-![Fliply Account RTL](documents/Images/Fliply-Account-RTL.png)
+![Fliply Home Student](documents/Images/Fliply-Home-Student.png)
+![Fliply Home Teacher](documents/Images/Fliply-Home-Teacher.png)
+![Fliply Flashcard](documents/Images/Fliply-Flashcard.png)
+![Fliply Quiz](documents/Images/Fliply-Quiz.png)
+![Fliply Account](documents/Images/Fliply-Account-1.png)
+![Fliply Account](documents/Images/Fliply-Account-2.png)
+![Fliply Account RTL](documents/Images/Fliply-Account-3.png)
 
 ## Diagrams
 ### Use Case Diagram
@@ -169,122 +174,132 @@ Because Fliply is a JavaFX desktop application, running it in Docker may require
 ## Localization System
 <details>
 
-### 1. Language Management
+Fliply currently supports six languages:
 
-Fliply uses a dedicated `Language` table to store all supported languages.  
-Each language is identified by a unique language code (e.g., `en`, `vi`, `fi`), which is used for:
+| Language | Code | Locale |
+|----------|------|--------|
+| English | `en` | `en_US` |
+| Arabic | `ar` | `ar_AR` |
+| Finnish | `fi` | `fi_FI` |
+| Korean | `ko` | `ko_KR` |
+| Lao | `lo` | `lo_LA` |
+| Vietnamese | `vi` | `vi_VN` |
 
-- Displaying available languages in the UI
-- Selecting translations at runtime
-- Referencing translations in other tables
+### 1. Active Language
 
-#### **Language Table Structure**
+The active language is managed in `util.LocaleManager`.
 
-| Column       | Description                                      |
-|--------------|--------------------------------------------------|
-| `id`         | Primary key                                      |
-| `code`       | Language code (e.g., `"en"`)                     |
-| `name`       | Human‑readable language name                     |
-| `is_default` | Indicates the system fallback language           |
+- English is the default language.
+- The account language menu lets users switch language.
+- The selected language code is saved in the `USER.Language` column.
+- Login applies the stored user language with `LocaleManager.setLocaleByLanguage(...)`.
+- Logout resets the application language back to English.
 
-The language code is used both in the language menu and as a reference key for retrieving translations across the system.
+#### `USER` Language Field
 
----
+| Column | Description |
+|--------|-------------|
+| `Language` | Two-letter language code, for example `en`, `vi`, or `lo` |
 
-### 2. Static UI Text Localization
+### 2. Static UI Text
 
-Static UI text (e.g., button labels, menu items, system messages) is stored in the `LocalizationString` table.  
-Each entry is identified by a unique key such as:
+Static UI text is stored in Java resource bundle files under `src/main/resources`.
 
-- `button.save`
-- `ui.welcome`
-- `error.notfound`
+| File | Purpose |
+|------|---------|
+| `Messages.properties` | Default fallback bundle |
+| `Messages_en_US.properties` | English UI text |
+| `Messages_ar_AR.properties` | Arabic UI text |
+| `Messages_fi_FI.properties` | Finnish UI text |
+| `Messages_ko_KR.properties` | Korean UI text |
+| `Messages_lo_LA.properties` | Lao UI text |
+| `Messages_vi_VN.properties` | Vietnamese UI text |
 
-#### Excel‑Based Translation Import
+FXML files use resource keys directly, for example:
 
-All static translations are maintained in an Excel file located in the project’s `resources` directory.  
-A Java `ImportService` reads this file and inserts or updates translations in the database.
-
-This allows translators or non‑technical team members to update UI text without modifying code.
-
-#### **LocalizationString Table Structure**
-
-| Column        | Description                          |
-|---------------|--------------------------------------|
-| `id`          | Primary key                          |
-| `key`         | Identifier for the UI text           |
-| `language_id` | References `Language.id`             |
-| `text`        | Translated text                      |
-
-A unique constraint on `(key, language_id)` ensures that each key has only one translation per language.
-
----
-
-### 3. Dynamic Content Localization
-
-Dynamic content—such as class names, flashcard terms, and flashcard definitions—requires separate translation tables because these values vary per record.
-
-Examples of translation tables:
-
-- `Class_Translation`
-- `FlashcardSet_Translation`
-- `Flashcard_Translation`
-
-#### **Translation Table Structure (General Pattern)**
-
-| Column            | Description                                      |
-|-------------------|--------------------------------------------------|
-| `id`              | Primary key                                      |
-| `<entity>_id`     | References the base table (e.g., `ClassId`)      |
-| `language_id`     | References `Language.id`                         |
-| `translated_value`| The translated text                              |
-
-This structure allows the system to store translations for any number of languages without altering the base tables.
-
----
-
-### 4. Runtime Localization Behavior
-
-The system determines the active language and retrieves the appropriate translations at runtime.  
-Localization behavior is divided into three components:  
-
-|Content Type |	Storage	Retrieval |Method |	Fallback |
-|-------------|-------------------|-------|-----------|
-|Static UI Text |	LocalizationString|	Lookup by key + language|	Default language|
-|Dynamic Content|	*_Translation tables|	Join base + translation table|	Base table value|
-|Language Selection|	User profile or UI menu|	Determines active language|	System default|
-
-#### 4.1 Language Selection
-
-| Source            | Description |
-|-------------------|-------------|
-| **User Profile**  | Each user has a preferred language stored in the `USER` table. |
-| **Language Menu** | Users may manually select a language in the UI. |
-| **Default Language** | If a translation is missing, the system uses the language marked as `is_default = TRUE`. |
-
-#### 4.2 Static Text Lookup
-
-Static UI text is retrieved from the `LocalizationString` table using the text key and the active language code.
-
-#### **SQL Query**
-
+```xml
+<Button text="%account.logout"/>
+<MenuButton text="%language.current"/>
 ```
-SELECT ls.text FROM LocalizationString ls
-JOIN Language l ON l.id = ls.language_id
-WHERE ls.key = :key AND l.code = :lang;
+
+Controllers that set text in Java load the same bundle through `ResourceBundle`, `I18n`, or `LocalizationService`.
+
+### 3. Screen Reload Behavior
+
+When a user changes language, the app updates `LocaleManager` and reloads the current screen through `Navigator.reloadCurrent()`. `Navigator` loads FXML with:
+
+```java
+ResourceBundle.getBundle("Messages", LocaleManager.getLocale())
 ```
-#### 4.3 Dynamic Content Lookup
-Dynamic content is retrieved by joining the base table with its corresponding translation table.  
-#### **SQL Query**
-Example: Class Name Localization
+
+This lets JavaFX resolve all `%key` values again using the selected language.
+
+### 4. Text Direction and Fonts
+
+- Arabic is displayed right-to-left through `Navigator.applyTextDirection(...)`.
+- Lao applies a dedicated font/style hook so Lao glyphs render consistently.
+- Vietnamese and Lao message files must not contain a UTF-8 BOM before the first key, otherwise Java treats the first key as a different string.
+
+### 5. Localized Flashcard Definitions
+
+Flashcard terms remain shared across languages, but definitions can now be stored in every supported language.
+
+#### `FLASHCARD` Definition Fields
+
+| Column | Language |
+|--------|----------|
+| `Definition` | English fallback |
+| `DefinitionAr` | Arabic |
+| `DefinitionFi` | Finnish |
+| `DefinitionKo` | Korean |
+| `DefinitionLo` | Lao |
+| `DefinitionVi` | Vietnamese |
+
+When a student opens flashcard details, `FlashcardDetailController` uses the current user's language:
+
+```java
+flashcard.getLocalizedDefinition(currentUser.getLanguage())
 ```
-SELECT c.ClassId, COALESCE(ct.name, c.ClassName) AS ClassName
-FROM CLASS c
-LEFT JOIN Class_Translation ct
-ON ct.class_id = c.ClassId
-AND ct.language_id = :langId;
+
+If the requested localized definition is missing or blank, the app falls back to the English `Definition` value.
+
+### 6. Teacher CSV Upload Format
+
+Teachers can upload flashcard sets with definitions in all supported languages. The import parser accepts `.csv`, `.tsv`, `.psv`, and `.pipe` files.
+
+Recommended CSV header:
+
+```csv
+Term,English,Arabic,Finnish,Korean,Lao,Vietnamese
 ```
+
+Example:
+
+```csv
+CPU,Central Processing Unit,وحدة المعالجة المركزية,Keskusyksikkö,중앙 처리 장치,ໜ່ວຍປະມວນຜົນກາງ,Bộ xử lý trung tâm
+```
+
+The older two-column format still works:
+
+```csv
+Term,Definition
+CPU,Central Processing Unit
+```
+
+In that case, only the English fallback definition is stored.
+
+### 7. Teacher Inline Editing
+
+When a teacher opens a flashcard set and edits a card, the inline editor now provides separate fields for:
+
+- English definition
+- Arabic definition
+- Finnish definition
+- Korean definition
+- Lao definition
+- Vietnamese definition
+
+English is required because it is the fallback definition. The other language fields are optional.
 </details>
-
 
 

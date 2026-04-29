@@ -42,6 +42,11 @@ class TeacherFlashcardSetDetailControllerTest {
     private VBox editorBox;
     private TextField termField;
     private TextArea definitionArea;
+    private TextArea definitionArArea;
+    private TextArea definitionFiArea;
+    private TextArea definitionKoArea;
+    private TextArea definitionLoArea;
+    private TextArea definitionViArea;
     private VBox cardsBox;
     private Button addMoreBtn;
     private FlashcardSet previousSelectedSet;
@@ -113,6 +118,11 @@ class TeacherFlashcardSetDetailControllerTest {
         editorBox = new VBox();
         termField = new TextField();
         definitionArea = new TextArea();
+        definitionArArea = new TextArea();
+        definitionFiArea = new TextArea();
+        definitionKoArea = new TextArea();
+        definitionLoArea = new TextArea();
+        definitionViArea = new TextArea();
         cardsBox = new VBox();
         addMoreBtn = new Button();
 
@@ -121,6 +131,11 @@ class TeacherFlashcardSetDetailControllerTest {
         setPrivate("editorBox", editorBox);
         setPrivate("termField", termField);
         setPrivate("definitionArea", definitionArea);
+        setPrivate("definitionArArea", definitionArArea);
+        setPrivate("definitionFiArea", definitionFiArea);
+        setPrivate("definitionKoArea", definitionKoArea);
+        setPrivate("definitionLoArea", definitionLoArea);
+        setPrivate("definitionViArea", definitionViArea);
         setPrivate("cardsBox", cardsBox);
         setPrivate("addMoreBtn", addMoreBtn);
 
@@ -192,6 +207,11 @@ class TeacherFlashcardSetDetailControllerTest {
 
         termField.setText("Old term");
         definitionArea.setText("Old definition");
+        definitionArArea.setText("Old Arabic");
+        definitionFiArea.setText("Old Finnish");
+        definitionKoArea.setText("Old Korean");
+        definitionLoArea.setText("Old Lao");
+        definitionViArea.setText("Old Vietnamese");
         setPrivate("editingRow", loadedSet.getCards().iterator().next());
 
         callPrivate("onAddMore");
@@ -200,6 +220,11 @@ class TeacherFlashcardSetDetailControllerTest {
         assertTrue(editorBox.isManaged());
         assertEquals("", termField.getText());
         assertEquals("", definitionArea.getText());
+        assertEquals("", definitionArArea.getText());
+        assertEquals("", definitionFiArea.getText());
+        assertEquals("", definitionKoArea.getText());
+        assertEquals("", definitionLoArea.getText());
+        assertEquals("", definitionViArea.getText());
         assertNull(getPrivate("editingRow"));
     }
 
@@ -249,6 +274,11 @@ class TeacherFlashcardSetDetailControllerTest {
         callPrivate("onAddMore");
         termField.setText("DNA");
         definitionArea.setText("Genetic code");
+        definitionArArea.setText("الشيفرة الجينية");
+        definitionFiArea.setText("Geneettinen koodi");
+        definitionKoArea.setText("유전 코드");
+        definitionLoArea.setText("ລະຫັດພັນທຸກໍາ");
+        definitionViArea.setText("Mã di truyền");
         callPrivate("onSave");
 
         assertEquals(2, loadedSet.getCards().size());
@@ -260,6 +290,11 @@ class TeacherFlashcardSetDetailControllerTest {
         Flashcard newCard = getCardFromSet(loadedSet, 1);
         assertEquals("DNA", newCard.getTerm());
         assertEquals("Genetic code", newCard.getDefinition());
+        assertEquals("الشيفرة الجينية", newCard.getDefinitionAr());
+        assertEquals("Geneettinen koodi", newCard.getDefinitionFi());
+        assertEquals("유전 코드", newCard.getDefinitionKo());
+        assertEquals("ລະຫັດພັນທຸກໍາ", newCard.getDefinitionLo());
+        assertEquals("Mã di truyền", newCard.getDefinitionVi());
         assertSame(loadedSet, newCard.getFlashcardSet());
         assertEquals("DNA", getCardTermLabel(1).getText());
     }
@@ -267,6 +302,8 @@ class TeacherFlashcardSetDetailControllerTest {
     @Test
     void editAndDeleteButtons_updateAndRemoveCards() {
         Flashcard firstCard = createCard("Cell", "Basic unit");
+        firstCard.setDefinitionFi("Perusyksikkö");
+        firstCard.setDefinitionVi("Đơn vị cơ bản");
         Flashcard secondCard = createCard("DNA", "Genetic code");
         FlashcardSet loadedSet = createSet(7, "Biology", firstCard, secondCard);
         controller.loadedSet = loadedSet;
@@ -278,14 +315,26 @@ class TeacherFlashcardSetDetailControllerTest {
         assertSame(firstCard, getPrivate("editingRow"));
         assertEquals("Cell", termField.getText());
         assertEquals("Basic unit", definitionArea.getText());
+        assertEquals("Perusyksikkö", definitionFiArea.getText());
+        assertEquals("Đơn vị cơ bản", definitionViArea.getText());
 
         termField.setText("Cell membrane");
         definitionArea.setText("Outer layer");
+        definitionArArea.setText("الطبقة الخارجية");
+        definitionFiArea.setText("Ulkokerros");
+        definitionKoArea.setText("바깥층");
+        definitionLoArea.setText("ຊັ້ນນອກ");
+        definitionViArea.setText("Lớp ngoài");
         callPrivate("onSave");
 
         assertEquals(2, loadedSet.getCards().size());
         assertEquals("Cell membrane", firstCard.getTerm());
         assertEquals("Outer layer", firstCard.getDefinition());
+        assertEquals("الطبقة الخارجية", firstCard.getDefinitionAr());
+        assertEquals("Ulkokerros", firstCard.getDefinitionFi());
+        assertEquals("바깥층", firstCard.getDefinitionKo());
+        assertEquals("ຊັ້ນນອກ", firstCard.getDefinitionLo());
+        assertEquals("Lớp ngoài", firstCard.getDefinitionVi());
         assertEquals("Cell membrane", getCardTermLabel(0).getText());
         assertEquals("Total: 2", headerController.subtitle);
 

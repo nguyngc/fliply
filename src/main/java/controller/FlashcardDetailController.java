@@ -13,6 +13,7 @@ import javafx.scene.layout.HBox;
 import model.AppState;
 import model.entity.Flashcard;
 import model.entity.FlashcardSet;
+import model.entity.User;
 import model.service.FlashcardService;
 import util.LocalizationService;
 import view.Navigator;
@@ -20,6 +21,7 @@ import view.Navigator;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 
@@ -220,8 +222,17 @@ public class FlashcardDetailController {
         // Display the current flashcard
         Flashcard c = cards.get(index);
         flipCardController.setTerm(c.getTerm());
-        flipCardController.setDefinition(c.getDefinition());
+        flipCardController.setDefinition(c.getLocalizedDefinition(getStudentLanguage()));
         flipCardController.showTerm();
+    }
+
+    private String getStudentLanguage() {
+        User user = AppState.currentUser.get();
+        String language = user == null ? null : user.getLanguage();
+        if (language == null || language.isBlank()) {
+            return Locale.ENGLISH.getLanguage();
+        }
+        return language;
     }
 
     /**

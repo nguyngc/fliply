@@ -53,8 +53,6 @@ class TeacherAddSetControllerTest {
                 "teacherAddSet.warning.emptyFile", "The uploaded file does not contain any flashcards."
         );
         private File chosenFile;
-        private List<String> linesToRead = List.of();
-        private Exception readFailure;
         private List<FlashcardFileParser.ParsedCard> parsedCards = List.of();
         private Exception parseFailure;
         private String createdSubject;
@@ -79,14 +77,6 @@ class TeacherAddSetControllerTest {
         }
 
         @Override
-        List<String> readAllLines(File file) throws Exception {
-            if (readFailure != null) {
-                throw readFailure;
-            }
-            return linesToRead;
-        }
-
-        @Override
         List<FlashcardFileParser.ParsedCard> parseSelectedFile(File file) throws Exception {
             if (parseFailure != null) {
                 throw parseFailure;
@@ -102,8 +92,8 @@ class TeacherAddSetControllerTest {
         }
 
         @Override
-        void createFlashcard(String term, String definition, FlashcardSet set, User teacher) {
-            createdFlashcards.add(term + "=" + definition);
+        void createFlashcard(FlashcardFileParser.ParsedCard card, FlashcardSet set, User teacher) {
+            createdFlashcards.add(card.term() + "=" + card.definition());
             lastCreatedFlashcardSet = set;
             lastTeacher = teacher;
         }
@@ -185,7 +175,10 @@ class TeacherAddSetControllerTest {
     @Test
     void onUpload_whenFileCanBeRead_updatesStatusAndCount() {
         controller.chosenFile = new File("cards.csv");
-        controller.linesToRead = List.of("term,definition", "A,B", "C,D");
+        controller.parsedCards = List.of(
+                new FlashcardFileParser.ParsedCard("A", "B"),
+                new FlashcardFileParser.ParsedCard("C", "D")
+        );
         runOnFxThread(() -> callPrivate("initialize"));
 
         runOnFxThread(() -> callPrivate("onUpload"));
@@ -198,7 +191,7 @@ class TeacherAddSetControllerTest {
     @Test
     void onUpload_whenReadFails_setsErrorMessage() {
         controller.chosenFile = new File("broken.csv");
-        controller.readFailure = new Exception("boom");
+        controller.parseFailure = new Exception("boom");
         runOnFxThread(() -> callPrivate("initialize"));
 
         runOnFxThread(() -> callPrivate("onUpload"));

@@ -42,9 +42,64 @@
                                           -fx-padding: 10 14;
                                           -fx-font-size: 14px;"/>
 
+                        <Label text="%teacherFlashcardSetDetail.definition"
+                               style="-fx-font-size: 13px;
+                                      -fx-font-weight: 600;
+                                      -fx-text-fill: #1F1F39;"/>
+
                         <TextArea fx:id="definitionArea"
-                                  promptText="%teacherFlashcardSetDetail.definition"
-                                  prefRowCount="3"
+                                  promptText="%teacherFlashcardSetDetail.definition.en"
+                                  prefRowCount="2"
+                                  wrapText="true"
+                                  styleClass="form-textarea"
+                                  style="-fx-background-radius: 14;
+                                         -fx-border-color: rgba(31,31,57,0.20);
+                                         -fx-border-radius: 10;
+                                         -fx-font-size: 14px;"/>
+
+                        <TextArea fx:id="definitionArArea"
+                                  promptText="%teacherFlashcardSetDetail.definition.ar"
+                                  prefRowCount="2"
+                                  wrapText="true"
+                                  styleClass="form-textarea"
+                                  style="-fx-background-radius: 14;
+                                         -fx-border-color: rgba(31,31,57,0.20);
+                                         -fx-border-radius: 10;
+                                         -fx-font-size: 14px;"/>
+
+                        <TextArea fx:id="definitionFiArea"
+                                  promptText="%teacherFlashcardSetDetail.definition.fi"
+                                  prefRowCount="2"
+                                  wrapText="true"
+                                  styleClass="form-textarea"
+                                  style="-fx-background-radius: 14;
+                                         -fx-border-color: rgba(31,31,57,0.20);
+                                         -fx-border-radius: 10;
+                                         -fx-font-size: 14px;"/>
+
+                        <TextArea fx:id="definitionKoArea"
+                                  promptText="%teacherFlashcardSetDetail.definition.ko"
+                                  prefRowCount="2"
+                                  wrapText="true"
+                                  styleClass="form-textarea"
+                                  style="-fx-background-radius: 14;
+                                         -fx-border-color: rgba(31,31,57,0.20);
+                                         -fx-border-radius: 10;
+                                         -fx-font-size: 14px;"/>
+
+                        <TextArea fx:id="definitionLoArea"
+                                  promptText="%teacherFlashcardSetDetail.definition.lo"
+                                  prefRowCount="2"
+                                  wrapText="true"
+                                  styleClass="form-textarea"
+                                  style="-fx-background-radius: 14;
+                                         -fx-border-color: rgba(31,31,57,0.20);
+                                         -fx-border-radius: 10;
+                                         -fx-font-size: 14px;"/>
+
+                        <TextArea fx:id="definitionViArea"
+                                  promptText="%teacherFlashcardSetDetail.definition.vi"
+                                  prefRowCount="2"
                                   wrapText="true"
                                   styleClass="form-textarea"
                                   style="-fx-background-radius: 14;

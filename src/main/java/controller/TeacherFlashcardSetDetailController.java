@@ -47,6 +47,16 @@ public class TeacherFlashcardSetDetailController {
     // Text area for entering the flashcard definition/answer
     @FXML
     private TextArea definitionArea;
+    @FXML
+    private TextArea definitionArArea;
+    @FXML
+    private TextArea definitionFiArea;
+    @FXML
+    private TextArea definitionKoArea;
+    @FXML
+    private TextArea definitionLoArea;
+    @FXML
+    private TextArea definitionViArea;
 
     // ========== List Display Components ==========
     // Container for displaying the list of flashcards
@@ -122,7 +132,7 @@ public class TeacherFlashcardSetDetailController {
         editingRow = null;
         // Clear input fields
         termField.clear();
-        definitionArea.clear();
+        clearDefinitionAreas();
         // Show the editor
         editorBox.setVisible(true);
         editorBox.setManaged(true);
@@ -142,6 +152,11 @@ public class TeacherFlashcardSetDetailController {
         // Pre-fill the fields with current data
         termField.setText(row.getTerm());
         definitionArea.setText(row.getDefinition());
+        definitionArArea.setText(row.getDefinitionAr());
+        definitionFiArea.setText(row.getDefinitionFi());
+        definitionKoArea.setText(row.getDefinitionKo());
+        definitionLoArea.setText(row.getDefinitionLo());
+        definitionViArea.setText(row.getDefinitionVi());
         // Show the editor
         editorBox.setVisible(true);
         editorBox.setManaged(true);
@@ -287,8 +302,13 @@ public class TeacherFlashcardSetDetailController {
         // Get and trim input values
         String term = termField.getText() == null ? "" : termField.getText().trim();
         String def = definitionArea.getText() == null ? "" : definitionArea.getText().trim();
+        String defAr = textOrNull(definitionArArea);
+        String defFi = textOrNull(definitionFiArea);
+        String defKo = textOrNull(definitionKoArea);
+        String defLo = textOrNull(definitionLoArea);
+        String defVi = textOrNull(definitionViArea);
         
-        // Validate that both fields are not empty
+        // English is the required fallback definition.
         if (term.isBlank() || def.isBlank()) return;
 
         // ========== Add or Edit ==========
@@ -298,6 +318,11 @@ public class TeacherFlashcardSetDetailController {
             Flashcard newCard = new Flashcard();
             newCard.setTerm(term);
             newCard.setDefinition(def);
+            newCard.setDefinitionAr(defAr);
+            newCard.setDefinitionFi(defFi);
+            newCard.setDefinitionKo(defKo);
+            newCard.setDefinitionLo(defLo);
+            newCard.setDefinitionVi(defVi);
             newCard.setFlashcardSet(set);
             // Add to the set
             set.getCards().add(newCard);
@@ -306,6 +331,11 @@ public class TeacherFlashcardSetDetailController {
             // Update the existing card
             editingRow.setTerm(term);
             editingRow.setDefinition(def);
+            editingRow.setDefinitionAr(defAr);
+            editingRow.setDefinitionFi(defFi);
+            editingRow.setDefinitionKo(defKo);
+            editingRow.setDefinitionLo(defLo);
+            editingRow.setDefinitionVi(defVi);
         }
 
         // ========== Refresh UI ==========
@@ -327,5 +357,21 @@ public class TeacherFlashcardSetDetailController {
 
     void navigateTo(AppState.Screen screen) {
         Navigator.go(screen);
+    }
+
+    private void clearDefinitionAreas() {
+        definitionArea.clear();
+        definitionArArea.clear();
+        definitionFiArea.clear();
+        definitionKoArea.clear();
+        definitionLoArea.clear();
+        definitionViArea.clear();
+    }
+
+    private String textOrNull(TextArea area) {
+        if (area == null || area.getText() == null || area.getText().isBlank()) {
+            return null;
+        }
+        return area.getText().trim();
     }
 }
