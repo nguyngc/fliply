@@ -11,6 +11,7 @@ import javafx.scene.layout.HBox;
 import model.AppState;
 import model.entity.Flashcard;
 import model.entity.FlashcardSet;
+import model.entity.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,6 +52,7 @@ class FlashcardDetailControllerTest {
     private String previousSelectedDefinition;
     private AppState.NavItem previousNavOverride;
     private FlashcardSet previousSelectedFlashcardSet;
+    private User previousCurrentUser;
     private List<Flashcard> previousCurrentDetailList;
     private List<Flashcard> previousMyFlashcards;
 
@@ -174,6 +176,7 @@ class FlashcardDetailControllerTest {
         previousSelectedDefinition = AppState.selectedDefinition.get();
         previousNavOverride = AppState.navOverride.get();
         previousSelectedFlashcardSet = AppState.selectedFlashcardSet.get();
+        previousCurrentUser = AppState.currentUser.get();
         previousCurrentDetailList = new ArrayList<>(AppState.currentDetailList);
         previousMyFlashcards = new ArrayList<>(AppState.myFlashcards);
 
@@ -203,6 +206,7 @@ class FlashcardDetailControllerTest {
         AppState.selectedDefinition.set("");
         AppState.navOverride.set(null);
         AppState.selectedFlashcardSet.set(null);
+        AppState.currentUser.set(null);
         AppState.currentDetailList.clear();
         AppState.myFlashcards.clear();
     }
@@ -218,6 +222,7 @@ class FlashcardDetailControllerTest {
         AppState.selectedDefinition.set(previousSelectedDefinition);
         AppState.navOverride.set(previousNavOverride);
         AppState.selectedFlashcardSet.set(previousSelectedFlashcardSet);
+        AppState.currentUser.set(previousCurrentUser);
         AppState.currentDetailList.clear();
         AppState.currentDetailList.addAll(previousCurrentDetailList);
         AppState.myFlashcards.clear();
@@ -249,6 +254,28 @@ class FlashcardDetailControllerTest {
 
         headerController.backAction.run();
         assertEquals(AppState.Screen.FLASHCARD_SET, controller.lastNavigatedScreen);
+    }
+
+    @Test
+    void initialize_usesStudentLanguageForDefinitionAndFallsBackToEnglish() {
+        Flashcard card1 = createCard("CPU", "Central Processing Unit");
+        card1.setDefinitionVi("Bộ xử lý trung tâm");
+        Flashcard card2 = createCard("RAM", "Random Access Memory");
+        User student = new User();
+        student.setRole(0);
+        student.setLanguage("vi");
+        AppState.currentUser.set(student);
+        AppState.currentDetailList.addAll(card1, card2);
+
+        callPrivate("initialize");
+
+        assertEquals("CPU", flipCardController.term);
+        assertEquals("Bộ xử lý trung tâm", flipCardController.definition);
+
+        callPrivate("next");
+
+        assertEquals("RAM", flipCardController.term);
+        assertEquals("Random Access Memory", flipCardController.definition);
     }
 
     @Test

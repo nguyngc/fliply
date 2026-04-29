@@ -52,12 +52,12 @@
                                    -fx-alignment: CENTER_LEFT;
                                    -fx-cursor: hand;">
                     <items>
-                        <MenuItem text="English" onAction="#switchToEnglish"/>
-                        <MenuItem text="Arabic" onAction="#switchToArabic"/>
-                        <MenuItem text="Finnish" onAction="#switchToFinnish"/>
-                        <MenuItem text="Korean" onAction="#switchToKorean"/>
-                        <MenuItem text="Lao" onAction="#switchToLao"/>
-                        <MenuItem text="Tiếng Việt" onAction="#switchToVietnamese"/>
+                        <MenuItem text="%language.english" onAction="#switchToEnglish"/>
+                        <MenuItem text="%language.arabic" onAction="#switchToArabic"/>
+                        <MenuItem text="%language.finnish" onAction="#switchToFinnish"/>
+                        <MenuItem text="%language.korean" onAction="#switchToKorean"/>
+                        <MenuItem text="%language.lao" onAction="#switchToLao"/>
+                        <MenuItem text="%language.vietnamese" onAction="#switchToVietnamese"/>
                     </items>
                 </MenuButton>
 

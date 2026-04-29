@@ -20,7 +20,6 @@ import util.LocalizationService;
 import view.Navigator;
 
 import java.io.File;
-import java.nio.file.Files;
 import java.text.MessageFormat;
 import java.util.List;
 import java.util.Map;
@@ -95,10 +94,9 @@ public class TeacherAddSetController {
 
         // ========== Parse File ==========
         try {
-            // Read all lines from the selected file
-            List<String> lines = readAllLines(selectedFile);
-            // Calculate number of cards (total lines minus 1 for header row)
-            parsedCount = Math.max(0, lines.size() - 1);
+            // Parse the file so the status reflects the cards that can really be imported.
+            List<FlashcardFileParser.ParsedCard> cards = parseSelectedFile(selectedFile);
+            parsedCount = cards.size();
 
             // Display success message with filename and card count
             fileStatusLabel.setText(MessageFormat.format(
@@ -155,7 +153,7 @@ public class TeacherAddSetController {
             User teacher = AppState.currentUser.get();
             // Create a flashcard for each parsed card from the file
             for (FlashcardFileParser.ParsedCard card : cards) {
-                createFlashcard(card.term(), card.definition(), set, teacher);
+                createFlashcard(card, set, teacher);
             }
 
             // ========== Reload Class and Navigate ==========
@@ -193,18 +191,8 @@ public class TeacherAddSetController {
      */
     File chooseFile() {
         FileChooser chooser = new FileChooser();
-        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("CSV", "*.csv"));
+        chooser.getExtensionFilters().add(new FileChooser.ExtensionFilter("Flashcard files", "*.csv", "*.tsv", "*.psv", "*.pipe"));
         return chooser.showOpenDialog(null);
-    }
-
-    /** Reads all lines from the given file.
-     *
-     * @param file The file to read from.
-     * @return A list of strings, each representing a line from the file.
-     * @throws Exception If an error occurs while reading the file.
-     */
-    List<String> readAllLines(File file) throws Exception {
-        return Files.readAllLines(file.toPath());
     }
 
     /** Parses the selected CSV file to extract flashcard data.
@@ -238,6 +226,11 @@ public class TeacherAddSetController {
     void createFlashcard(String term, String definition, FlashcardSet set, User teacher) {
         FlashcardService flashcardService = new FlashcardService();
         flashcardService.createFlashcard(term, definition, set, teacher);
+    }
+
+    void createFlashcard(FlashcardFileParser.ParsedCard card, FlashcardSet set, User teacher) {
+        FlashcardService flashcardService = new FlashcardService();
+        flashcardService.createFlashcard(card, set, teacher);
     }
 
     /** Reloads the class details for the given class ID to reflect any changes made (e.g., new flashcard set).

@@ -3,6 +3,7 @@ package model.entity;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -68,6 +69,23 @@ class FlashcardTest {
         Flashcard f = new Flashcard();
         f.setDefinition("DefX");
         assertEquals("DefX", f.getDefinition());
+    }
+
+    @Test
+    void localizedDefinitions_returnRequestedLanguageWithEnglishFallback() {
+        Flashcard f = new Flashcard();
+        f.setDefinitions(Map.of(
+                "en", "Central Processing Unit",
+                "fi", "Keskusyksikkö",
+                "vi", "Bộ xử lý trung tâm"
+        ));
+
+        assertEquals("Central Processing Unit", f.getDefinition());
+        assertEquals("Keskusyksikkö", f.getDefinitionFi());
+        assertEquals("Bộ xử lý trung tâm", f.getDefinitionVi());
+        assertEquals("Bộ xử lý trung tâm", f.getLocalizedDefinition("vi"));
+        assertEquals("Central Processing Unit", f.getLocalizedDefinition("ko"));
+        assertEquals("Central Processing Unit", f.getLocalizedDefinition(null));
     }
 
     @Test

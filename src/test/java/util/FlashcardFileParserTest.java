@@ -80,7 +80,7 @@ class FlashcardFileParserTest {
 
         assertEquals(1, psvCards.size());
         assertEquals("CLI", psvCards.get(0).term());
-        assertEquals("Command Line Interface|ignored", psvCards.get(0).definition());
+        assertEquals("Command Line Interface", psvCards.get(0).definition());
 
         assertEquals(3, txtCards.size());
         assertEquals("Question", txtCards.get(0).term());
@@ -89,5 +89,26 @@ class FlashcardFileParserTest {
         assertEquals("Definition", txtCards.get(1).definition());
         assertEquals("Valid", txtCards.get(2).term());
         assertEquals("Entry", txtCards.get(2).definition());
+    }
+
+    @Test
+    void parseCsv_withLocalizedDefinitionColumns_keepsAllSupportedDefinitions() throws Exception {
+        Path file = Files.createTempFile("flashcards-localized", ".csv");
+        Files.write(file, List.of(
+                "Term,English,Arabic,Finnish,Korean,Lao,Vietnamese",
+                "CPU,Central Processing Unit,وحدة المعالجة المركزية,Keskusyksikkö,중앙 처리 장치,ໜ່ວຍປະມວນຜົນກາງ,Bộ xử lý trung tâm"
+        ), StandardCharsets.UTF_8);
+
+        List<FlashcardFileParser.ParsedCard> cards = FlashcardFileParser.parse(file.toFile());
+
+        assertEquals(1, cards.size());
+        FlashcardFileParser.ParsedCard card = cards.getFirst();
+        assertEquals("CPU", card.term());
+        assertEquals("Central Processing Unit", card.definition());
+        assertEquals("وحدة المعالجة المركزية", card.definitionFor("ar"));
+        assertEquals("Keskusyksikkö", card.definitionFor("fi"));
+        assertEquals("중앙 처리 장치", card.definitionFor("ko"));
+        assertEquals("ໜ່ວຍປະມວນຜົນກາງ", card.definitionFor("lo"));
+        assertEquals("Bộ xử lý trung tâm", card.definitionFor("vi"));
     }
 }

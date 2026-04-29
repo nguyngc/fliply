@@ -42,6 +42,11 @@ CREATE TABLE FLASHCARD
     FlashcardId    INT NOT NULL AUTO_INCREMENT,
     Term           VARCHAR(255) NOT NULL,
     Definition     TEXT NOT NULL,
+    DefinitionAr   TEXT NULL,
+    DefinitionFi   TEXT NULL,
+    DefinitionKo   TEXT NULL,
+    DefinitionLo   TEXT NULL,
+    DefinitionVi   TEXT NULL,
     FlashcardSetId INT NOT NULL,
     UserId         INT NOT NULL,
     PRIMARY KEY (FlashcardId),
@@ -95,4 +100,3 @@ CREATE TABLE STUDY
     FOREIGN KEY (UserId) REFERENCES `USER`(UserId),
     FOREIGN KEY (FlashcardSetId) REFERENCES FLASHCARDSET(FlashcardSetId)
 );
-
