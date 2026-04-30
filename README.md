@@ -1,305 +1,305 @@
 # Fliply
 
-## Overview
-Fliply is an online flashcard learning application for students and teachers. The system helps users create and manage flashcards, study with flashcard sets, take quizzes, join classrooms, and track learning progress in one place.
+## 1. Project Title & Overview
+Fliply is a JavaFX desktop application that supports flashcard learning, quiz generation, classroom management, and multilingual study content in one place. It was built to solve the problem of scattered learning workflows for students and teachers, where study material, progress, and class resources are often managed in separate tools. The application uses Java 21, JavaFX, Maven, MariaDB, JPA/Hibernate, JUnit 5, Mockito, JaCoCo, Docker, and Jenkins. It supports English, Arabic, Finnish, Korean, Lao, and Vietnamese user interfaces. The project was delivered over eight 2-week sprints, for a total duration of 16 weeks. All diagrams, screenshots, and sprint documents are referenced in section 12 below.
 
-## Features
-- User authentication
-- Flashcard management
-- Flashcard set management
-- Study mode
-- Quiz mode
-- Classroom management
-- Progress tracking
-- Support multi-language (English, Arabic, Finnish, Korean, Lao, Vietnamese)
+## 2. Product Vision
+**Vision statement:** Build a lightweight but structured learning platform where teachers publish study material and students practice it through flashcards, quizzes, and classroom-based content.
 
-## Screens
-![Fliply Welcome](documents/Images/Fliply-Welcome.png)
-![Fliply Home Student](documents/Images/Fliply-Home-Student.png)
-![Fliply Home Teacher](documents/Images/Fliply-Home-Teacher.png)
-![Fliply Flashcard](documents/Images/Fliply-Flashcard.png)
-![Fliply Quiz](documents/Images/Fliply-Quiz.png)
-![Fliply Account](documents/Images/Fliply-Account-1.png)
-![Fliply Account](documents/Images/Fliply-Account-2.png)
-![Fliply Account RTL](documents/Images/Fliply-Account-3.png)
+**Main goals**
+- Provide a single system for creating, studying, and reviewing learning material.
+- Support both student and teacher workflows with clear role-based screens.
+- Deliver a localized user interface for multiple languages.
+- Keep the application testable, maintainable, and easy to deploy.
 
-## Diagrams
-### Use Case Diagram
-![Use Case Diagram](documents/Diagrams/UseCase.png)
+**Key features**
+- User authentication and account management
+- Flashcard and flashcard-set management
+- Quiz generation and quiz result tracking
+- Classroom management for teachers and students
+- Multilingual UI and localized learning content
 
-### ER Diagram
-![ER Diagram](documents/Diagrams/ERDiagram.png)
+**Definition of success**
+The project is considered complete when the core workflows work reliably, automated tests pass, localization is available, the main technical documents are finished, and the final product can be built and run reproducibly.
 
-### Relational Schema
-![Relational Schema](documents/Diagrams/RelationalSchema.png)
+## 3. Project Plan & Sprint Structure
+Fliply was developed using an Agile/Scrum approach with 2-week sprints. Each sprint focused on one major part of the system, from initial planning to final documentation and quality assurance.
 
-### Activity Diagram
-![Activity Diagram](documents/Diagrams/ActivityDiagram-GenerateQuiz.png)
+| Sprint | Goal |
+|---|---|
+| Sprint 1 | Project planning, vision, scope, backlog, and risk definition |
+| Sprint 2 | Functional requirements, use cases, and database design |
+| Sprint 3 | JavaFX UI implementation and CI pipeline setup |
+| Sprint 4 | Docker containerization and reproducible runtime setup |
+| Sprint 5 | UI localization and language support |
+| Sprint 6 | Database localization and acceptance testing preparation |
+| Sprint 7 | Quality assurance, static analysis, and test stabilization |
+| Sprint 8 | Final documentation, consolidation, and repository finalization |
 
-### Class Diagram
-![Class Diagram](documents/Diagrams/ClassDiagram.png)
+## 4. Sprint 1 – Project Planning & Vision
+Sprint 1 defined the project direction, scope, backlog, and delivery plan. The team validated the product vision, documented risks, and created the initial project backlog.
 
-### Sequence Diagram
-![Sequence Diagram](documents/Diagrams/SequenceDiagram.png)
+- Planning report: [`Sprint_1_Planning_Report.md`](documents/Sprint%201/Sprint_1_Planning_Report.md)
+- Review report: [`Sprint_1_Review_Report.md`](documents/Sprint%201/Sprint_1_Review_Report.md)
+- Supporting documents: [`Product Vision`](documents/Sprint%201/Product_Vision.pdf), [`Project Plan`](documents/Sprint%201/Project_Plan.pdf), [`Product Backlog`](documents/Sprint%201/Product_Backlog.pdf)
 
-### Deployment Diagram
-![Deployment Diagram](documents/Diagrams/DeploymentDiagram.png)
+## 5. Sprint 2 – Requirements & Database
+Sprint 2 focused on functional requirements, use cases, and database design. The system data model was defined with MariaDB and JPA/Hibernate, and the ER diagram and relational schema were finalized.
 
-## Technologies Used
+- Planning report: [`Sprint_2_Planning_Report.md`](documents/Sprint%202/Sprint_2_Planning_Report.md)
+- Review report: [`Sprint_2_Review_Report.md`](documents/Sprint%202/Sprint_2_Review_Report.md)
+- Database implementation: MariaDB + JPA/Hibernate with schema and seed scripts under `src/main/sql/`
+- Unit testing strategy: JUnit 5 and Mockito, with H2 used for isolated test execution
+
+## 6. Sprint 3 – UI Implementation & CI
+Sprint 3 delivered the first JavaFX screens and controller structure. The UI was implemented with FXML, and the CI pipeline was prepared to build, test, and measure coverage automatically.
+
+- Planning report: [`Sprint_3_Planning_Report.md`](documents/Sprint%203/Sprint_3_Planning_Report.md)
+- Review report: [`Sprint_3_Review_Report.md`](documents/Sprint%203/Sprint_3_Review_Report.md)
+- UI framework: JavaFX with FXML-based screens and controller classes
+- Typical screens: welcome, login, register, home, flashcards, quizzes, classes, and account
+- Jenkins pipeline: automated build, test execution, and coverage reporting with JaCoCo
+
+## 7. Sprint 4 – Docker Containerization
+Sprint 4 introduced Docker-based delivery so the application and database could be run in a reproducible environment. This improved consistency between development, testing, and deployment.
+
+- Planning report: [`Sprint_4_Planning_Report.md`](documents/Sprint%204/Sprint_4_Planning_Report.md)
+- Review report: [`Sprint_4_Review_Report.md`](documents/Sprint%204/Sprint_4_Review_Report.md)
+- Containerized services: the Fliply application and MariaDB database
+- Docker setup: [`Dockerfile`](Dockerfile) and [`docker-compose.yml`](docker-compose.yml)
+- Development/testing use: consistent local environments and repeatable container-based execution
+
+## 8. Sprint 5 – UI Localization & Kubernetes
+Sprint 5 focused on multilingual UI support and locale switching. The application uses resource bundles and a stored user language preference to reload screens in the selected locale. Kubernetes was not used in the final delivery; Docker remained the deployment approach.
+
+- Planning report: [`Sprint_5_Planning_Report.md`](documents/Sprint%205/Sprint_5_Planning_Report.md)
+- Review report: [`Sprint_5_Review_Report.md`](documents/Sprint%205/Sprint_5_Review_Report.md)
+- Supported UI languages: English, Arabic, Finnish, Korean, Lao, and Vietnamese
+- Localization approach: Java resource bundle files and locale-aware screen reloads
+- Kubernetes: not applied in the final product; containerization is handled with Docker and Docker Compose
+
+## 9. Sprint 6 – Database Localization
+Sprint 6 extended localization into the data layer so flashcard definitions could be stored and shown in multiple languages. Validation and acceptance planning were also completed for the localized workflows.
+
+- Planning report: [`Sprint_6_Planning_Report.md`](documents/Sprint%206/Sprint_6_Planning_Report.md)
+- Review report: [`Sprint_6_Review_Report.md`](documents/Sprint%206/Sprint_6_Review_Report.md)
+- Language-specific data handling: localized flashcard definition fields and fallback behavior
+- Database and import updates: schema and CSV import support for multilingual content
+- Validation approach: check localized fields during create/edit/import workflows
+
+## 10. Sprint 7 – Quality Assurance
+Sprint 7 was dedicated to quality assurance, code analysis, usability evaluation, and bug fixing. This sprint covered SonarQube analysis, unit testing, functional testing, heuristic evaluation, and UAT preparation.
+
+- Planning report: [`Sprint_7_Planning_Report.md`](documents/Sprint%207/Sprint_7_Planning_Report.md)
+- Review report: [`Sprint_7_Review_Report.md`](documents/Sprint%207/Sprint_7_Review_Report.md)
+- SonarQube usage: static analysis, issue tracking, and code-quality review
+- Quality tools: JaCoCo coverage, JUnit 5, Mockito, and Jenkins build verification
+- Testing scope: functional testing, non-functional checks, heuristic evaluation, and UAT documentation
+
+## 11. Sprint 8 – Documentation & Finalization
+Sprint 8 consolidated the final technical documentation and repository structure. The final README, documentation index, and architecture references were organized so the repository is easy to navigate.
+
+- Final repository README: this file
+- API documentation: not applicable, because Fliply is a desktop JavaFX application and does not expose a public HTTP API
+- Final system architecture diagram: linked below under diagrams
+- Outcome: the repository now provides a clear entry point for reports, diagrams, screenshots, and final technical references
+
+## 12. Documentation Hub
+
+### Sprint Reports
+
+| Sprint | Planning | Review | Notes |
+|---|---|---|---|
+| Sprint 1 | [Planning](documents/Sprint%201/Sprint_1_Planning_Report.md) | [Review](documents/Sprint%201/Sprint_1_Review_Report.md) | Vision, backlog, scope, and risk planning |
+| Sprint 2 | [Planning](documents/Sprint%202/Sprint_2_Planning_Report.md) | [Review](documents/Sprint%202/Sprint_2_Review_Report.md) | Requirements and database design |
+| Sprint 3 | [Planning](documents/Sprint%203/Sprint_3_Planning_Report.md) | [Review](documents/Sprint%203/Sprint_3_Review_Report.md) | UI implementation and CI |
+| Sprint 4 | [Planning](documents/Sprint%204/Sprint_4_Planning_Report.md) | [Review](documents/Sprint%204/Sprint_4_Review_Report.md) | Docker containerization |
+| Sprint 5 | [Planning](documents/Sprint%205/Sprint_5_Planning_Report.md) | [Review](documents/Sprint%205/Sprint_5_Review_Report.md) | Localization and database-language support |
+| Sprint 6 | [Planning](documents/Sprint%206/Sprint_6_Planning_Report.md) | [Review](documents/Sprint%206/Sprint_6_Review_Report.md) | Acceptance testing and localization validation |
+| Sprint 7 | [Planning](documents/Sprint%207/Sprint_7_Planning_Report.md) | [Review](documents/Sprint%207/Sprint_7_Review_Report.md) | Quality assurance, SonarQube, and testing |
+
+### Diagrams
+
+| Diagram | File |
+|---|---|
+| Use Case Diagram | [UseCase.png](documents/Diagrams/UseCase.png) / [PDF](documents/Diagrams/UseCase%20Diagram.pdf) |
+| ER Diagram | [ERDiagram.png](documents/Diagrams/ERDiagram.png) |
+| Relational Schema | [RelationalSchema.png](documents/Diagrams/RelationalSchema.png) |
+| Activity Diagram – Generate Quiz | [ActivityDiagram-GenerateQuiz.png](documents/Diagrams/ActivityDiagram-GenerateQuiz.png) |
+| Activity Diagram – Manage Flashcards | [Activity Diagram-Manage Flashcards.png](documents/Diagrams/Activity%20Diagram-Manage%20Flashcards.png) |
+| Class Diagram | [ClassDiagram.png](documents/Diagrams/ClassDiagram.png) |
+| Sequence Diagram | [SequenceDiagram.png](documents/Diagrams/SequenceDiagram.png) |
+| Deployment Diagram | [DeploymentDiagram.png](documents/Diagrams/DeploymentDiagram.png) |
+| User Journey Map | [UserJourneyMap.png](documents/Diagrams/UserJourneyMap.png) |
+
+
+
+### Screenshots and Images
+
+<table>
+  <tr>
+    <td align="center">
+      <img src="documents/Images/Fliply-Welcome.png" alt="Welcome" width="300" />
+      <br><strong>Welcome Screen</strong>
+    </td>
+    <td align="center">
+      <img src="documents/Images/Fliply-Home-Student.png" alt="Home Student" width="300" />
+      <br><strong>Home Screen – Student</strong>
+    </td>
+    <td align="center">
+      <img src="documents/Images/Fliply-Home-Teacher.png" alt="Home Teacher" width="300" />
+      <br><strong>Home Screen – Teacher</strong>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="documents/Images/Fliply-Flashcard.png" alt="Flashcard" width="300" />
+      <br><strong>Flashcard Screen</strong>
+    </td>
+    <td align="center">
+      <img src="documents/Images/Fliply-Quiz.png" alt="Quiz" width="300" />
+      <br><strong>Quiz Screen</strong>
+    </td>
+    <td align="center">
+      <img src="documents/Images/Fliply-Account-1.png" alt="Account English" width="300" />
+      <br><strong>Account – English</strong>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="documents/Images/Fliply-Account-2.png" alt="Account Localized" width="300" />
+      <br><strong>Account – Localized View</strong>
+    </td>
+    <td align="center">
+      <img src="documents/Images/Fliply-Account-3.png" alt="Account RTL" width="300" />
+      <br><strong>Account – RTL</strong>
+    </td>
+    <td align="center">
+      <img src="documents/Images/SonarQube.png" alt="SonarQube" width="300" />
+      <br><strong>SonarQube Report</strong>
+    </td>
+  </tr>
+  <tr>
+    <td align="center" colspan="3">
+      <img src="documents/Images/Test%20UT.png" alt="Test UT" width="600" />
+      <br><strong>Unit Test Evidence</strong>
+    </td>
+  </tr>
+</table>
+
+### Supporting Documents
+
+| Document | File |
+|---|---|
+| Product Vision | [Product_Vision.pdf](documents/Sprint%201/Product_Vision.pdf) |
+| Product Backlog | [Product_Backlog.pdf](documents/Sprint%201/Product_Backlog.pdf) |
+| Project Plan | [Project_Plan.pdf](documents/Sprint%201/Project_Plan.pdf) |
+| SEP1 Project Report | [SEP1 - Project Fliply.pdf](documents/Sprint%204/SEP1%20-%20Project%20Fliply.pdf) |
+| Localization Workbook | [Fliply-Localization.xlsx](documents/Sprint%205/Fliply-Localization.xlsx) |
+| Database Localization Plan | [Database localization plan report.pdf](documents/Sprint%206/Database%20localization%20plan%20report.pdf) |
+| Acceptance Test Planning | [Sprint 6 Acceptance Test Planning.pdf](documents/Sprint%206/Sprint%206%20Acceptance%20Test%20Planning.pdf) |
+| Statistical Code Review | [Statistical_Code_Review.pdf](documents/Sprint%206/Statistical_Code_Review.pdf) |
+| Heuristic Evaluation | [Heuristic Evaluation Table.pdf](documents/Sprint%207/Heuristic%20Evaluation%20Table.pdf) |
+| Test Plan | [TestPlan.pdf](documents/Sprint%207/TestPlan.pdf) |
+| Acceptance Test Cases | [Test case.xlsx](documents/Sprint%207/Test%20case.xlsx) |
+
+## 13. How to Run the Project
+
+### Prerequisites
 - Java 21
-- JavaFX
-- Maven
-- MariaDB
-- JPA / Hibernate
-- JUnit 5
-- Mockito
-- JaCoCo
-- Docker
-- Jenkins
+- Maven 3.9+
+- MariaDB 11+ or Docker
+- Git
 
-## Repository
-```
-git clone https://github.com/nguyngc/fliply.git
-```
-## Trello Board
-[https://trello.com/w/sep1_group3/home](https://trello.com/w/sep1_group3/home)
-
-## Figma Design
-[Fliply Prototype](https://www.figma.com/proto/vr1e9M1MRVlRu9v6x4GVHH/Untitled?node-id=1-2&p=f&t=KOn9wktxFwEu72ek-0&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1&starting-point-node-id=1%3A2&show-proto-sidebar=1)
-
-## Project Structure
-```text
-src/
-├─ main/
-│  ├─ java/
-│  │  ├─ model/
-│  │  ├─ view/
-│  │  ├─ controller/
-│  │  └─ util/
-│  ├─ resources/
-│  │  └─ META-INF/
-│  │     └─ persistence.xml
-│  └─ sql/
-│     ├─ db_fliply.sql
-│     └─ seed.sql
-├─ test/
-Dockerfile
-Jenkinsfile
-pom.xml
-README.md
-```
-
-## Prerequisites
-- Java 21
-- Maven
-- MariaDB
-- Docker
-- Jenkins
-
-## Database Configuration
-The project uses JPA with Hibernate and MariaDB.
-
+### Database configuration
 - Persistence unit: `FliplyDbUnit`
-- Database: `fliply`
-- URL: `jdbc:mariadb://localhost:3306/fliply`
+- Database name: `fliply`
+- JDBC URL: `jdbc:mariadb://localhost:3306/fliply`
 - Username: `appuser`
 - Password: `password`
 - Hibernate setting: `hibernate.hbm2ddl.auto=update`
 
-## Database Setup
-1. Make sure MariaDB is installed and running.
-2. Create a database named `fliply`.
-3. Create the user `appuser` and give it access to the `fliply` database.
-4. Run the SQL scripts in `src/main/sql/` as needed (run `db_fliply.sql` to recreate the schema, then `seed.sql` to populate sample data).
+### Database setup
+1. Start MariaDB locally or use Docker Compose.
+2. Create the `fliply` database and the `appuser` account if you run MariaDB manually.
+3. For a clean local database, run `src/main/sql/db_fliply.sql` first and then `src/main/sql/seed.sql`.
+4. The Docker Compose database service uses `sql/init.sql` for container initialization.
 
-Example SQL:
+Sample seed accounts:
 
-```sql
-CREATE DATABASE fliply;
-CREATE USER 'appuser'@'localhost' IDENTIFIED BY 'password';
-GRANT ALL PRIVILEGES ON fliply.* TO 'appuser'@'localhost';
-FLUSH PRIVILEGES;
+| Role | Email | Password |
+|---|---|---|
+| Teacher | teacher1@example.com | 123 |
+| Teacher | teacher2@example.com | 123 |
+| Student | student1@example.com | 123 |
+| Student | student2@example.com | 123 |
+
+### Local setup
+```bash
+git clone https://github.com/nguyngc/fliply.git
+cd fliply
 ```
 
-## Authentication Flow
-Fliply now authenticates users with email and password credentials (Google Sign-In has been removed). Create accounts through the UI or by running the database scripts in `src/main/sql/` (`db_fliply.sql` resets the schema, `seed.sql` inserts the sample accounts below):
+Start the database locally or use the bundled Docker database service. For a local MariaDB setup, create the database and user described below.
 
-| Role     | Email                   | Password |
-|----------|-------------------------|----------|
-| Teacher  | teacher1@example.com    | 123      |
-| Teacher  | teacher2@example.com    | 123      |
-| Student  | student1@example.com    | 123      |
-| Student  | student2@example.com    | 123      |
-
-Run `db_fliply.sql` followed by `seed.sql` whenever you need a clean database that already contains these starter accounts, and update the passwords immediately after first login if you retain these seed accounts in any shared environment.
-
-## Build the Project
-``` mvn clean install```
-
-## Run the Application
-Run with JavaFX Maven plugin:
-
-``` mvn javafx:run```
-
-Or run the `view.Main` class directly from your IDE.
-
-## Run Tests
-``` mvn test```
-
-## Package Executable JAR
-```mvn clean package```
-
-The project uses the Maven Shade Plugin and the main class is `view.Main`.
-
-## Run with Docker
-
-### Build Docker image
-```docker build -t fliply .```
-
-### Run Docker container
-```docker run --rm fliply```
-
-### Docker Notes
-- The Dockerfile uses a multi-stage build.
-- Stage 1 builds the project with Maven and Java 21.
-- Stage 2 runs the packaged JAR with JavaFX.
-- JavaFX libraries are installed inside the container.
-- The application runs with:
-  - `javafx.controls`
-  - `javafx.fxml`
-
-### Important
-Because Fliply is a JavaFX desktop application, running it in Docker may require an X server or GUI forwarding on your machine.
-
-## Localization System
-<details>
-
-Fliply currently supports six languages:
-
-| Language | Code | Locale |
-|----------|------|--------|
-| English | `en` | `en_US` |
-| Arabic | `ar` | `ar_AR` |
-| Finnish | `fi` | `fi_FI` |
-| Korean | `ko` | `ko_KR` |
-| Lao | `lo` | `lo_LA` |
-| Vietnamese | `vi` | `vi_VN` |
-
-### 1. Active Language
-
-The active language is managed in `util.LocaleManager`.
-
-- English is the default language.
-- The account language menu lets users switch language.
-- The selected language code is saved in the `USER.Language` column.
-- Login applies the stored user language with `LocaleManager.setLocaleByLanguage(...)`.
-- Logout resets the application language back to English.
-
-#### `USER` Language Field
-
-| Column | Description |
-|--------|-------------|
-| `Language` | Two-letter language code, for example `en`, `vi`, or `lo` |
-
-### 2. Static UI Text
-
-Static UI text is stored in Java resource bundle files under `src/main/resources`.
-
-| File | Purpose |
-|------|---------|
-| `Messages.properties` | Default fallback bundle |
-| `Messages_en_US.properties` | English UI text |
-| `Messages_ar_AR.properties` | Arabic UI text |
-| `Messages_fi_FI.properties` | Finnish UI text |
-| `Messages_ko_KR.properties` | Korean UI text |
-| `Messages_lo_LA.properties` | Lao UI text |
-| `Messages_vi_VN.properties` | Vietnamese UI text |
-
-FXML files use resource keys directly, for example:
-
-```xml
-<Button text="%account.logout"/>
-<MenuButton text="%language.current"/>
+### Run with Maven
+```bash
+mvn clean install
+mvn javafx:run
 ```
 
-Controllers that set text in Java load the same bundle through `ResourceBundle`, `I18n`, or `LocalizationService`.
-
-### 3. Screen Reload Behavior
-
-When a user changes language, the app updates `LocaleManager` and reloads the current screen through `Navigator.reloadCurrent()`. `Navigator` loads FXML with:
-
-```java
-ResourceBundle.getBundle("Messages", LocaleManager.getLocale())
+### Run with Docker Compose
+```bash
+docker compose up --build
 ```
 
-This lets JavaFX resolve all `%key` values again using the selected language.
+The Docker setup starts the MariaDB container and the application container. Because Fliply is a JavaFX desktop application, your machine may need GUI forwarding or an X server for the window to appear.
 
-### 4. Text Direction and Fonts
+### Access the application
+- When run locally, the JavaFX window opens on the desktop.
+- When run in Docker, use the display/GUI forwarding configuration required by your platform.
 
-- Arabic is displayed right-to-left through `Navigator.applyTextDirection(...)`.
-- Lao applies a dedicated font/style hook so Lao glyphs render consistently.
-- Vietnamese and Lao message files must not contain a UTF-8 BOM before the first key, otherwise Java treats the first key as a different string.
+## 14. Testing Instructions
 
-### 5. Localized Flashcard Definitions
-
-Flashcard terms remain shared across languages, but definitions can now be stored in every supported language.
-
-#### `FLASHCARD` Definition Fields
-
-| Column | Language |
-|--------|----------|
-| `Definition` | English fallback |
-| `DefinitionAr` | Arabic |
-| `DefinitionFi` | Finnish |
-| `DefinitionKo` | Korean |
-| `DefinitionLo` | Lao |
-| `DefinitionVi` | Vietnamese |
-
-When a student opens flashcard details, `FlashcardDetailController` uses the current user's language:
-
-```java
-flashcard.getLocalizedDefinition(currentUser.getLanguage())
+### Unit tests
+```bash
+mvn test
 ```
 
-If the requested localized definition is missing or blank, the app falls back to the English `Definition` value.
-
-### 6. Teacher CSV Upload Format
-
-Teachers can upload flashcard sets with definitions in all supported languages. The import parser accepts `.csv`, `.tsv`, `.psv`, and `.pipe` files.
-
-Recommended CSV header:
-
-```csv
-Term,English,Arabic,Finnish,Korean,Lao,Vietnamese
+### Coverage report
+```bash
+mvn verify
 ```
 
-Example:
+After `verify`, open the JaCoCo report at:
+- `target/site/jacoco/index.html`
 
-```csv
-CPU,Central Processing Unit,وحدة المعالجة المركزية,Keskusyksikkö,중앙 처리 장치,ໜ່ວຍປະມວນຜົນກາງ,Bộ xử lý trung tâm
-```
+### Performance testing
+No dedicated JMeter test suite was delivered in the final repository. The final QA scope focused on functional testing, non-functional checks, and static analysis.
 
-The older two-column format still works:
+## 15. Repository Structure
 
-```csv
-Term,Definition
-CPU,Central Processing Unit
-```
+| Path | Description |
+|---|---|
+| `src/main/java` | Application source code: controllers, services, entities, DAO, utilities, and views |
+| `src/main/resources` | FXML files, resource bundles, and persistence configuration |
+| `src/main/sql` | Database schema and seed scripts |
+| `sql` | Docker initialization SQL used by the compose setup |
+| `documents` | Documentation hub, sprint reports, diagrams, screenshots, and supporting files |
+| `Dockerfile` | Docker image definition for the application |
+| `docker-compose.yml` | Multi-service local container setup for app and database |
+| `Jenkinsfile` | CI pipeline definition |
+| `pom.xml` | Maven build, test, coverage, and packaging configuration |
+| `target` | Build output generated by Maven |
 
-In that case, only the English fallback definition is stored.
+## 16. Authors
 
-### 7. Teacher Inline Editing
+| Team member | Role               |
+|---|--------------------|
+| Ngoc Nguyen | Developer / tester |
+| Thanh Nguyen | Developer / tester |
+| Nhut Vo | Developer / tester |
+| Hoang Vu | Developer / tester |
 
-When a teacher opens a flashcard set and edits a card, the inline editor now provides separate fields for:
-
-- English definition
-- Arabic definition
-- Finnish definition
-- Korean definition
-- Lao definition
-- Vietnamese definition
-
-English is required because it is the fallback definition. The other language fields are optional.
-</details>
-
-
+**Course:** Software Project 1 & 2, Spring 2026  
+**Semester:** Spring 2026
