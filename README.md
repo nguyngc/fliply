@@ -83,7 +83,7 @@ Sprint 6 extended localization into the data layer so flashcard definitions coul
 - **Achievements:** Flashcard table expanded with definition columns (definition_en, definition_vi, definition_lo, etc.); fallback logic implemented (display English if target language unavailable); CSV import supports multi-language definitions; detailed acceptance test cases created; migration strategy documented
 - **Features:** Multi-language flashcard definitions; fallback to English; admin interface for translation review
 - **Tools:** SQL migration scripts, CSV parser, test case management (Excel/PDF)
-- **Documents:** [`Sprint_6_Planning_Report.md`](documents/Sprint%206/Sprint_6_Planning_Report.md), [`Sprint_6_Review_Report.md`](documents/Sprint%206/Sprint_6_Review_Report.md), [`Database localization plan report.pdf`](documents/Sprint%206/Database%20localization%20plan%20report.pdf), [`Sprint 6 Acceptance Test Planning.pdf`](documents/Sprint%206/Sprint%206%20Acceptance%20Test%20Planning.pdf)
+- **Documents:** [`Sprint_6_Planning_Report.md`](documents/Sprint%206/Sprint_6_Planning_Report.md), [`Sprint_6_Review_Report.md`](documents/Sprint%206/Sprint_6_Review_Report.md), [`Database_Localization_Design_Implementation_Report.pdf`](documents/Sprint%206/Database_Localization_Design_Implementation_Report.pdf), [`Sprint 6 Acceptance Test Planning.pdf`](documents/Sprint%206/Sprint%206%20Acceptance%20Test%20Planning.pdf)
 
 ## 10. Sprint 7 – Quality Assurance
 Sprint 7 was dedicated to quality assurance, code analysis, usability evaluation, and bug fixing. This sprint covered SonarQube analysis, unit testing, functional testing, heuristic evaluation, and UAT preparation.
