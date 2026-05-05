@@ -7,6 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -110,5 +111,50 @@ class FlashcardFileParserTest {
         assertEquals("중앙 처리 장치", card.definitionFor("ko"));
         assertEquals("ໜ່ວຍປະມວນຜົນກາງ", card.definitionFor("lo"));
         assertEquals("Bộ xử lý trung tâm", card.definitionFor("vi"));
+    }
+
+    @Test
+    void parseCsv_acceptsDefinitionLanguageAliasesAndFallsBackToFirstProvidedDefinition() throws Exception {
+        Path file = Files.createTempFile("flashcards-localized-aliases", ".csv");
+        Files.write(file, List.of(
+                "Term,definition_ar,Definition-FI,Definition Korean,definitionvi",
+                "Router,جهاز يوجه البيانات,Laite joka ohjaa dataa,데이터를 보내는 장치,Thiết bị định tuyến dữ liệu"
+        ), StandardCharsets.UTF_8);
+
+        List<FlashcardFileParser.ParsedCard> cards = FlashcardFileParser.parse(file.toFile());
+
+        assertEquals(1, cards.size());
+        FlashcardFileParser.ParsedCard card = cards.getFirst();
+        assertEquals("Router", card.term());
+        assertEquals("جهاز يوجه البيانات", card.definition());
+        assertEquals("جهاز يوجه البيانات", card.definitionFor("ar"));
+        assertEquals("Laite joka ohjaa dataa", card.definitionFor("fi"));
+        assertEquals("데이터를 보내는 장치", card.definitionFor("ko"));
+        assertEquals("Thiết bị định tuyến dữ liệu", card.definitionFor("vi"));
+        assertEquals("جهاز يوجه البيانات", card.definitionFor("lo"));
+    }
+
+    @Test
+    void parsedCard_normalizesNullDefinitionsAndUsesEnglishFallback() {
+        FlashcardFileParser.ParsedCard emptyDefinitions = new FlashcardFileParser.ParsedCard(
+                "Cache",
+                "Temporary storage",
+                null
+        );
+
+        assertTrue(emptyDefinitions.definitions().isEmpty());
+        assertEquals("Temporary storage", emptyDefinitions.definition());
+        assertEquals("Temporary storage", emptyDefinitions.definitionFor(null));
+        assertEquals("Temporary storage", emptyDefinitions.definitionFor("vi"));
+
+        FlashcardFileParser.ParsedCard englishFromMap = new FlashcardFileParser.ParsedCard(
+                "Bandwidth",
+                "   ",
+                Map.of("en", "Data transfer capacity", "vi", "Dung lượng truyền dữ liệu")
+        );
+
+        assertEquals("Data transfer capacity", englishFromMap.definition());
+        assertEquals("Data transfer capacity", englishFromMap.definitionFor("ko"));
+        assertEquals("Dung lượng truyền dữ liệu", englishFromMap.definitionFor("vi"));
     }
 }

@@ -102,7 +102,7 @@ public class AccountHelpController {
      * Populates the help content sections with role-specific guidance and common tasks.
      * Uses resource bundle keys to support internationalization and role-based messaging.
      */
-    private void populateHelpContent() {
+    void populateHelpContent() {
         boolean teacher = AppState.isTeacher();
 
         setText(quickStartTitleLabel, message("help.quickStart.title", "Quick Start"));
@@ -136,7 +136,7 @@ public class AccountHelpController {
      * @param teacher  whether the user is a teacher or student
      * @return the full resource key for the message
      */
-    private String roleKey(String baseKey, boolean teacher) {
+    String roleKey(String baseKey, boolean teacher) {
         return baseKey + (teacher ? ".teacher" : ".student");
     }
 
@@ -147,7 +147,7 @@ public class AccountHelpController {
      * @param fallback  the fallback text to use if the key is not found
      * @return the localized message or the fallback text
      */
-    private String message(String key, String fallback) {
+    String message(String key, String fallback) {
         return I18n.message(effectiveResources, key, fallback);
     }
 

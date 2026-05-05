@@ -173,6 +173,28 @@ class QuizDetailControllerTest {
     }
 
     @Test
+    void initialize_withoutCurrentUser_navigatesToQuizzesWithoutLoadingQuestions() {
+        AppState.selectedQuiz.set(createQuiz(7));
+        AppState.currentUser.set(null);
+
+        callPrivate("initialize");
+
+        assertEquals(AppState.Screen.QUIZZES, controller.lastNavigatedScreen);
+        assertNull(controller.lastLanguage);
+    }
+
+    @Test
+    void initialize_withCurrentUserWithoutId_navigatesToQuizzesWithoutLoadingQuestions() {
+        AppState.selectedQuiz.set(createQuiz(7));
+        AppState.currentUser.set(new User());
+
+        callPrivate("initialize");
+
+        assertEquals(AppState.Screen.QUIZZES, controller.lastNavigatedScreen);
+        assertNull(controller.lastLanguage);
+    }
+
+    @Test
     void initialize_usesResourcesAndRendersFirstQuestion() {
         Quiz quiz = createQuiz(7);
         controller.questionsToLoad = List.of(
@@ -212,6 +234,19 @@ class QuizDetailControllerTest {
 
         headerController.backAction.run();
         assertEquals(AppState.Screen.QUIZZES, controller.lastNavigatedScreen);
+    }
+
+    @Test
+    void initialize_defaultEnglishUserPassesEnglishLanguageToQuestionLoader() {
+        AppState.selectedQuiz.set(createQuiz(8));
+        User user = AppState.currentUser.get();
+        user.setLanguage("en");
+        controller.questionsToLoad = List.of(question(1, "Question", "A", "A", "B", "C", "D"));
+
+        callPrivate("initialize");
+
+        assertEquals("en", controller.lastLanguage);
+        assertEquals("Question", termLabel.getText());
     }
 
     @Test

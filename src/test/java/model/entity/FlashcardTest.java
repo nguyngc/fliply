@@ -89,6 +89,51 @@ class FlashcardTest {
     }
 
     @Test
+    void localizedDefinitions_supportEveryConfiguredLanguageAndTrimBlankInput() {
+        Flashcard f = new Flashcard();
+        f.setDefinitions(Map.of(
+                "en", " English definition ",
+                "ar", " Arabic definition ",
+                "fi", " Finnish definition ",
+                "ko", " Korean definition ",
+                "lo", " Lao definition ",
+                "vi", " Vietnamese definition "
+        ));
+
+        assertEquals("English definition", f.getDefinition());
+        assertEquals("Arabic definition", f.getDefinitionAr());
+        assertEquals("Finnish definition", f.getDefinitionFi());
+        assertEquals("Korean definition", f.getDefinitionKo());
+        assertEquals("Lao definition", f.getDefinitionLo());
+        assertEquals("Vietnamese definition", f.getDefinitionVi());
+        assertEquals("Arabic definition", f.getLocalizedDefinition("ar"));
+        assertEquals("Finnish definition", f.getLocalizedDefinition("fi"));
+        assertEquals("Korean definition", f.getLocalizedDefinition("ko"));
+        assertEquals("Lao definition", f.getLocalizedDefinition("lo"));
+        assertEquals("Vietnamese definition", f.getLocalizedDefinition("vi"));
+        assertEquals("English definition", f.getLocalizedDefinition("   "));
+    }
+
+    @Test
+    void setDefinitions_allowsNullAndConvertsBlankLocalizedValuesToFallback() {
+        Flashcard f = new Flashcard();
+        f.setDefinition("Existing English");
+
+        f.setDefinitions(null);
+        assertEquals("Existing English", f.getDefinition());
+
+        f.setDefinitions(Map.of(
+                "en", "English",
+                "ar", "   ",
+                "vi", "Vietnamese"
+        ));
+
+        assertNull(f.getDefinitionAr());
+        assertEquals("English", f.getLocalizedDefinition("ar"));
+        assertEquals("Vietnamese", f.getLocalizedDefinition("vi"));
+    }
+
+    @Test
     void constructorAssignsFields() {
         FlashcardSet set = new FlashcardSet();
         User user = new User();
