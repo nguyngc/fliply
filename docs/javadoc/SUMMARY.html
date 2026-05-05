@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Fliply — Documentation Summary</title>
+  <style>
+    body{font-family:Segoe UI,Arial,Helvetica,sans-serif;line-height:1.5;margin:24px;color:#222}
+    h1,h2{color:#1a73a8}
+    a{color:#1a73a8}
+    .box{border:1px solid #ddd;padding:12px;border-radius:6px;background:#fafafa}
+    ul{margin-top:0}
+    .small{font-size:0.95em;color:#555}
+  </style>
+</head>
+<body>
+  <h1>Fliply — Documentation (Summary)</h1>
+  <p>Đây là trang tóm tắt nhanh cho JavaDoc và tài liệu kèm theo. Nếu cần xem toàn bộ API chi tiết (HTML), hãy mở mục <strong>Full API</strong> bên dưới.</p>
+
+  <h2>Quick links</h2>
+  <div class="box">
+    <ul>
+      <li><a href="index.html">Full API (index.html)</a> — mở để xem tài liệu JavaDoc đầy đủ (HTML).</li>
+      <li><a href="allpackages-index.html">Package index (all packages)</a> — danh sách package và link tới từng package.</li>
+      <li><a href="../..\target\fliply-javadoc.zip">Javadoc ZIP (download)</a> — file nén toàn bộ HTML (dễ nộp).</li>
+      <li><a href="../../README.md">Project README (root)</a> — hướng dẫn chạy, cấu hình, report.</li>
+    </ul>
+  </div>
+
+  <h2>Nội dung tóm tắt</h2>
+  <div class="box">
+    <p class="small">Mục tiêu:</p>
+    <ul>
+      <li>Fliply là ứng dụng desktop JavaFX quản lý flashcards, tạo quiz, quản lý lớp học và hỗ trợ đa ngôn ngữ.</li>
+      <li>Thư mục JavaDoc hiện tại: <code>docs/javadoc/</code> (đã được tạo 1 lần). Mở <code>docs/javadoc/index.html</code> để xem đầy đủ.</li>
+    </ul>
+  </div>
+
+  <h2>Hướng dẫn ngắn</h2>
+  <div class="box">
+    <ol>
+      <li>Để xem toàn bộ documentation: mở <code>docs/javadoc/index.html</code> bằng trình duyệt (double-click hoặc Open with browser).</li>
+      <li>Nếu muốn nộp 1 file duy nhất: gửi <code>target/fliply-javadoc.zip</code> (đã chứa toàn bộ HTML).</li>
+      <li>Nếu cần cập nhật JavaDoc: thêm comment /** ... */ trong source, sau đó chạy Maven (local) để regen và copy lại vào <code>docs/javadoc/</code>.</li>
+    </ol>
+  </div>
+
+  <h2>Ghi chú</h2>
+  <div class="box">
+    <p class="small">Thông tin thêm:</p>
+    <ul>
+      <li>Folder <code>docs/javadoc/</code> là bản tĩnh đã tạo — bạn có thể commit vào repo nếu muốn nó luôn hiển thị trong project.</li>
+      <li>File tạm tạo trong <code>target/javadoc-bundle-options/</code> là do Maven plugin sinh ra; bỏ qua được.</li>
+    </ul>
+  </div>
+
+  <footer style="margin-top:18px;font-size:0.9em;color:#666">
+    <p>Generated: May 05, 2026 — Fliply</p>
+  </footer>
+</body>
+</html>
