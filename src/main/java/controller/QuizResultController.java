@@ -7,6 +7,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import model.AppState;
 import model.entity.Quiz;
+import model.entity.User;
 import model.service.QuizService;
 import util.I18n;
 import view.Navigator;
@@ -74,7 +75,12 @@ public class QuizResultController {
         
         // ========== Load Quiz Questions ==========
         // Build the quiz questions for review
-        questions = quizService.buildQuizQuestions(quiz.getQuizId(), AppState.currentUser.get().getUserId());
+        User currentUser = AppState.currentUser.get();
+        if (currentUser == null || currentUser.getUserId() == null) {
+            Navigator.go(AppState.Screen.QUIZZES);
+            return;
+        }
+        questions = quizService.buildQuizQuestions(quiz.getQuizId(), currentUser.getUserId(), currentUser.getLanguage());
         
         // Render the results
         renderResults();

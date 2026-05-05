@@ -10,6 +10,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import model.AppState;
 import model.entity.Quiz;
+import model.entity.User;
 import model.service.QuizService;
 import view.Navigator;
 
@@ -107,7 +108,12 @@ public class QuizDetailController {
         
         // ========== Build Quiz Questions ==========
         // Generate the quiz questions with shuffled options
-        questions = loadQuestions(quiz.getQuizId(), AppState.currentUser.get().getUserId());
+        User currentUser = AppState.currentUser.get();
+        if (currentUser == null || currentUser.getUserId() == null) {
+            navigateTo(AppState.Screen.QUIZZES);
+            return;
+        }
+        questions = loadQuestions(quiz.getQuizId(), currentUser.getUserId(), currentUser.getLanguage());
 
         // ========== Configure Header ==========
         if (headerController != null) {
@@ -419,7 +425,11 @@ public class QuizDetailController {
     }
 
     List<QuizService.QuizQuestion> loadQuestions(int quizId, int userId) {
-        return quizService.buildQuizQuestions(quizId, userId);
+        return loadQuestions(quizId, userId, null);
+    }
+
+    List<QuizService.QuizQuestion> loadQuestions(int quizId, int userId, String language) {
+        return quizService.buildQuizQuestions(quizId, userId, language);
     }
 
     void navigateTo(AppState.Screen screen) {

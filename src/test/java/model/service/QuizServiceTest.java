@@ -310,4 +310,41 @@ class QuizServiceTest {
         assertEquals(1, questions.size());
         assertEquals(List.of("Central Processing Unit"), questions.get(0).getOptions());
     }
+
+    @Test
+    void buildQuizQuestions_usesRequestedLanguageForCorrectAndWrongAnswers() throws Exception {
+        QuizDetailsDao mockQuizDetailsDao = mock(QuizDetailsDao.class);
+        FlashcardDao mockFlashcardDao = mock(FlashcardDao.class);
+
+        Flashcard promptCard = new Flashcard();
+        setField(promptCard, "flashcardId", 101);
+        promptCard.setTerm("CPU");
+        promptCard.setDefinition("Central Processing Unit");
+        promptCard.setDefinitionVi("Bộ xử lý trung tâm");
+
+        Flashcard wrongCard = new Flashcard();
+        setField(wrongCard, "flashcardId", 102);
+        wrongCard.setTerm("RAM");
+        wrongCard.setDefinition("Random Access Memory");
+        wrongCard.setDefinitionVi("Bộ nhớ truy cập ngẫu nhiên");
+
+        QuizDetails detail = new QuizDetails();
+        detail.setFlashcard(promptCard);
+
+        when(mockQuizDetailsDao.findByQuizId(99)).thenReturn(List.of(detail));
+        when(mockFlashcardDao.findAvailableForUser(6)).thenReturn(List.of(promptCard, wrongCard));
+
+        setField(quizService, "quizDetailsDao", mockQuizDetailsDao);
+        setField(quizService, "flashcardDao", mockFlashcardDao);
+
+        List<QuizService.QuizQuestion> questions = quizService.buildQuizQuestions(99, 6, "vi");
+
+        assertEquals(1, questions.size());
+        QuizService.QuizQuestion question = questions.get(0);
+        assertEquals("Bộ xử lý trung tâm", question.getCorrectAnswer());
+        assertTrue(question.getOptions().contains("Bộ xử lý trung tâm"));
+        assertTrue(question.getOptions().contains("Bộ nhớ truy cập ngẫu nhiên"));
+        assertFalse(question.getOptions().contains("Central Processing Unit"));
+        assertFalse(question.getOptions().contains("Random Access Memory"));
+    }
 }

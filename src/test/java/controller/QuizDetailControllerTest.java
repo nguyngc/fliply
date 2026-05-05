@@ -61,9 +61,16 @@ class QuizDetailControllerTest {
     private static final class TestableQuizDetailController extends QuizDetailController {
         private List<QuizService.QuizQuestion> questionsToLoad = List.of();
         private AppState.Screen lastNavigatedScreen;
+        private String lastLanguage;
 
         @Override
         List<QuizService.QuizQuestion> loadQuestions(int quizId, int userId) {
+            return loadQuestions(quizId, userId, null);
+        }
+
+        @Override
+        List<QuizService.QuizQuestion> loadQuestions(int quizId, int userId, String language) {
+            lastLanguage = language;
             return questionsToLoad;
         }
 
@@ -182,6 +189,7 @@ class QuizDetailControllerTest {
             }
         });
         AppState.selectedQuiz.set(quiz);
+        AppState.currentUser.get().setLanguage("vi");
 
         callPrivate("initialize");
 
@@ -190,6 +198,7 @@ class QuizDetailControllerTest {
         assertTrue(headerController.backVisible);
         assertEquals(NodeOrientation.LEFT_TO_RIGHT, navigationBox.getNodeOrientation());
         assertEquals(AppState.NavItem.QUIZZES, AppState.navOverride.get());
+        assertEquals("vi", controller.lastLanguage);
         assertEquals("Capital of France?", termLabel.getText());
         assertEquals("1 / 2", pageLabel.getText());
         assertEquals("Paris", opt1.getText());

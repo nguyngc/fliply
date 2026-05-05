@@ -12,6 +12,7 @@ import javafx.scene.layout.VBox;
 import model.AppState;
 import model.entity.Flashcard;
 import model.entity.FlashcardSet;
+import model.entity.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -51,12 +52,16 @@ class TeacherFlashcardSetDetailControllerTest {
     private Button addMoreBtn;
     private FlashcardSet previousSelectedSet;
     private AppState.NavItem previousNavOverride;
+    private User previousCurrentUser;
 
     private static final class TestableTeacherFlashcardSetDetailController extends TeacherFlashcardSetDetailController {
         private Map<String, String> localizedStrings = Map.of("teacherFlashcardSetDetail.subtitle", "Total: {0}");
         private FlashcardSet loadedSet;
         private Integer lastLoadedSetId;
         private AppState.Screen lastNavigatedScreen;
+        private Flashcard savedCard;
+        private Flashcard updatedCard;
+        private Flashcard deletedCard;
 
         @Override
         Map<String, String> loadLocalizedStrings() {
@@ -67,6 +72,21 @@ class TeacherFlashcardSetDetailControllerTest {
         FlashcardSet loadSetWithCards(int setId) {
             lastLoadedSetId = setId;
             return loadedSet;
+        }
+
+        @Override
+        void saveFlashcard(Flashcard card) {
+            savedCard = card;
+        }
+
+        @Override
+        void updateFlashcard(Flashcard card) {
+            updatedCard = card;
+        }
+
+        @Override
+        void deleteFlashcard(Flashcard card) {
+            deletedCard = card;
         }
 
         @Override
@@ -112,6 +132,7 @@ class TeacherFlashcardSetDetailControllerTest {
     void setUp() {
         previousSelectedSet = AppState.selectedSet.get();
         previousNavOverride = AppState.navOverride.get();
+        previousCurrentUser = AppState.currentUser.get();
 
         controller = new TestableTeacherFlashcardSetDetailController();
         headerController = new FakeHeaderController();
@@ -141,12 +162,14 @@ class TeacherFlashcardSetDetailControllerTest {
 
         AppState.selectedSet.set(null);
         AppState.navOverride.set(null);
+        AppState.currentUser.set(null);
     }
 
     @AfterEach
     void tearDown() {
         AppState.selectedSet.set(previousSelectedSet);
         AppState.navOverride.set(previousNavOverride);
+        AppState.currentUser.set(previousCurrentUser);
     }
 
     @Test
@@ -201,7 +224,9 @@ class TeacherFlashcardSetDetailControllerTest {
     @Test
     void onAddMore_showsEditorForAddAndClearsFields() {
         FlashcardSet loadedSet = createSet(7, "Biology", createCard("Cell", "Basic unit"));
+        User teacher = createUser(9);
         controller.loadedSet = loadedSet;
+        AppState.currentUser.set(teacher);
         AppState.selectedSet.set(createSet(7, "Biology"));
         callPrivate("initialize");
 
@@ -267,7 +292,9 @@ class TeacherFlashcardSetDetailControllerTest {
     @Test
     void onSave_addMode_addsCardRendersListAndUpdatesHeader() {
         FlashcardSet loadedSet = createSet(7, "Biology", createCard("Cell", "Basic unit"));
+        User teacher = createUser(9);
         controller.loadedSet = loadedSet;
+        AppState.currentUser.set(teacher);
         AppState.selectedSet.set(createSet(7, "Biology"));
         callPrivate("initialize");
 
@@ -295,6 +322,8 @@ class TeacherFlashcardSetDetailControllerTest {
         assertEquals("유전 코드", newCard.getDefinitionKo());
         assertEquals("ລະຫັດພັນທຸກໍາ", newCard.getDefinitionLo());
         assertEquals("Mã di truyền", newCard.getDefinitionVi());
+        assertSame(teacher, newCard.getUser());
+        assertSame(newCard, controller.savedCard);
         assertSame(loadedSet, newCard.getFlashcardSet());
         assertEquals("DNA", getCardTermLabel(1).getText());
     }
@@ -335,6 +364,7 @@ class TeacherFlashcardSetDetailControllerTest {
         assertEquals("바깥층", firstCard.getDefinitionKo());
         assertEquals("ຊັ້ນນອກ", firstCard.getDefinitionLo());
         assertEquals("Lớp ngoài", firstCard.getDefinitionVi());
+        assertSame(firstCard, controller.updatedCard);
         assertEquals("Cell membrane", getCardTermLabel(0).getText());
         assertEquals("Total: 2", headerController.subtitle);
 
@@ -342,6 +372,7 @@ class TeacherFlashcardSetDetailControllerTest {
         assertTrue(editorBox.isVisible());
         getDeleteButton(0).fire();
 
+        assertSame(firstCard, controller.deletedCard);
         assertEquals(1, loadedSet.getCards().size());
         assertEquals(1, cardsBox.getChildren().size());
         assertFalse(editorBox.isVisible());
@@ -368,6 +399,13 @@ class TeacherFlashcardSetDetailControllerTest {
         card.setTerm(term);
         card.setDefinition(definition);
         return card;
+    }
+
+    private User createUser(int userId) {
+        User user = new User();
+        user.setRole(1);
+        setEntityField(User.class, user, "userId", userId);
+        return user;
     }
 
     private Flashcard getCardFromSet(FlashcardSet set, int index) {
