@@ -69,6 +69,10 @@ public class QuizService {
      * This is runtime only.
      */
     public List<QuizQuestion> buildQuizQuestions(int quizId, int userId) {
+        return buildQuizQuestions(quizId, userId, null);
+    }
+
+    public List<QuizQuestion> buildQuizQuestions(int quizId, int userId, String language) {
 
         List<QuizDetails> details = quizDetailsDao.findByQuizId(quizId);
         if (details == null || details.isEmpty()) return Collections.emptyList();
@@ -84,7 +88,7 @@ public class QuizService {
             if (q == null) continue;
 
             String prompt = q.getTerm();          // question text
-            String correct = q.getDefinition();   // correct answer
+            String correct = q.getLocalizedDefinition(language);   // correct answer
 
             // options = correct + 3 wrong definitions
             LinkedHashSet<String> optionsSet = new LinkedHashSet<>();
@@ -95,7 +99,7 @@ public class QuizService {
                 Flashcard pick = pool.get(RANDOM.nextInt(pool.size()));
                 if (pick == null) { guard++; continue; }
 
-                String wrong = pick.getDefinition();
+                String wrong = pick.getLocalizedDefinition(language);
                 if (wrong != null && !wrong.equals(correct)) {
                     optionsSet.add(wrong);
                 }

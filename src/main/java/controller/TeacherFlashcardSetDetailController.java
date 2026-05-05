@@ -15,6 +15,8 @@ import javafx.scene.layout.VBox;
 import model.AppState;
 import model.entity.Flashcard;
 import model.entity.FlashcardSet;
+import model.entity.User;
+import model.service.FlashcardService;
 import model.service.FlashcardSetService;
 import util.LocalizationService;
 import view.Navigator;
@@ -77,6 +79,7 @@ public class TeacherFlashcardSetDetailController {
     // The flashcard currently being edited (null if adding new)
     private Flashcard editingRow = null;
     private final FlashcardSetService flashcardSetService = new FlashcardSetService();
+    private final FlashcardService flashcardService = new FlashcardService();
 
     /**
      * Initializes the controller when the FXML is loaded.
@@ -257,6 +260,8 @@ public class TeacherFlashcardSetDetailController {
                     -fx-cursor: hand;
                 """);
         deleteBtn.setOnAction(e -> {
+            // Delete from database first so a screen reload does not bring the card back.
+            deleteFlashcard(row);
             // Remove the flashcard from the set
             set.getCards().remove(row);
             // Hide the editor if open
@@ -314,6 +319,10 @@ public class TeacherFlashcardSetDetailController {
         // ========== Add or Edit ==========
         if (editingRow == null) {
             // ========== ADD MODE ==========
+            User teacher = AppState.currentUser.get();
+            if (teacher == null) {
+                return;
+            }
             // Create a new flashcard
             Flashcard newCard = new Flashcard();
             newCard.setTerm(term);
@@ -324,6 +333,9 @@ public class TeacherFlashcardSetDetailController {
             newCard.setDefinitionLo(defLo);
             newCard.setDefinitionVi(defVi);
             newCard.setFlashcardSet(set);
+            newCard.setUser(teacher);
+            // Save to database first so the card survives navigation/reload.
+            saveFlashcard(newCard);
             // Add to the set
             set.getCards().add(newCard);
         } else {
@@ -336,6 +348,8 @@ public class TeacherFlashcardSetDetailController {
             editingRow.setDefinitionKo(defKo);
             editingRow.setDefinitionLo(defLo);
             editingRow.setDefinitionVi(defVi);
+            // Persist edit so reopening the set shows the updated term/definitions.
+            updateFlashcard(editingRow);
         }
 
         // ========== Refresh UI ==========
@@ -353,6 +367,18 @@ public class TeacherFlashcardSetDetailController {
 
     FlashcardSet loadSetWithCards(int setId) {
         return flashcardSetService.getSetWithCards(setId);
+    }
+
+    void saveFlashcard(Flashcard card) {
+        flashcardService.save(card);
+    }
+
+    void updateFlashcard(Flashcard card) {
+        flashcardService.update(card);
+    }
+
+    void deleteFlashcard(Flashcard card) {
+        flashcardService.delete(card);
     }
 
     void navigateTo(AppState.Screen screen) {
