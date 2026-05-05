@@ -303,5 +303,5 @@ No dedicated JMeter test suite was delivered in the final repository. The final 
 | Nhut Vo | Developer / tester |
 | Hoang Vu | Developer / tester |
 
-**Course:** Software Project 1 & 2, Spring 2026  
+**Course:** Software Engineering Project 1 & 2, Spring 2026  
 **Semester:** Spring 2026
