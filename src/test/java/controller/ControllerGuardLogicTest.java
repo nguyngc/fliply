@@ -349,6 +349,8 @@ class ControllerGuardLogicTest {
 
         AppState.role.set(AppState.Role.STUDENT);
         controller.populateHelpContent();
+
+        assertEquals(AppState.Role.STUDENT, AppState.role.get());
     }
 
     @Test
