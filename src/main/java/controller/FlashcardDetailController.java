@@ -31,6 +31,8 @@ import java.util.Optional;
  * Supports two contexts: viewing from a flashcard set or from the general flashcards list.
  */
 public class FlashcardDetailController {
+    private static final String FLASHCARD_ALERT_TITLE_KEY = "flashcardForm.alertTitle";
+    private static final String FLASHCARD_ALERT_TITLE_FALLBACK = "Flashcard";
 
     // List of flashcards to display
     private final List<Flashcard> cards = new ArrayList<>();
@@ -309,7 +311,7 @@ public class FlashcardDetailController {
                         "flashcardDetail.delete.error",
                         "Delete failed. Could not delete flashcard from database."
                 ));
-        a.setTitle(localizedStrings.getOrDefault("flashcardForm.alertTitle", "Flashcard"));
+        a.setTitle(localizedStrings.getOrDefault(FLASHCARD_ALERT_TITLE_KEY, FLASHCARD_ALERT_TITLE_FALLBACK));
         a.setHeaderText(null);
         a.showAndWait();
     }
@@ -322,13 +324,13 @@ public class FlashcardDetailController {
                 "flashcardDetail.delete.success",
                 "Flashcard deleted successfully.");
         Alert success = new Alert(Alert.AlertType.INFORMATION, successMessage);
-        success.setTitle(localizedStrings.getOrDefault("flashcardForm.alertTitle", "Flashcard"));
+        success.setTitle(localizedStrings.getOrDefault(FLASHCARD_ALERT_TITLE_KEY, FLASHCARD_ALERT_TITLE_FALLBACK));
         success.setHeaderText(null);
         success.showAndWait();
     }
 
     boolean confirmDelete() {
-        String title = localizedStrings.getOrDefault("flashcardForm.alertTitle", "Flashcard");
+        String title = localizedStrings.getOrDefault(FLASHCARD_ALERT_TITLE_KEY, FLASHCARD_ALERT_TITLE_FALLBACK);
         String message = localizedStrings.getOrDefault(
                 "flashcardDetail.delete.confirm",
                 "Are you sure you want to delete this flashcard?"

@@ -78,8 +78,7 @@ public class QuizService {
         if (details == null || details.isEmpty()) return Collections.emptyList();
 
         // pool for wrong answers
-        List<Flashcard> pool = flashcardDao.findAvailableForUser(userId);
-        if (pool == null) pool = new ArrayList<>();
+        List<Flashcard> pool = availableFlashcardPool(userId);
 
         List<QuizQuestion> out = new ArrayList<>();
 
@@ -89,30 +88,49 @@ public class QuizService {
 
             String prompt = q.getTerm();          // question text
             String correct = q.getLocalizedDefinition(language);   // correct answer
-
-            // options = correct + 3 wrong definitions
-            LinkedHashSet<String> optionsSet = new LinkedHashSet<>();
-            if (correct != null) optionsSet.add(correct);
-
-            int guard = 0;
-            while (optionsSet.size() < 4 && guard < 300 && !pool.isEmpty()) {
-                Flashcard pick = pool.get(RANDOM.nextInt(pool.size()));
-                if (pick == null) { guard++; continue; }
-
-                String wrong = pick.getLocalizedDefinition(language);
-                if (wrong != null && !wrong.equals(correct)) {
-                    optionsSet.add(wrong);
-                }
-                guard++;
-            }
-
-            List<String> options = new ArrayList<>(optionsSet);
-            Collections.shuffle(options, RANDOM);
+            List<String> options = buildOptions(correct, pool, language);
 
             out.add(new QuizQuestion(q.getFlashcardId(), prompt, correct, options));
         }
 
         return out;
+    }
+
+    private List<Flashcard> availableFlashcardPool(int userId) {
+        List<Flashcard> pool = flashcardDao.findAvailableForUser(userId);
+        return pool == null ? new ArrayList<>() : pool;
+    }
+
+    private List<String> buildOptions(String correct, List<Flashcard> pool, String language) {
+        LinkedHashSet<String> optionsSet = new LinkedHashSet<>();
+        if (correct != null) optionsSet.add(correct);
+
+        int guard = 0;
+        while (optionsSet.size() < 4 && guard < 300 && !pool.isEmpty()) {
+            addRandomWrongOption(optionsSet, correct, pool, language);
+            guard++;
+        }
+
+        List<String> options = new ArrayList<>(optionsSet);
+        Collections.shuffle(options, RANDOM);
+        return options;
+    }
+
+    private void addRandomWrongOption(
+            LinkedHashSet<String> optionsSet,
+            String correct,
+            List<Flashcard> pool,
+            String language
+    ) {
+        Flashcard pick = pool.get(RANDOM.nextInt(pool.size()));
+        if (pick == null) {
+            return;
+        }
+
+        String wrong = pick.getLocalizedDefinition(language);
+        if (wrong != null && !wrong.equals(correct)) {
+            optionsSet.add(wrong);
+        }
     }
 
     public List<Quiz> getQuizzesByUser(Integer userId) {
