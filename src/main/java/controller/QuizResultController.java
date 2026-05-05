@@ -53,7 +53,7 @@ public class QuizResultController {
         Quiz quiz = AppState.selectedQuiz.get();
         if (quiz == null) {
             // Navigate back to quizzes list if no quiz is selected
-            Navigator.go(AppState.Screen.QUIZZES);
+            navigateTo(AppState.Screen.QUIZZES);
             return;
         }
 
@@ -67,7 +67,7 @@ public class QuizResultController {
             
             // Show back button to return to quizzes list
             headerController.setBackVisible(true);
-            headerController.setOnBack(() -> Navigator.go(AppState.Screen.QUIZZES));
+            headerController.setOnBack(() -> navigateTo(AppState.Screen.QUIZZES));
         }
 
         // Set the active navigation item to QUIZZES
@@ -77,10 +77,10 @@ public class QuizResultController {
         // Build the quiz questions for review
         User currentUser = AppState.currentUser.get();
         if (currentUser == null || currentUser.getUserId() == null) {
-            Navigator.go(AppState.Screen.QUIZZES);
+            navigateTo(AppState.Screen.QUIZZES);
             return;
         }
-        questions = quizService.buildQuizQuestions(quiz.getQuizId(), currentUser.getUserId(), currentUser.getLanguage());
+        questions = loadQuestions(quiz.getQuizId(), currentUser.getUserId(), currentUser.getLanguage());
         
         // Render the results
         renderResults();
@@ -91,7 +91,7 @@ public class QuizResultController {
      * Displays the question prompt and whether it was answered correctly, incorrectly, or not answered.
      * Uses color coding: green for correct, red for incorrect/not answered.
      */
-    private void renderResults() {
+    void renderResults() {
         // Clear any previously rendered results
         resultBox.getChildren().clear();
 
@@ -181,7 +181,7 @@ public class QuizResultController {
         AppState.navOverride.set(AppState.NavItem.QUIZZES);
         
         // Navigate back to quiz detail screen to retake the quiz
-        Navigator.go(AppState.Screen.QUIZ_DETAIL);
+        navigateTo(AppState.Screen.QUIZ_DETAIL);
     }
 
     /**
@@ -191,6 +191,26 @@ public class QuizResultController {
     @FXML
     private void backToList() {
         AppState.navOverride.set(AppState.NavItem.QUIZZES);
-        Navigator.go(AppState.Screen.QUIZZES);
+        navigateTo(AppState.Screen.QUIZZES);
+    }
+
+    /**
+     * Loads the quiz questions for the given quiz and user.
+     * Fetches the questions from the QuizService and builds them for display.
+     * @param quizId The ID of the quiz to load questions for.
+     * @param userId The ID of the user to load questions for (to get user-specific data like previous answers).
+     * @param language The language to load questions in (for localization).
+     * @return A list of QuizQuestion objects representing the questions for the quiz.
+     */
+    List<QuizService.QuizQuestion> loadQuestions(int quizId, int userId, String language) {
+        return quizService.buildQuizQuestions(quizId, userId, language);
+    }
+
+    /**
+     * Navigates to the specified screen.
+     * @param screen The screen to navigate to.
+     */
+    void navigateTo(AppState.Screen screen) {
+        Navigator.go(screen);
     }
 }

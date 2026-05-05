@@ -144,7 +144,7 @@ public class QuizDetailController {
      * Handles button states, displays previously selected answers if applicable,
      * and manages navigation button visibility.
      */
-    private void render() {
+    void render() {
         // ========== Get Current Question Index ==========
         int idx = AppState.quizQuestionIndex.get();
         int total = questions.size();
@@ -424,14 +424,36 @@ public class QuizDetailController {
         }
     }
 
+    /**
+     * Loads the quiz questions for the given quiz and user.
+     * Uses the QuizService to build the questions with options and correct answers.
+     *
+     * @param quizId The ID of the quiz to load
+     * @param userId The ID of the user taking the quiz
+     * @return A list of QuizQuestion objects containing prompts, options, and correct answers
+     */
     List<QuizService.QuizQuestion> loadQuestions(int quizId, int userId) {
         return loadQuestions(quizId, userId, null);
     }
 
+    /**
+     * Loads the quiz questions for the given quiz, user, and language.
+     * Uses the QuizService to build the questions with options and correct answers.
+     *
+     * @param quizId The ID of the quiz to load
+     * @param userId The ID of the user taking the quiz
+     * @param language The language code for localization (optional)
+     * @return A list of QuizQuestion objects containing prompts, options, and correct answers
+     */
     List<QuizService.QuizQuestion> loadQuestions(int quizId, int userId, String language) {
         return quizService.buildQuizQuestions(quizId, userId, language);
     }
 
+    /**
+     * Navigates to the specified screen using the Navigator.
+     *
+     * @param screen The target screen to navigate to
+     */
     void navigateTo(AppState.Screen screen) {
         Navigator.go(screen);
     }

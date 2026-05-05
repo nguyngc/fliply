@@ -6,7 +6,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import model.AppState;
-import model.service.TeacherAddClassService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -25,10 +24,26 @@ class TeacherAddClassControllerTest {
 
     private static class TestableTeacherAddClassController extends TeacherAddClassController {
         private boolean blankCodeWarningShown;
+        private String createdCode;
+        private RuntimeException createFailure;
+        private AppState.Screen lastNavigatedScreen;
 
         @Override
         void showBlankCodeWarning() {
             blankCodeWarningShown = true;
+        }
+
+        @Override
+        void createClass(String code) {
+            if (createFailure != null) {
+                throw createFailure;
+            }
+            createdCode = code;
+        }
+
+        @Override
+        void navigateTo(AppState.Screen screen) {
+            lastNavigatedScreen = screen;
         }
     }
 
@@ -53,18 +68,10 @@ class TeacherAddClassControllerTest {
 
         @Override
         public void setMeta(String text) { metaLabel.setText(text); }
-    }
-
-    // Fake service
-    private static class FakeTeacherAddClassService extends TeacherAddClassService {
-        String lastCreatedCode = null;
 
         @Override
-        public void createClass(String code) {
-            if (code.equals("error")) {
-                throw new IllegalArgumentException("Invalid code");
-            }
-            lastCreatedCode = code;
+        public void setOnBack(Runnable action) {
+            backButton.setOnAction(event -> action.run());
         }
     }
 
@@ -78,10 +85,6 @@ class TeacherAddClassControllerTest {
 
         // Inject UI field
         setPrivate("classCodeField", new TextField());
-
-        // Inject fake service
-        FakeTeacherAddClassService fakeService = new FakeTeacherAddClassService();
-        setPrivate("teacherAddClass", fakeService);
 
         // Reset navOverride
         AppState.navOverride.set(null);
@@ -131,17 +134,27 @@ class TeacherAddClassControllerTest {
 
         callPrivate("onAdd");
 
-        FakeTeacherAddClassService fake = (FakeTeacherAddClassService) getPrivate("teacherAddClass");
         assertTrue(controller.blankCodeWarningShown);
-        assertNull(fake.lastCreatedCode);
-        assertNull(AppState.navOverride.get());
+        assertNull(controller.createdCode);
+        assertNull(controller.lastNavigatedScreen);
     }
 
+    @Test
+    void testOnAdd_validCode_trimsCreatesClassAndNavigates() {
+        TextField field = (TextField) getPrivate("classCodeField");
+        field.setText("  SEP-2026  ");
+
+        callPrivate("onAdd");
+
+        assertEquals("SEP-2026", controller.createdCode);
+        assertEquals(AppState.Screen.CLASSES, controller.lastNavigatedScreen);
+    }
 
     @Test
     void testOnAdd_serviceThrowsError_doesNotNavigate() {
         TextField field = (TextField) getPrivate("classCodeField");
         field.setText("error");
+        controller.createFailure = new IllegalArgumentException("Invalid code");
 
         Logger logger = Logger.getLogger(TeacherAddClassController.class.getName());
         Level previousLevel = logger.getLevel();
@@ -152,6 +165,22 @@ class TeacherAddClassControllerTest {
             logger.setLevel(previousLevel);
         }
 
-        assertNull(AppState.navOverride.get());
+        assertNull(controller.lastNavigatedScreen);
+    }
+
+    @Test
+    void testOnCancel_navigatesToClasses() {
+        callPrivate("onCancel");
+
+        assertEquals(AppState.Screen.CLASSES, controller.lastNavigatedScreen);
+    }
+
+    @Test
+    void testBackAction_navigatesToClasses() {
+        FakeHeaderController header = (FakeHeaderController) getPrivate("headerController");
+
+        header.backButton.getOnAction().handle(null);
+
+        assertEquals(AppState.Screen.CLASSES, controller.lastNavigatedScreen);
     }
 }

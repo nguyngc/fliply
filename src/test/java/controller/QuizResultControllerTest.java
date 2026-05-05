@@ -25,8 +25,12 @@ import org.junit.jupiter.api.Test;
 import util.LocaleManager;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.HashMap;
 import java.util.List;
+import java.util.ListResourceBundle;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.UUID;
 
@@ -45,6 +49,27 @@ class QuizResultControllerTest {
     private final QuizDao quizDao = new QuizDao();
     private final QuizDetailsDao quizDetailsDao = new QuizDetailsDao();
 
+    private static class TestableQuizResultController extends QuizResultController {
+        List<QuizService.QuizQuestion> questionsToLoad = List.of();
+        AppState.Screen lastNavigatedScreen;
+        String lastLanguage;
+        int lastQuizId;
+        int lastUserId;
+
+        @Override
+        List<QuizService.QuizQuestion> loadQuestions(int quizId, int userId, String language) {
+            lastQuizId = quizId;
+            lastUserId = userId;
+            lastLanguage = language;
+            return questionsToLoad;
+        }
+
+        @Override
+        void navigateTo(AppState.Screen screen) {
+            lastNavigatedScreen = screen;
+        }
+    }
+
     private static class FakeHeaderController extends HeaderController {
         String title;
         String subtitle;
@@ -55,6 +80,139 @@ class QuizResultControllerTest {
         @Override public void setSubtitle(String text) { subtitle = text; }
         @Override public void setBackVisible(boolean visible) { backVisible = visible; }
         @Override public void setOnBack(Runnable action) { onBack = action; }
+    }
+
+    @Test
+    void initialize_usesStudentLanguageAndRendersLocalizedStatusLabels() throws Exception {
+        AppStateSnapshot snapshot = snapshotAppState();
+        try {
+            TestableQuizResultController controller = new TestableQuizResultController();
+            FakeHeaderController header = new FakeHeaderController();
+            VBox resultBox = new VBox();
+            Quiz quiz = createQuizWithId(21);
+            User student = createUserWithId(8);
+            student.setLanguage("lo");
+
+            controller.questionsToLoad = List.of(
+                    new QuizService.QuizQuestion(1, "CPU", "A", List.of("A", "B", "C", "D")),
+                    new QuizService.QuizQuestion(2, "RAM", "B", List.of("A", "B", "C", "D")),
+                    new QuizService.QuizQuestion(3, "ROM", "C", List.of("A", "B", "C", "D"))
+            );
+            AppState.selectedQuiz.set(quiz);
+            AppState.currentUser.set(student);
+            AppState.quizPoints.set(2);
+            AppState.quizCorrectMap.put(0, true);
+            AppState.quizCorrectMap.put(1, false);
+
+            setPrivate(controller, "headerController", header);
+            setPrivate(controller, "resultBox", resultBox);
+            setPrivate(controller, "resources", new ListResourceBundle() {
+                @Override
+                protected Object[][] getContents() {
+                    return new Object[][]{
+                            {"quizResult.header", "Review"},
+                            {"quizResult.subtitle", "Score {0}"},
+                            {"quizResult.correct", "ຖືກ"},
+                            {"quizResult.incorrect", "ຜິດ"},
+                            {"quizResult.notAnswered", "ຍັງບໍ່ໄດ້ຕອບ"}
+                    };
+                }
+            });
+
+            callPrivate(controller, "initialize");
+
+            assertEquals(21, controller.lastQuizId);
+            assertEquals(8, controller.lastUserId);
+            assertEquals("lo", controller.lastLanguage);
+            assertEquals(AppState.NavItem.QUIZZES, AppState.navOverride.get());
+            assertEquals("Review", header.title);
+            assertEquals("Score 2", header.subtitle);
+            assertTrue(header.backVisible);
+            assertEquals(3, resultBox.getChildren().size());
+            assertEquals("ຖືກ", rightText(resultBox, 0));
+            assertEquals("ຜິດ", rightText(resultBox, 1));
+            assertEquals("ຍັງບໍ່ໄດ້ຕອບ", rightText(resultBox, 2));
+
+            header.onBack.run();
+            assertEquals(AppState.Screen.QUIZZES, controller.lastNavigatedScreen);
+        } finally {
+            restoreAppState(snapshot);
+        }
+    }
+
+    @Test
+    void initialize_withoutSelectedQuizNavigatesBackWithoutLoadingQuestions() throws Exception {
+        AppStateSnapshot snapshot = snapshotAppState();
+        try {
+            TestableQuizResultController controller = new TestableQuizResultController();
+            setPrivate(controller, "resultBox", new VBox());
+            AppState.selectedQuiz.set(null);
+
+            callPrivate(controller, "initialize");
+
+            assertEquals(AppState.Screen.QUIZZES, controller.lastNavigatedScreen);
+            assertEquals(0, controller.lastQuizId);
+            assertNull(controller.lastLanguage);
+        } finally {
+            restoreAppState(snapshot);
+        }
+    }
+
+    @Test
+    void initialize_withoutCurrentUserNavigatesBackWithoutLoadingQuestions() throws Exception {
+        AppStateSnapshot snapshot = snapshotAppState();
+        try {
+            TestableQuizResultController controller = new TestableQuizResultController();
+            setPrivate(controller, "headerController", new FakeHeaderController());
+            setPrivate(controller, "resultBox", new VBox());
+            AppState.selectedQuiz.set(createQuizWithId(22));
+            AppState.currentUser.set(null);
+
+            callPrivate(controller, "initialize");
+
+            assertEquals(AppState.Screen.QUIZZES, controller.lastNavigatedScreen);
+            assertEquals(0, controller.lastQuizId);
+        } finally {
+            restoreAppState(snapshot);
+        }
+    }
+
+    @Test
+    void restartClearsQuizStateAndNavigatesToQuizDetail() throws Exception {
+        AppStateSnapshot snapshot = snapshotAppState();
+        try {
+            TestableQuizResultController controller = new TestableQuizResultController();
+            AppState.quizAnswers.put(0, "A");
+            AppState.quizCorrectMap.put(0, true);
+            AppState.quizPoints.set(1);
+            AppState.quizQuestionIndex.set(3);
+
+            callPrivate(controller, "restart");
+
+            assertTrue(AppState.quizAnswers.isEmpty());
+            assertTrue(AppState.quizCorrectMap.isEmpty());
+            assertEquals(0, AppState.quizPoints.get());
+            assertEquals(0, AppState.quizQuestionIndex.get());
+            assertEquals(AppState.NavItem.QUIZZES, AppState.navOverride.get());
+            assertEquals(AppState.Screen.QUIZ_DETAIL, controller.lastNavigatedScreen);
+        } finally {
+            restoreAppState(snapshot);
+        }
+    }
+
+    @Test
+    void backToList_setsQuizNavAndNavigatesToQuizzes() throws Exception {
+        AppStateSnapshot snapshot = snapshotAppState();
+        try {
+            TestableQuizResultController controller = new TestableQuizResultController();
+
+            callPrivate(controller, "backToList");
+
+            assertEquals(AppState.NavItem.QUIZZES, AppState.navOverride.get());
+            assertEquals(AppState.Screen.QUIZZES, controller.lastNavigatedScreen);
+        } finally {
+            restoreAppState(snapshot);
+        }
     }
 
     private User newUser(String prefix) {
@@ -89,6 +247,19 @@ class QuizResultControllerTest {
         f.setFlashcardSet(set);
         f.setUser(user);
         return f;
+    }
+
+    private Quiz createQuizWithId(int quizId) {
+        Quiz quiz = new Quiz();
+        setEntityField(Quiz.class, quiz, "quizId", quizId);
+        return quiz;
+    }
+
+    private User createUserWithId(int userId) {
+        User user = new User();
+        user.setRole(0);
+        setEntityField(User.class, user, "userId", userId);
+        return user;
     }
 
     @Test
@@ -192,10 +363,68 @@ class QuizResultControllerTest {
         }
     }
 
+    private void setEntityField(Class<?> type, Object target, String fieldName, Object value) {
+        try {
+            Field field = type.getDeclaredField(fieldName);
+            field.setAccessible(true);
+            field.set(target, value);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void callPrivate(Object controller, String methodName) {
+        try {
+            Method method = QuizResultController.class.getDeclaredMethod(methodName);
+            method.setAccessible(true);
+            method.invoke(controller);
+        } catch (InvocationTargetException e) {
+            Throwable cause = e.getCause();
+            if (cause instanceof RuntimeException runtimeException) {
+                throw runtimeException;
+            }
+            throw new RuntimeException(cause);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private AppStateSnapshot snapshotAppState() {
+        return new AppStateSnapshot(
+                AppState.selectedQuiz.get(),
+                AppState.currentUser.get(),
+                AppState.navOverride.get(),
+                AppState.quizQuestionIndex.get(),
+                AppState.quizPoints.get(),
+                new HashMap<>(AppState.quizAnswers),
+                new HashMap<>(AppState.quizCorrectMap)
+        );
+    }
+
+    private void restoreAppState(AppStateSnapshot snapshot) {
+        AppState.selectedQuiz.set(snapshot.selectedQuiz());
+        AppState.currentUser.set(snapshot.currentUser());
+        AppState.navOverride.set(snapshot.navOverride());
+        AppState.quizQuestionIndex.set(snapshot.quizQuestionIndex());
+        AppState.quizPoints.set(snapshot.quizPoints());
+        AppState.quizAnswers.clear();
+        AppState.quizAnswers.putAll(snapshot.quizAnswers());
+        AppState.quizCorrectMap.clear();
+        AppState.quizCorrectMap.putAll(snapshot.quizCorrectMap());
+    }
+
+    private record AppStateSnapshot(
+            Quiz selectedQuiz,
+            User currentUser,
+            AppState.NavItem navOverride,
+            int quizQuestionIndex,
+            int quizPoints,
+            Map<Integer, String> quizAnswers,
+            Map<Integer, Boolean> quizCorrectMap
+    ) {}
+
     private String rightText(VBox box, int index) {
         HBox row = (HBox) box.getChildren().get(index);
         return ((Label) row.getChildren().get(1)).getText();
     }
 }
-
-

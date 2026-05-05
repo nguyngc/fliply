@@ -329,6 +329,55 @@ class TeacherFlashcardSetDetailControllerTest {
     }
 
     @Test
+    void onSave_addMode_trimsFieldsAndStoresBlankLocalizedDefinitionsAsNull() {
+        FlashcardSet loadedSet = createSet(7, "Biology");
+        User teacher = createUser(9);
+        controller.loadedSet = loadedSet;
+        AppState.currentUser.set(teacher);
+        AppState.selectedSet.set(createSet(7, "Biology"));
+        callPrivate("initialize");
+
+        callPrivate("onAddMore");
+        termField.setText("  API  ");
+        definitionArea.setText("  Application Programming Interface  ");
+        definitionArArea.setText("   ");
+        definitionFiArea.setText("  Ohjelmointirajapinta  ");
+        definitionKoArea.setText("");
+        definitionLoArea.setText("  ");
+        definitionViArea.setText("  Giao diện lập trình ứng dụng  ");
+        callPrivate("onSave");
+
+        Flashcard newCard = getCardFromSet(loadedSet, 0);
+        assertEquals("API", newCard.getTerm());
+        assertEquals("Application Programming Interface", newCard.getDefinition());
+        assertNull(newCard.getDefinitionAr());
+        assertEquals("Ohjelmointirajapinta", newCard.getDefinitionFi());
+        assertNull(newCard.getDefinitionKo());
+        assertNull(newCard.getDefinitionLo());
+        assertEquals("Giao diện lập trình ứng dụng", newCard.getDefinitionVi());
+        assertSame(newCard, controller.savedCard);
+    }
+
+    @Test
+    void onSave_addMode_withoutCurrentTeacherKeepsEditorOpenAndDoesNotSave() {
+        FlashcardSet loadedSet = createSet(7, "Biology");
+        controller.loadedSet = loadedSet;
+        AppState.currentUser.set(null);
+        AppState.selectedSet.set(createSet(7, "Biology"));
+        callPrivate("initialize");
+
+        callPrivate("onAddMore");
+        termField.setText("CPU");
+        definitionArea.setText("Central Processing Unit");
+        callPrivate("onSave");
+
+        assertTrue(loadedSet.getCards().isEmpty());
+        assertNull(controller.savedCard);
+        assertTrue(editorBox.isVisible());
+        assertTrue(editorBox.isManaged());
+    }
+
+    @Test
     void editAndDeleteButtons_updateAndRemoveCards() {
         Flashcard firstCard = createCard("Cell", "Basic unit");
         firstCard.setDefinitionFi("Perusyksikkö");

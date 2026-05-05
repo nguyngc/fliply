@@ -1,0 +1,33 @@
+Term,English,Arabic,Finnish,Korean,Lao,Vietnamese
+CPU,Central Processing Unit,وحدة المعالجة المركزية,Keskusyksikkö,중앙 처리 장치,ໜ່ວຍປະມວນຜົນກາງ,Bộ xử lý trung tâm
+RAM,Random Access Memory,ذاكرة الوصول العشوائي,Hajasaantimuisti,임의 접근 메모리,ໜ່ວຍຄວາມຈຳເຂົ້າເຖິງສຸ່ມ,Bộ nhớ truy cập ngẫu nhiên
+GPU,Graphics Processing Unit,وحدة معالجة الرسومات,Grafiikkasuoritin,그래픽 처리 장치,ໜ່ວຍປະມວນຜົນກາຟິກ,Bộ xử lý đồ họa
+SSD,Solid State Drive,محرك أقراص الحالة الصلبة,Puolijohdelevy,솔리드 스테이트 드라이브,ອຸປະກອນເກັບຂໍ້ມູນແບບໂຊລິດສະເຕດ,Ổ đĩa thể rắn
+HDD,Hard Disk Drive,محرك القرص الصلب,Kiintolevy,하드 디스크 드라이브,ຮາດດິສກ໌,Ổ đĩa cứng
+OS,Operating System,نظام التشغيل,Käyttöjärjestelmä,운영 체제,ລະບົບປະຕິບັດການ,Hệ điều hành
+API,Application Programming Interface,واجهة برمجة التطبيقات,Sovellusohjelmointirajapinta,응용 프로그램 프로그래밍 인터페이스,ອິນເຕີເຟດການຂຽນໂປຣແກຣມແອັບພລິເຄຊັນ,Giao diện lập trình ứng dụng
+HTTP,Hypertext Transfer Protocol,بروتوكول نقل النص التشعبي,Hypertekstin siirtoprotokolla,하이퍼텍스트 전송 프로토콜,ໂປຣໂຕຄອນສົ່ງຂໍ້ຄວາມໄຮເປີເທັກ,Giao thức truyền siêu văn bản
+HTTPS,Hypertext Transfer Protocol Secure,بروتوكول نقل النص التشعبي الآمن,Suojattu hypertekstin siirtoprotokolla,보안 하이퍼텍스트 전송 프로토콜,ໂປຣໂຕຄອນສົ່ງຂໍ້ຄວາມໄຮເປີເທັກແບບປອດໄພ,Giao thức truyền siêu văn bản bảo mật
+URL,Uniform Resource Locator,محدد موقع الموارد الموحد,Yhdenmukainen resurssin paikannin,통합 자원 위치 지정자,ຕົວລະບຸທີ່ຢູ່ຊັບພະຍາກອນແບບມາດຕະຖານ,Bộ định vị tài nguyên thống nhất
+DNS,Domain Name System,نظام أسماء النطاقات,Nimipalvelujärjestelmä,도메인 이름 시스템,ລະບົບຊື່ໂດເມນ,Hệ thống tên miền
+IP,Internet Protocol,بروتوكول الإنترنت,Internet-protokolla,인터넷 프로토콜,ໂປຣໂຕຄອນອິນເຕີເນັດ,Giao thức Internet
+TCP,Transmission Control Protocol,بروتوكول التحكم في النقل,Tiedonsiirron ohjausprotokolla,전송 제어 프로토콜,ໂປຣໂຕຄອນຄວບຄຸມການສົ່ງຂໍ້ມູນ,Giao thức điều khiển truyền vận
+UDP,User Datagram Protocol,بروتوكول مخطط بيانات المستخدم,Käyttäjän datagrammiprotokolla,사용자 데이터그램 프로토콜,ໂປຣໂຕຄອນດາຕາແກຣມຂອງຜູ້ໃຊ້,Giao thức gói dữ liệu người dùng
+SQL,Structured Query Language,لغة الاستعلام البنيوية,Rakenteinen kyselykieli,구조화 질의 언어,ພາສາສອບຖາມແບບໂຄງສ້າງ,Ngôn ngữ truy vấn có cấu trúc
+NoSQL,Non-relational database model,نموذج قاعدة بيانات غير علائقية,Ei-relationaalinen tietokantamalli,비관계형 데이터베이스 모델,ຮູບແບບຖານຂໍ້ມູນທີ່ບໍ່ແມ່ນເຊິງສຳພັນ,Mô hình cơ sở dữ liệu phi quan hệ
+JSON,JavaScript Object Notation,ترميز كائنات جافاسكريبت,JavaScript-oliomerkintä,자바스크립트 객체 표기법,ຮູບແບບຂໍ້ມູນວັດຖຸຂອງ JavaScript,Ký hiệu đối tượng JavaScript
+XML,eXtensible Markup Language,لغة الترميز القابلة للتوسعة,Laajennettava merkintäkieli,확장 가능한 마크업 언어,ພາສາມາກອັບທີ່ຂະຫຍາຍໄດ້,Ngôn ngữ đánh dấu mở rộng
+IDE,Integrated Development Environment,بيئة تطوير متكاملة,Integroitu kehitysympäristö,통합 개발 환경,ສະພາບແວດລ້ອມພັດທະນາແບບລວມ,Môi trường phát triển tích hợp
+CLI,Command Line Interface,واجهة سطر الأوامر,Komentorivikäyttöliittymä,명령줄 인터페이스,ອິນເຕີເຟດແຖວຄຳສັ່ງ,Giao diện dòng lệnh
+GUI,Graphical User Interface,واجهة مستخدم رسومية,Graafinen käyttöliittymä,그래픽 사용자 인터페이스,ອິນເຕີເຟດຜູ້ໃຊ້ແບບກາຟິກ,Giao diện người dùng đồ họa
+OOP,Object-Oriented Programming,البرمجة كائنية التوجه,Olio-ohjelmointi,객체 지향 프로그래밍,ການຂຽນໂປຣແກຣມແບບວັດຖຸ,Lập trình hướng đối tượng
+JVM,Java Virtual Machine,آلة جافا الافتراضية,Java-virtuaalikone,자바 가상 머신,ເຄື່ອງຈຳລອງ Java,Máy ảo Java
+JDK,Java Development Kit,حزمة تطوير جافا,Java-kehityspaketti,자바 개발 키트,ຊຸດພັດທະນາ Java,Bộ công cụ phát triển Java
+SDK,Software Development Kit,حزمة تطوير البرمجيات,Ohjelmistokehityspaketti,소프트웨어 개발 키트,ຊຸດພັດທະນາຊອບແວ,Bộ công cụ phát triển phần mềm
+Git,Distributed version control system,نظام تحكم بالإصدارات موزع,Hajautettu versionhallintajärjestelmä,분산 버전 관리 시스템,ລະບົບຄວບຄຸມເວີຊັນແບບກະຈາຍ,Hệ thống quản lý phiên bản phân tán
+Docker,Containerization platform,منصة الحاويات,Konttialusta,컨테이너화 플랫폼,ແພລດຟອມຄອນເທນເນີ,Nền tảng đóng gói vùng chứa
+Kubernetes,Container orchestration system,نظام تنسيق الحاويات,Konttien orkestrointijärjestelmä,컨테이너 오케스트레이션 시스템,ລະບົບຈັດການຄອນເທນເນີ,Hệ thống điều phối vùng chứa
+CI/CD,Continuous Integration and Continuous Delivery,التكامل المستمر والتسليم المستمر,Jatkuva integraatio ja jatkuva toimitus,지속적 통합 및 지속적 전달,ການລວມລະຫັດຕໍ່ເນື່ອງ ແລະ ການສົ່ງມອບຕໍ່ເນື່ອງ,Tích hợp liên tục và chuyển giao liên tục
+Agile,Iterative software development methodology,منهجية تطوير برمجيات تكرارية,Ketterä iteratiivinen ohjelmistokehitysmenetelmä,반복적 소프트웨어 개발 방법론,ວິທີການພັດທະນາຊອບແວແບບວົງຈອນຊ້ຳ,Phương pháp phát triển phần mềm lặp
+Scrum,Agile framework using sprints,إطار عمل رشيق يستخدم سباقات العمل,Ketterä kehys joka käyttää sprinttejä,스프린트를 사용하는 애자일 프레임워크,ກອບການເຮັດວຽກ Agile ທີ່ໃຊ້ sprint,Khung Agile sử dụng sprint
+Kanban,Visual workflow management method,طريقة بصرية لإدارة سير العمل,Visuaalinen työnkulun hallintamenetelmä,시각적 작업 흐름 관리 방법,ວິທີຈັດການຂັ້ນຕອນວຽກແບບມອງເຫັນ,Phương pháp quản lý quy trình trực quan

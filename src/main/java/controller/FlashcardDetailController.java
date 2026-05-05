@@ -226,7 +226,7 @@ public class FlashcardDetailController {
         flipCardController.showTerm();
     }
 
-    private String getStudentLanguage() {
+    String getStudentLanguage() {
         User user = AppState.currentUser.get();
         String language = user == null ? null : user.getLanguage();
         if (language == null || language.isBlank()) {
@@ -340,7 +340,7 @@ public class FlashcardDetailController {
         return decision.isPresent() && decision.get() == ButtonType.OK;
     }
 
-    private boolean matchesCard(Flashcard candidate, Flashcard target, Integer targetId) {
+    boolean matchesCard(Flashcard candidate, Flashcard target, Integer targetId) {
         if (candidate == null || target == null) {
             return false;
         }

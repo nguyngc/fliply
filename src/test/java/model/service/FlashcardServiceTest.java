@@ -13,12 +13,20 @@ import model.entity.Quiz;
 import model.entity.QuizDetails;
 import model.entity.User;
 import org.junit.jupiter.api.*;
+import util.FlashcardFileParser;
 
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentCaptor.forClass;
+import org.mockito.ArgumentCaptor;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -223,8 +231,87 @@ class FlashcardServiceTest {
         verify(flashcardDaoMock).findByFlashcardSetId(12);
     }
 
+    @Test
+    void createFlashcard_fromParsedCardCopiesLocalizedDefinitionsAndPersists() throws Exception {
+        FlashcardDao flashcardDaoMock = mock(FlashcardDao.class);
+        injectDao(flashcardService, "flashDao", flashcardDaoMock);
+
+        FlashcardSet set = new FlashcardSet();
+        setId(set, "flashcardSetId", 44);
+        User user = new User();
+        FlashcardFileParser.ParsedCard parsedCard = new FlashcardFileParser.ParsedCard(
+                "Algorithm",
+                "Step-by-step instructions",
+                Map.of(
+                        "en", "Step-by-step instructions",
+                        "ar", "تعليمات خطوة بخطوة",
+                        "fi", "Vaiheittaiset ohjeet",
+                        "ko", "단계별 지침",
+                        "lo", "ຄໍາແນະນໍາເປັນຂັ້ນຕອນ",
+                        "vi", "Hướng dẫn từng bước"
+                )
+        );
+
+        when(flashcardDaoMock.existsByTermInSet("Algorithm", 44)).thenReturn(false);
+
+        Flashcard created = flashcardService.createFlashcard(parsedCard, set, user);
+
+        assertNotNull(created);
+        assertEquals("Algorithm", created.getTerm());
+        assertEquals("Step-by-step instructions", created.getDefinition());
+        assertEquals("تعليمات خطوة بخطوة", created.getDefinitionAr());
+        assertEquals("Vaiheittaiset ohjeet", created.getDefinitionFi());
+        assertEquals("단계별 지침", created.getDefinitionKo());
+        assertEquals("ຄໍາແນະນໍາເປັນຂັ້ນຕອນ", created.getDefinitionLo());
+        assertEquals("Hướng dẫn từng bước", created.getDefinitionVi());
+        assertSame(set, created.getFlashcardSet());
+        assertSame(user, created.getUser());
+
+        ArgumentCaptor<Flashcard> persisted = forClass(Flashcard.class);
+        verify(flashcardDaoMock).persist(persisted.capture());
+        assertSame(created, persisted.getValue());
+    }
+
+    @Test
+    void createFlashcard_nullParsedCardReturnsNullWithoutDaoCalls() throws Exception {
+        FlashcardDao flashcardDaoMock = mock(FlashcardDao.class);
+        injectDao(flashcardService, "flashDao", flashcardDaoMock);
+
+        assertNull(flashcardService.createFlashcard((FlashcardFileParser.ParsedCard) null, new FlashcardSet(), new User()));
+
+        verify(flashcardDaoMock, never()).existsByTermInSet(anyString(), anyInt());
+        verify(flashcardDaoMock, never()).persist(any());
+    }
+
+    @Test
+    void createFlashcard_duplicateLocalizedCardReturnsNullWithoutPersisting() throws Exception {
+        FlashcardDao flashcardDaoMock = mock(FlashcardDao.class);
+        injectDao(flashcardService, "flashDao", flashcardDaoMock);
+
+        FlashcardSet set = new FlashcardSet();
+        setId(set, "flashcardSetId", 55);
+        FlashcardFileParser.ParsedCard parsedCard = new FlashcardFileParser.ParsedCard(
+                "Cache",
+                "Temporary storage",
+                Map.of("en", "Temporary storage", "vi", "Bộ nhớ tạm")
+        );
+
+        when(flashcardDaoMock.existsByTermInSet("Cache", 55)).thenReturn(true);
+
+        assertNull(flashcardService.createFlashcard(parsedCard, set, new User()));
+
+        verify(flashcardDaoMock).existsByTermInSet(eq("Cache"), eq(55));
+        verify(flashcardDaoMock, never()).persist(any());
+    }
+
     private void injectDao(Object target, String fieldName, Object value) throws Exception {
         Field field = FlashcardService.class.getDeclaredField(fieldName);
+        field.setAccessible(true);
+        field.set(target, value);
+    }
+
+    private void setId(Object target, String fieldName, Integer value) throws Exception {
+        Field field = target.getClass().getDeclaredField(fieldName);
         field.setAccessible(true);
         field.set(target, value);
     }

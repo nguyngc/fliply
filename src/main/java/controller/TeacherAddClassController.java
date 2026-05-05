@@ -51,7 +51,7 @@ public class TeacherAddClassController {
         headerController.setBackVisible(true);
         
         // Set back button to navigate to classes screen
-        headerController.setOnBack(() -> Navigator.go(AppState.Screen.CLASSES));
+        headerController.setOnBack(() -> navigateTo(AppState.Screen.CLASSES));
     }
 
     /**
@@ -62,8 +62,12 @@ public class TeacherAddClassController {
     @FXML
     private void onAdd() {
         // Get the class code from the input field and trim whitespace
-        String code = classCodeField.getText() == null ? "" : classCodeField.getText().trim();
-        
+        addClass(classCodeField.getText());
+    }
+
+    void addClass(String rawCode) {
+        String code = rawCode == null ? "" : rawCode.trim();
+
         // Validate that class code is not empty
         if (code.isBlank()) {
             showBlankCodeWarning();
@@ -73,10 +77,10 @@ public class TeacherAddClassController {
         // ========== Create Class ==========
         try {
             // Call the service to create a new class with the entered code
-            teacherAddClass.createClass(code);
+            createClass(code);
             
             // Navigate back to the classes list after successful creation
-            Navigator.go(AppState.Screen.CLASSES);
+            navigateTo(AppState.Screen.CLASSES);
         } catch (IllegalArgumentException e) {
             // Display error message if class creation fails (e.g., duplicate code)
             LOGGER.log(Level.WARNING, e, () -> rb.getString("addClass.error") + e.getMessage());
@@ -89,7 +93,7 @@ public class TeacherAddClassController {
      */
     @FXML
     private void onCancel() {
-        Navigator.go(AppState.Screen.CLASSES);
+        navigateTo(AppState.Screen.CLASSES);
     }
 
     /**
@@ -101,5 +105,13 @@ public class TeacherAddClassController {
         alert.setHeaderText(null);
         alert.setContentText(rb.getString("addClass.code.message"));
         alert.showAndWait();
+    }
+
+    void createClass(String code) {
+        teacherAddClass.createClass(code);
+    }
+
+    void navigateTo(AppState.Screen screen) {
+        Navigator.go(screen);
     }
 }
