@@ -115,6 +115,7 @@ Sprint 8 consolidated the final technical documentation and repository structure
 | Sprint 5 | [Planning](documents/Sprint%205/Sprint_5_Planning_Report.md) | [Review](documents/Sprint%205/Sprint_5_Review_Report.md) | Localization and database-language support |
 | Sprint 6 | [Planning](documents/Sprint%206/Sprint_6_Planning_Report.md) | [Review](documents/Sprint%206/Sprint_6_Review_Report.md) | Acceptance testing and localization validation |
 | Sprint 7 | [Planning](documents/Sprint%207/Sprint_7_Planning_Report.md) | [Review](documents/Sprint%207/Sprint_7_Review_Report.md) | Quality assurance, SonarQube, and testing |
+| Sprint 8 | [Planning](documents/Sprint%208/Sprint_8_Planning_Report.md) | [Review](documents/Sprint%208/Sprint_8_Review_Report.md) | Documentation, presentation, and DevOps finalization |
 
 ### Diagrams
 
