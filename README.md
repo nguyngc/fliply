@@ -97,9 +97,9 @@ Sprint 7 was dedicated to quality assurance, code analysis, usability evaluation
 ## 11. Sprint 8 – Documentation & Finalization
 Sprint 8 consolidated the final technical documentation and repository structure. The final README, documentation index, and architecture references were organized so the repository is easy to navigate.
 
-- **Deliverables:** Comprehensive root README.md (16 sections); Software Production Project Final Report; documentation hub; verification of all references and artifacts
-- **Achievements:** All 8 sprint reports compiled; repository structured and grader-ready; 9 system diagrams and 10 screenshots organized
-- **Documents:** Root `README.md` (main entry point)
+- **Deliverables:** Comprehensive root README.md (17 sections); Software Production Project Final Report; documentation hub; JavaDoc API documentation; verification of all references and artifacts
+- **Achievements:** All 8 sprint reports compiled; repository structured and grader-ready; 9 system diagrams and 10 screenshots organized; JavaDoc generated and organized; CI/CD pipeline validated
+- **Documents:** [`Sprint_8_Planning_Report.md`](documents/Sprint%208/Sprint_8_Planning_Report.md), [`Sprint_8_Review_Report.md`](documents/Sprint%208/Sprint_8_Review_Report.md), [`Fliply_Report.pdf`](documents/Sprint%208/Fliply_Report.pdf), [`Fliply_Project_Presentation.pdf`](documents/Sprint%208/Fliply_Project_Presentation.pdf)
 
 
 ## 12. Documentation Hub
