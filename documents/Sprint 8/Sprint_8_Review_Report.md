@@ -2,8 +2,8 @@
 
 ## Sprint Number & Dates
 **Sprint 8**  
-**Duration:** 2 weeks (29/04/2026 - 13/05/2026)  
-**Scrum Master:** Ngoc Nguyen
+**Duration:** 1 weeks (29/04/2026 - 06/05/2026)  
+**Scrum Master:** Nhut Vo
 
 ## Sprint Goal
 The goal of Sprint 8 is to consolidate and finalize the Fliply project by completing comprehensive documentation, preparing the final project presentation, and reinforcing DevOps practices. This sprint focuses on creating the final README, organizing all sprint reports, generating JavaDoc API documentation, preparing slides, and ensuring the project is production-ready with CI/CD pipeline validation.
@@ -67,10 +67,10 @@ The goal of Sprint 8 is to consolidate and finalize the Fliply project by comple
 
 | Team Member  | Main Contributions                                                                                                     | Time Spent (Hours) | In-class tasks |
 |--------------|------------------------------------------------------------------------------------------------------------------------|--------------------|----------------|
-| Ngoc Nguyen  | - Root README.md organization, sprint report consolidation, JavaDoc summary page, presentation slides (1–3)          | 4                  | Submitted      |
-| Thanh Nguyen | - Documentation hub and linking, JavaDoc site organization, presentation slides (4–6), DevOps guide draft             | 4                  | Submitted      |
-| Nhut Vo      | - Final README review, JavaDoc generation and optimization, presentation slides (7–9), Docker validation, CI/CD test | 4                  | Submitted      |
-| Hoang Vu     | - Supporting documents organization, diagram/screenshot curation, presentation slides (10–12), deployment verification | 4                  | Submitted      |
+| Ngoc Nguyen  | - Root README.md organization, sprint report consolidation, JavaDoc summary page, presentation slides (6-9)            | 4                  | Submitted      |
+| Thanh Nguyen | - Documentation hub and linking, JavaDoc site organization, presentation slides (1-3), DevOps guide draft              | 4                  | Submitted      |
+| Nhut Vo      | - Final README review, JavaDoc generation and optimization, presentation slides (4-5), Docker validation, CI/CD test   | 4                  | Submitted      |
+| Hoang Vu     | - Supporting documents organization, diagram/screenshot curation, presentation slides (10–13), deployment verification | 4                  | Submitted      |
 | **Total**    |                                                                                                                        | **16**             |                |
 
 ## Deliverables Checklist
